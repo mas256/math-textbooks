@@ -4,7 +4,7 @@
     "category": "数列・漸化式",
     "description": "漸化式を基本から発展・応用まで、考え方と解法の流れに沿って体系的に解説します。",
     "edition": "第1版",
-    "version": "v1.0.1",
+    "version": "v1.0.2",
     "site": "https://mas256.github.io/zenkashiki-no-chotaikei-publishing/",
     "pdf": "https://mas256.github.io/zenkashiki-no-chotaikei-publishing/book.pdf",
     "repository": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing",
