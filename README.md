@@ -5,6 +5,12 @@
 - 公開サイト: https://mas256.github.io/math-textbooks/
 - 教科書一覧データ: [`books.json`](books.json)
 
+## リポジトリの役割と版番号
+
+このRepositoryは一覧カタログです。教科書の原稿・Tag・正式Release・PDFは、書籍ごとのRepositoryで管理します。各書籍の`books.json`項目には、公開が完了した最新の正式Releaseの版番号を記入し、`pdf`にはその書籍のPagesサイトにある正式版`book.pdf`を指定します。
+
+`latest_pdf`は成功した開発ビルドを読むための別リンクです。Pre-release名や開発ビルド番号は正式版の`version`に入れません。正式Release・PDF・SHA-256の検査とPages公開が終わってから`books.json`を更新します。
+
 ## 掲載書籍を追加する
 
 `books.json`に次の形式の要素を追加し、`main`へPushしてください。Pages Workflowが一覧データを検証して自動公開します。
@@ -25,7 +31,7 @@
 }
 ```
 
-`title`は一覧内で一意にし、リンクはHTTPSで指定します。各教科書の書名・説明・公開URL・版番号を記入してください。
+`title`は一覧内で一意にし、リンクはHTTPSで指定します。各教科書の書名・説明・公開URL・正式版番号を記入してください。
 
 ## ローカルで表示する
 
