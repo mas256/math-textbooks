@@ -9,7 +9,12 @@
     "pdf": "https://mas256.github.io/zenkashiki-no-chotaikei-publishing/book.pdf",
     "repository": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing",
     "releases": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/releases",
-    "tags": ["高校数学", "数列", "漸化式"]
+    "tags": [
+      "高校数学",
+      "数列",
+      "漸化式"
+    ],
+    "latest_pdf": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/releases/download/latest-build/main.pdf"
   },
   {
     "title": "教科書に乗っていない積分の話",
@@ -21,6 +26,11 @@
     "pdf": "https://mas256.github.io/textbook-not-in-textbook-integrals/book.pdf",
     "repository": "https://github.com/mas256/textbook-not-in-textbook-integrals",
     "releases": "https://github.com/mas256/textbook-not-in-textbook-integrals/releases",
-    "tags": ["高校数学", "微分積分", "積分"]
+    "tags": [
+      "高校数学",
+      "微分積分",
+      "積分"
+    ],
+    "latest_pdf": "https://github.com/mas256/textbook-not-in-textbook-integrals/releases/download/latest-build/main.pdf"
   }
 ]

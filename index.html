@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f4ee">
-  <meta name="description" content="数学の教科書や解説書をまとめて探せる公開カタログです。">
+  <meta name="description" content="公開中の数学教科書の正式版PDFと最新版PDFを読める本棚です。">
   <title>数学書の本棚 — 数学教科書カタログ</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
@@ -15,68 +15,24 @@
       <span class="brand-mark" aria-hidden="true">∫</span>
       <span>数学書の本棚</span>
     </a>
-    <nav aria-label="メインナビゲーション">
-      <a href="#books">教科書を探す</a>
-      <a href="#about">このサイトについて</a>
-    </nav>
+
   </header>
 
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow"><span></span> OPEN MATH TEXTBOOKS</p>
-        <h1 id="hero-title">数学の「わからない」を、<br><em>体系的に。</em></h1>
-        <p class="hero-description">学びたいテーマから、公開中の数学教科書・解説書を探せる本棚です。じっくり読めるWeb版と、手元に置けるPDFをまとめました。</p>
-        <a class="hero-link" href="#books">本棚を見る <span aria-hidden="true">↓</span></a>
-      </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="orbit orbit-one"></div>
-        <div class="orbit orbit-two"></div>
-        <div class="formula formula-top">a<sub>n+1</sub> = f(a<sub>n</sub>)</div>
-        <div class="book-stack">
-          <div class="book book-back"><span>数学を、深く。</span></div>
-          <div class="book book-front"><span class="book-symbol">∫</span><span class="book-title">考え方から<br>解き明かす</span><span class="book-rule"></span><span class="book-subtitle">OPEN TEXTBOOK</span></div>
-        </div>
-        <div class="formula formula-bottom">∫ f(x) dx = F(x) + C</div>
-        <span class="spark spark-one">✳</span><span class="spark spark-two">·</span>
-      </div>
-    </section>
-
     <section class="catalog" id="books" aria-labelledby="catalog-title">
       <div class="section-heading">
         <div>
           <p class="eyebrow section-eyebrow">THE COLLECTION</p>
-          <h2 id="catalog-title">教科書を探す</h2>
+          <h2 id="catalog-title">公開中の教科書</h2>
         </div>
         <p class="catalog-count" id="catalog-count" aria-live="polite">読み込み中…</p>
       </div>
 
-      <div class="filters">
-        <label class="search-box">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <span class="visually-hidden">教科書を検索</span>
-          <input id="search" type="search" placeholder="タイトル・テーマで検索" autocomplete="off">
-          <kbd>/</kbd>
-        </label>
-        <label class="filter-select">
-          <span class="visually-hidden">分野で絞り込む</span>
-          <select id="category"><option value="">すべての分野</option></select>
-        </label>
-      </div>
-
       <div class="book-grid" id="book-grid" aria-live="polite" aria-busy="true"></div>
-      <p class="empty-state" id="empty-state" hidden>条件に合う教科書が見つかりませんでした。検索語や分野を変えてみてください。</p>
       <p class="load-error" id="load-error" hidden>一覧を読み込めませんでした。時間をおいて再読み込みしてください。</p>
     </section>
 
-    <section class="about" id="about" aria-labelledby="about-title">
-      <div class="about-mark" aria-hidden="true">a<sub>n</sub></div>
-      <div>
-        <p class="eyebrow section-eyebrow">ABOUT THIS SHELF</p>
-        <h2 id="about-title">学びの入口を、ひとつに。</h2>
-        <p>ここに掲載しているのは、著者が執筆・公開している数学書です。各書籍の紹介ページからWeb版を読み、PDFや過去の版はリリース一覧から確認できます。</p>
-      </div>
-    </section>
+
   </main>
 
   <footer class="site-footer">

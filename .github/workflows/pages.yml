@@ -48,6 +48,9 @@ jobs:
                       parsed = urlparse(book[key])
                       assert parsed.scheme == "https" and parsed.netloc, f"invalid {key}: {book[key]}"
               assert book["title"] not in ids, f"duplicate title: {book['title']}"
+              if "latest_pdf" in book:
+                  parsed = urlparse(book["latest_pdf"])
+                  assert parsed.scheme == "https" and parsed.netloc, f"invalid latest_pdf: {book['latest_pdf']}"
               ids.add(book["title"])
           print(f"Catalog validated: {len(books)} books")
           PY

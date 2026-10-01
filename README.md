@@ -18,6 +18,7 @@
   "version": "v1.0.0",
   "site": "https://example.github.io/book/",
   "pdf": "https://example.github.io/book/book.pdf",
+  "latest_pdf": "https://github.com/owner/book/releases/download/latest-build/main.pdf",
   "repository": "https://github.com/owner/book",
   "releases": "https://github.com/owner/book/releases",
   "tags": ["テーマ1", "テーマ2"]
@@ -35,3 +36,11 @@ python -m http.server 8000
 ```
 
 ブラウザーで <http://localhost:8000/> を開きます。
+
+## 正式版と最新版
+
+「正式版PDF」は各教科書の正式Releaseに対応します。
+「最新版PDF（開発中）」は、各教科書の`main`へのpush後にBuildが成功したPDFです。
+失敗したpushでは更新せず、直前の成功ビルドを維持します。
+教科書側の`latest-build` Pre-releaseに保存するため、Actions Artifactの保存期限に左右されません。
+`latest_pdf`は任意項目です。最新版の公開に未対応の書籍では省略できます。
