@@ -14,7 +14,7 @@
       "数列",
       "漸化式"
     ],
-    "latest_pdf": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/releases/download/latest-build/main.pdf"
+    "latest_pdf": "https://mas256.github.io/zenkashiki-no-chotaikei-publishing/latest.pdf"
   },
   {
     "title": "教科書に乗っていない積分の話",
@@ -31,6 +31,6 @@
       "微分積分",
       "積分"
     ],
-    "latest_pdf": "https://github.com/mas256/textbook-not-in-textbook-integrals/releases/download/latest-build/main.pdf"
+    "latest_pdf": "https://mas256.github.io/textbook-not-in-textbook-integrals/latest.pdf"
   }
 ]
