@@ -14,7 +14,6 @@ function bookCard(book) {
   return `
     <article class="book-card">
       <div class="card-top">
-        <span class="category-label">${escapeHTML(book.category)}</span>
         <span class="edition-label">${escapeHTML(book.edition)} · ${escapeHTML(book.version)}</span>
       </div>
       <h3>${escapeHTML(book.title)}</h3>

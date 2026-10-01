@@ -41,6 +41,7 @@ button, input, select { font: inherit; }
 .site-header nav a:hover, .site-footer a:hover { color: var(--teal); }
 
 .catalog { width: min(1160px, calc(100% - 64px)); margin: 0 auto; padding: 48px 0 64px; }
+.other-works { padding-top: 0; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 31px; }
 .section-eyebrow { margin-bottom: 10px; font-size: 9px; }
 h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 600; letter-spacing: .04em; }
@@ -48,8 +49,7 @@ h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 
 .book-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .book-card { position: relative; display: flex; flex-direction: column; min-height: 285px; padding: 26px 28px 23px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .book-card:hover { transform: translateY(-3px); border-color: #b9c9c0; box-shadow: 0 14px 32px rgba(40,52,48,.08); }
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
-.category-label { color: var(--teal); font-size: 11px; font-weight: 600; }
+.card-top { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 25px; margin-bottom: 22px; }
 .edition-label { padding: 4px 9px; border: 1px solid #d8d5c9; border-radius: 20px; color: #707873; font-size: 10px; white-space: nowrap; }
 .book-card h3 { max-width: 500px; margin: 0 0 13px; font-family: var(--serif); font-size: 21px; font-weight: 600; line-height: 1.6; }
 .book-card .description { min-height: 48px; margin: 0 0 20px; color: #69737a; font-size: 12px; line-height: 1.9; }
@@ -62,6 +62,8 @@ h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 
 .card-secondary { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: #6b7479; font-size: 11px; }
 .card-secondary a { text-decoration: none; }
 .card-secondary a:hover { color: var(--teal); text-decoration: underline; }
+.other-works .card-actions { margin-top: auto; }
+.installer-status { color: var(--muted); font-size: 11px; }
 .empty-state, .load-error { padding: 45px 20px; border: 1px dashed #c9c7bc; border-radius: 5px; color: var(--muted); text-align: center; font-size: 13px; line-height: 1.8; }
 .load-error { color: #9d4b3b; }
 

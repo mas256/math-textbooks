@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f4ee">
-  <meta name="description" content="公開中の数学教科書の正式版PDFと最新版PDFを読める本棚です。">
+  <meta name="description" content="公開中の数学教科書やその他の著作物を探せる本棚です。">
   <title>数学書の本棚 — 数学教科書カタログ</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
@@ -32,7 +32,24 @@
       <p class="load-error" id="load-error" hidden>一覧を読み込めませんでした。時間をおいて再読み込みしてください。</p>
     </section>
 
-
+    <section class="catalog other-works" id="other-works" aria-labelledby="other-works-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="other-works-title">その他の公開中の著作物</h2>
+        </div>
+      </div>
+      <div class="book-grid">
+        <article class="book-card">
+          <div class="card-top" aria-hidden="true"></div>
+          <h3>Equashare</h3>
+          <p class="description">数式を、つくって、画像にして、共有する。<br>数式を誰かに共有したいとき、数式ひとつのために大きなPDFを作る必要はありません。 このアプリは、LaTeXの数式を手軽に画像へ変換するための軽量な数式エディタです。</p>
+          <div class="card-actions">
+            <a class="card-primary" href="https://github.com/mas256/Equashare" target="_blank" rel="noopener noreferrer">インストーラをダウンロード <span aria-hidden="true">↗</span></a>
+            <span class="installer-status">配布準備中</span>
+          </div>
+        </article>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
