@@ -5,7 +5,7 @@
 - 公開サイト: https://mas256.github.io/math-textbooks/
 - 教科書一覧データ: [`books.json`](books.json)
 
-その他の著作物は `index.html` の「その他の公開中の著作物」に掲載します。Equashare のインストーラは配布準備中のため、現在は配布元のRepositoryへ案内しています。インストーラ公開後は、ダウンロードリンクを実際の配布URLに更新してください。
+「その他の公開中の著作物」にはEquashare v5.0.2のインストーラダウンロードとWeb版へのリンクを掲載しています。Web版のビルドは [`equashare/`](equashare/) にあります。
 
 ## リポジトリの役割と版番号
 

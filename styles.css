@@ -56,6 +56,7 @@ h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 
 .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 21px; padding: 0; list-style: none; }
 .tag-list li { padding: 4px 8px; border-radius: 3px; background: #f0f1eb; color: #65716e; font-size: 10px; }
 .card-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid #e9e6dd; }
+.card-action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .card-primary { display: inline-flex; align-items: center; gap: 8px; color: var(--teal-dark); font-size: 12px; font-weight: 700; text-decoration: none; }
 .card-primary span { font-size: 16px; transition: transform .2s ease; }
 .card-primary:hover span { transform: translateX(3px); }

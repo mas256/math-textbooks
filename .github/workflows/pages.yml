@@ -8,6 +8,7 @@ on:
       - "styles.css"
       - "app.js"
       - "books.json"
+      - "equashare/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -60,8 +61,9 @@ jobs:
 
       - name: Assemble site
         run: |
-          mkdir -p site
+          mkdir -p site/equashare
           cp index.html styles.css app.js books.json site/
+          cp -a equashare/. site/equashare/
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
