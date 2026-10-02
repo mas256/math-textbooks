@@ -63,7 +63,21 @@ h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 
 .card-secondary a { text-decoration: none; }
 .card-secondary a:hover { color: var(--teal); text-decoration: underline; }
 .other-works .card-actions { margin-top: auto; }
-.installer-status { color: var(--muted); font-size: 11px; }
+.card-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid #d6ddd7;
+  border-radius: 4px;
+  color: var(--teal-dark);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.card-github:hover { border-color: var(--teal); background: #f0f5f1; }
+.card-github span { font-size: 14px; }
 .empty-state, .load-error { padding: 45px 20px; border: 1px dashed #c9c7bc; border-radius: 5px; color: var(--muted); text-align: center; font-size: 13px; line-height: 1.8; }
 .load-error { color: #9d4b3b; }
 
