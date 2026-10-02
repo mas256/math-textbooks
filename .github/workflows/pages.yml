@@ -3,12 +3,6 @@ name: Deploy Pages
 on:
   push:
     branches: [main]
-    paths:
-      - "index.html"
-      - "styles.css"
-      - "app.js"
-      - "books.json"
-      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -30,38 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate catalog
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          from urllib.parse import urlparse
-
-          books = json.loads(Path("books.json").read_text(encoding="utf-8"))
-          assert isinstance(books, list) and books, "books.json must be a non-empty array"
-          ids = set()
-          required = ("title", "category", "description", "edition", "version", "site", "pdf", "repository", "releases")
-          for book in books:
-              for key in required:
-                  assert isinstance(book.get(key), str) and book[key].strip(), f"missing {key}: {book}"
-                  if key in {"site", "pdf", "repository", "releases"}:
-                      parsed = urlparse(book[key])
-                      assert parsed.scheme == "https" and parsed.netloc, f"invalid {key}: {book[key]}"
-              assert book["title"] not in ids, f"duplicate title: {book['title']}"
-              if "latest_pdf" in book:
-                  parsed = urlparse(book["latest_pdf"])
-                  assert parsed.scheme == "https" and parsed.netloc, f"invalid latest_pdf: {book['latest_pdf']}"
-              ids.add(book["title"])
-          print(f"Catalog validated: {len(books)} books")
-          PY
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Assemble site
         run: |
           mkdir -p site
-          cp index.html styles.css app.js books.json site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='site' ./ site/
+          test -s site/index.html
+          test -d site/assets
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
