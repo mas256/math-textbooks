@@ -9,7 +9,7 @@
 
 ## リポジトリの役割と版番号
 
-このRepositoryは一覧カタログです。教科書の原稿・Tag・正式Release・PDFは、書籍ごとのRepositoryで管理します。各書籍の`books.json`項目には、公開が完了した最新の正式Releaseの版番号を記入し、`pdf`にはその書籍のPagesサイトにある正式版`book.pdf`を指定します。
+このRepositoryは一覧カタログです。教科書の原稿・Tag・正式Release・PDFは、書籍ごとのRepositoryで管理します。各書籍カードのリリース番号は、ページ読み込み時にGitHub APIからそのRepositoryの最新の公開Release番号を取得して表示します。`books.json`の`version`はAPIに接続できない場合の予備表示なので、正式Release後は最新番号に更新してください。`pdf`には各RepositoryのPagesサイトにある正式版`book.pdf`を指定します。
 
 `latest_pdf`は、正式版とは別に案内する開発中PDFへのリンクです。正式版の`version`には開発ビルドの番号を入れません。正式Release・PDF・SHA-256の検査とPages公開が終わってから、`books.json`の正式版番号を更新します。
 
