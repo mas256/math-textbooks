@@ -21,6 +21,12 @@ function externalLink(href, label, className, ariaLabel) {
   return link;
 }
 
+function versionedPdfUrl(pdfUrl, version) {
+  const url = new URL(pdfUrl);
+  if (version) url.searchParams.set("v", version);
+  return url.href;
+}
+
 function bookCard(book, index) {
   const article = document.createElement("article");
   article.className = "book-card";
@@ -47,7 +53,8 @@ function bookCard(book, index) {
   const actions = document.createElement("div");
   actions.className = "card-actions";
 
-  const primaryLink = externalLink(book.pdf, "PDFを読む", "card-primary");
+  const primaryLink = externalLink(versionedPdfUrl(book.pdf, book.version), "PDFを読む", "card-primary");
+  primaryLink.id = "release-pdf-" + index;
   const arrow = createTextElement("span", "", "↗");
   arrow.setAttribute("aria-hidden", "true");
   primaryLink.append(document.createTextNode(" "), arrow);
@@ -129,10 +136,15 @@ async function updateReleaseVersions() {
     if (!label) return;
 
     try {
-      label.textContent = await fetchLatestReleaseTag(book.repository);
+      const tag = await fetchLatestReleaseTag(book.repository);
+      const pdfLink = document.getElementById("release-pdf-" + index);
+      if (pdfLink) pdfLink.href = versionedPdfUrl(book.pdf, tag);
+      label.textContent = tag;
       label.title = "GitHubの最新公開Releaseから取得";
       label.removeAttribute("aria-label");
     } catch (error) {
+      const pdfLink = document.getElementById("release-pdf-" + index);
+      if (pdfLink) pdfLink.href = versionedPdfUrl(book.pdf, book.version);
       showFallbackVersion(book, label);
       console.warn("最新Release番号を取得できませんでした:", book.repository, error);
     }
