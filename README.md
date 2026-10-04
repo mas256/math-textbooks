@@ -9,11 +9,13 @@
 
 ## リポジトリの役割と版番号
 
-このRepositoryは一覧カタログです。教科書の原稿・Tag・正式Release・PDFは、書籍ごとのRepositoryで管理します。各書籍カードのリリース番号は、ページ読み込み時にGitHub APIからそのRepositoryの最新の公開Release番号を取得して表示します。`books.json`の`version`はAPIに接続できない場合の予備表示なので、正式Release後は最新番号に更新してください。`pdf`には各RepositoryのPagesサイトにある正式版`book.pdf`を指定します。
+このRepositoryは一覧カタログです。教科書の原稿・Tag・正式Release・PDFは、書籍ごとのRepositoryで管理します。各Pagesの `catalog.json` から、配信済みの正式Release番号、PDFファイル名、正式版とlatestの最終更新日時をまとめて取得します。`books.json` に版やバージョンを手動登録する必要はありません。
 
-`latest_pdf`は、正式版とは別に案内する開発中PDFへのリンクです。正式版の`version`には開発ビルドの番号を入れません。正式Release・PDF・SHA-256の検査とPages公開が終わってから、`books.json`の正式版番号を更新します。
+各カードの左上に更新日時を日本時間（JST）で縦に表示し、右上には `v1.5.0` のようにRelease番号だけを表示します。正式版の日付はReleaseの公開日時、latestの日付は配信する成功ビルドの `built_at` です。Pagesの再配信だけでは日付を変えません。
 
-「PDFを読む」のURLには表示する正式版番号を `?v=v1.5.0` のように付けます。GitHub APIから最新番号を取得できた場合は、版番号とPDFリンクを一緒に更新します。取得できない場合は `books.json` の番号を使います。これにより、同じ `book.pdf` URLに保存された旧版のブラウザーキャッシュを避けます。
+PDFは `タイトル-v1.5.0.pdf`、開発中PDFは `latest-タイトル-v1.5.0.pdf` の形式です。latestの版番号は現在の正式Release番号を使用します。同じ版番号の間にlatestが更新されても、SHA-256をクエリに付けて旧キャッシュを避けます。
+
+公開情報を取得できない場合は「取得できません」と表示し、PDFリンクを有効にしません。版番号だけが先に進んで旧PDFを案内する状態を防ぎます。
 
 ## 掲載書籍を追加する
 
@@ -24,18 +26,14 @@
   "title": "書名",
   "category": "分野",
   "description": "本の短い紹介",
-  "edition": "第1版",
-  "version": "v1.0.0",
   "site": "https://example.github.io/book/",
-  "pdf": "https://example.github.io/book/book.pdf",
-  "latest_pdf": "https://owner.github.io/book/latest.pdf",
   "repository": "https://github.com/owner/book",
   "releases": "https://github.com/owner/book/releases",
   "tags": ["テーマ1", "テーマ2"]
 }
 ```
 
-`title`は一覧内で一意にし、リンクはHTTPSで指定します。各教科書の書名・説明・公開URL・正式版番号を記入してください。`latest_pdf`は任意項目です。開発中PDFの配信方法や更新条件は、各書籍のRepositoryにあるREADMEを正とします。
+`title`は一覧内で一意にし、リンクはHTTPSで指定します。各教科書の書名・説明・公開URLを記入してください。各Pagesは配信PDFと同じ公開処理で `catalog.json` を生成してください。開発中PDFの配信方法や更新条件は、各書籍のRepositoryにあるREADMEを正とします。
 
 ## ローカルで表示する
 

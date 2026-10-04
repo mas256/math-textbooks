@@ -12,7 +12,8 @@ function createTextElement(tagName, className, text) {
 
 function externalLink(href, label, className, ariaLabel) {
   const link = document.createElement("a");
-  link.href = href;
+  if (href) link.href = href;
+  else link.setAttribute("aria-disabled", "true");
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.textContent = label;
@@ -21,57 +22,39 @@ function externalLink(href, label, className, ariaLabel) {
   return link;
 }
 
-function versionedPdfUrl(pdfUrl, version) {
-  const url = new URL(pdfUrl);
-  if (version) url.searchParams.set("v", version);
-  return url.href;
-}
-
 function bookCard(book, index) {
   const article = document.createElement("article");
   article.className = "book-card";
-
-  const cardTop = document.createElement("div");
-  cardTop.className = "card-top";
-  const edition = createTextElement("span", "edition-label", "");
-  edition.append(document.createTextNode((book.edition || "版未登録") + " · "));
-  const version = createTextElement("span", "", "確認中…");
+  const cardTop = createTextElement("div", "card-top", "");
+  const dates = createTextElement("div", "update-dates", "");
+  for (const [kind, label] of [["release", "正式版"], ["latest", "latest"]]) {
+    const row = createTextElement("p", "update-date", label + " 最終更新: ");
+    const time = createTextElement("time", "", "確認中…");
+    time.id = kind + "-updated-" + index;
+    row.append(time);
+    dates.append(row);
+  }
+  const version = createTextElement("span", "release-label", "確認中…");
   version.id = "release-version-" + index;
-  edition.append(version);
-  cardTop.append(edition);
+  cardTop.append(dates, version);
 
   const title = createTextElement("h3", "", book.title || "書名未登録");
+  title.id = "book-title-" + index;
   const description = createTextElement("p", "description", book.description || "");
-
-  const tagList = document.createElement("ul");
-  tagList.className = "tag-list";
+  const tagList = createTextElement("ul", "tag-list", "");
   tagList.setAttribute("aria-label", "テーマ");
-  (book.tags || []).forEach((tag) => {
-    tagList.append(createTextElement("li", "", tag));
-  });
-
-  const actions = document.createElement("div");
-  actions.className = "card-actions";
-
-  const primaryLink = externalLink(versionedPdfUrl(book.pdf, book.version), "PDFを読む", "card-primary");
+  (book.tags || []).forEach((tag) => tagList.append(createTextElement("li", "", tag)));
+  const actions = createTextElement("div", "card-actions", "");
+  const primaryLink = externalLink(null, "PDFを読む", "card-primary");
   primaryLink.id = "release-pdf-" + index;
   const arrow = createTextElement("span", "", "↗");
   arrow.setAttribute("aria-hidden", "true");
   primaryLink.append(document.createTextNode(" "), arrow);
-
-  const secondaryLinks = document.createElement("div");
-  secondaryLinks.className = "card-secondary";
-  if (book.latest_pdf) {
-    secondaryLinks.append(externalLink(book.latest_pdf, "最新版PDF（開発中）"));
-  }
-  secondaryLinks.append(externalLink(book.releases, "版一覧"));
-  secondaryLinks.append(externalLink(
-    book.repository,
-    "GitHub",
-    "",
-    (book.title || "書籍") + "のRepository",
-  ));
-
+  const secondaryLinks = createTextElement("div", "card-secondary", "");
+  const latestLink = externalLink(null, "最新版PDF（開発中）");
+  latestLink.id = "latest-pdf-" + index;
+  secondaryLinks.append(latestLink, externalLink(book.releases, "版一覧"),
+    externalLink(book.repository, "GitHub", "", (book.title || "書籍") + "のRepository"));
   actions.append(primaryLink, secondaryLinks);
   article.append(cardTop, title, description, tagList, actions);
   return article;
@@ -83,70 +66,72 @@ function render() {
   grid.hidden = books.length === 0;
 }
 
-async function fetchLatestReleaseTag(repositoryUrl) {
-  const repository = new URL(repositoryUrl);
-  if (repository.protocol !== "https:" || repository.hostname.toLowerCase() !== "github.com") {
-    throw new Error("書籍のRepository URLがGitHub URLではありません");
-  }
-
-  const pathParts = repository.pathname.split("/").filter(Boolean);
-  if (pathParts.length !== 2) {
-    throw new Error("GitHub Repository URLの形式が正しくありません");
-  }
-
-  const owner = pathParts[0];
-  const repositoryName = pathParts[1].replace(/\.git$/i, "");
-  const apiUrl = "https://api.github.com/repos/"
-    + encodeURIComponent(owner) + "/"
-    + encodeURIComponent(repositoryName)
-    + "/releases/latest";
-  const response = await fetch(apiUrl, {
-    headers: { Accept: "application/vnd.github+json" },
-    cache: "no-cache",
-  });
-  if (!response.ok) {
-    throw new Error("GitHub Releases API: " + response.status);
-  }
-
-  const release = await response.json();
-  if (typeof release.tag_name !== "string" || !release.tag_name.trim()) {
-    throw new Error("最新Releaseにtag_nameがありません");
-  }
-  return release.tag_name.trim();
+function pdfUrl(site, info, development = false) {
+  // Encode the title as a filename, including characters such as # and %.
+  const url = new URL(encodeURIComponent(info.pdf), site);
+  if (development) url.searchParams.set("sha", info.sha256);
+  return url.href;
 }
 
-function showFallbackVersion(book, label) {
-  const fallback = typeof book.version === "string" ? book.version.trim() : "";
-  if (fallback) {
-    label.textContent = fallback + "（最新情報を取得できず）";
-  } else {
-    label.textContent = "版数を取得できません";
+function validateCatalog(catalog) {
+  if (catalog.schema_version !== 1 || typeof catalog.title !== "string" || !catalog.title) {
+    throw new Error("公開PDF情報の形式が正しくありません");
   }
-  label.setAttribute(
-    "aria-label",
-    fallback
-      ? fallback + "。GitHubから最新のリリース番号を取得できませんでした。"
-      : "GitHubから最新のリリース番号を取得できませんでした。",
-  );
+  if (!catalog.release) throw new Error("正式Release情報がありません");
+  for (const [kind, info] of [["release", catalog.release], ["latest", catalog.latest]]) {
+    if (!info) continue;
+    if (!/^v\d+\.\d+\.\d+$/.test(info.version)
+      || !/^[a-f0-9]{64}$/.test(info.sha256)
+      || !Number.isFinite(Date.parse(info.updated_at))) {
+      throw new Error("公開PDFのバージョン・日時・SHA-256が正しくありません");
+    }
+    const expected = (kind === "latest" ? "latest-" : "") + catalog.title + "-" + info.version + ".pdf";
+    if (info.pdf !== expected || /[\\/]/.test(info.pdf)) {
+      throw new Error("公開PDFのファイル名が正しくありません");
+    }
+  }
+  return catalog;
 }
 
-async function updateReleaseVersions() {
+function showUpdatedTime(element, value) {
+  element.dateTime = value;
+  element.textContent = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).format(new Date(value)) + " JST";
+}
+
+async function updatePublications() {
   await Promise.all(books.map(async (book, index) => {
-    const label = document.getElementById("release-version-" + index);
-    if (!label) return;
-
+    const version = document.getElementById("release-version-" + index);
     try {
-      const tag = await fetchLatestReleaseTag(book.repository);
-      const pdfLink = document.getElementById("release-pdf-" + index);
-      if (pdfLink) pdfLink.href = versionedPdfUrl(book.pdf, tag);
-      label.textContent = tag;
-      label.title = "GitHubの最新公開Releaseから取得";
-      label.removeAttribute("aria-label");
+      const site = new URL(book.site);
+      if (site.protocol !== "https:") throw new Error("Pages URLはHTTPSで指定してください");
+      const response = await fetch(new URL("catalog.json", site), { cache: "no-store" });
+      if (!response.ok) throw new Error("公開PDF情報: " + response.status);
+      const catalog = validateCatalog(await response.json());
+      document.getElementById("book-title-" + index).textContent = catalog.title;
+      version.textContent = catalog.release.version;
+      version.title = "Pagesで配信中の正式Release";
+      for (const kind of ["release", "latest"]) {
+        const time = document.getElementById(kind + "-updated-" + index);
+        const link = document.getElementById(kind + "-pdf-" + index);
+        const info = catalog[kind];
+        if (info) {
+          showUpdatedTime(time, info.updated_at);
+          link.href = pdfUrl(site, info, kind === "latest");
+          link.removeAttribute("aria-disabled");
+        } else {
+          time.textContent = "未公開";
+          link.hidden = true;
+        }
+      }
     } catch (error) {
-      const pdfLink = document.getElementById("release-pdf-" + index);
-      if (pdfLink) pdfLink.href = versionedPdfUrl(book.pdf, book.version);
-      showFallbackVersion(book, label);
-      console.warn("最新Release番号を取得できませんでした:", book.repository, error);
+      version.textContent = "取得できません";
+      for (const kind of ["release", "latest"]) {
+        document.getElementById(kind + "-updated-" + index).textContent = "取得できません";
+      }
+      console.warn("公開PDF情報を取得できませんでした:", book.site, error);
     }
   }));
 }
@@ -160,7 +145,7 @@ async function loadBooks() {
     books = data;
     grid.setAttribute("aria-busy", "false");
     render();
-    void updateReleaseVersions();
+    void updatePublications();
   } catch (error) {
     console.error(error);
     grid.hidden = true;

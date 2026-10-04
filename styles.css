@@ -60,8 +60,11 @@ h2 { margin-bottom: 0; font-family: var(--serif); font-size: 29px; font-weight: 
 .book-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .book-card { position: relative; display: flex; flex-direction: column; min-height: 285px; padding: 26px 28px 23px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .book-card:hover { transform: translateY(-3px); border-color: #b9c9c0; box-shadow: 0 14px 32px rgba(40,52,48,.08); }
-.card-top { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 25px; margin-bottom: 22px; }
-.edition-label { padding: 4px 9px; border: 1px solid #d8d5c9; border-radius: 20px; color: #707873; font-size: 10px; white-space: nowrap; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; min-height: 25px; margin-bottom: 22px; }
+.update-dates { display: flex; flex-direction: column; gap: 5px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+.update-date { margin: 0; }
+.release-label { padding: 4px 9px; border: 1px solid #d8d5c9; border-radius: 20px; color: #707873; font-size: 10px; white-space: nowrap; }
+a[aria-disabled="true"] { color: var(--muted); cursor: default; }
 .book-card h3 { max-width: 500px; margin: 0 0 13px; font-family: var(--serif); font-size: 21px; font-weight: 600; line-height: 1.6; }
 .book-card .description { min-height: 48px; margin: 0 0 20px; color: #69737a; font-size: 12px; line-height: 1.9; }
 .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 21px; padding: 0; list-style: none; }
