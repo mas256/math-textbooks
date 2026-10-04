@@ -61,6 +61,15 @@ jobs:
           mkdir -p site/equashare
           cp index.html styles.css app.js books.json site/
           cp -a equashare/. site/equashare/
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          path = Path("site/index.html")
+          page = path.read_text(encoding="utf-8")
+          page = re.sub(r'((?:src|href)="(?:app\.js|styles\.css))(?:\?[^"\s]*)?"',
+                        lambda match: match[1] + "?v=" + os.environ["GITHUB_SHA"] + '"', page)
+          path.write_text(page, encoding="utf-8")
+          PY
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
