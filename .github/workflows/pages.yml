@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Validate catalog
         run: |
@@ -52,9 +54,6 @@ jobs:
               ids.add(book["title"])
           print(f"Catalog validated: {len(books)} books")
           PY
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       - name: Assemble site
         run: |
@@ -79,3 +78,5 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          reporting_interval: 1000
