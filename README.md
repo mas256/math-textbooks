@@ -4,6 +4,9 @@
 
 - 公開サイト: https://mas256.github.io/math-textbooks/
 - 教科書一覧データ: [`books.json`](books.json)
+- 漸化式の問題生成: https://mas256.github.io/math-textbooks/recurrence/
+
+漸化式生成ページの仕様・検証範囲・開発手順は [`recurrence/README.md`](recurrence/README.md) にあります。Pagesの公開前に同じコミットから問題を生成し、Leanとブラウザーで検証します。検証に失敗したビルドは公開しません。
 
 トップページの案内欄にEquashare v5.0.2のWindows版ダウンロードとWeb版へのリンクを掲載しています。Equashareは教科書一覧には含めていません。Web版のビルドは [`equashare/`](equashare/) にあります。
 

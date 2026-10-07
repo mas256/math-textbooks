@@ -11,9 +11,14 @@ def compile_blocks(recipe):
     if core["kind"] == "constant":
         formula = params["initial"]
     elif core["kind"] == "geometric":
+        assert evaluate(params["ratio"], 0) not in {0, 1}, "Degenerate geometric core"
+        assert evaluate(params["amplitude"], 0) != 0
         formula = mul(params["amplitude"], power(params["ratio"], nat()))
         Q = params["ratio"]
     elif core["kind"] == "affine_fixed_point":
+        r, c, d = (evaluate(params[k], 0) for k in ("ratio", "fixed_point", "amplitude"))
+        assert r not in {0, 1} and c != 0 and d != 0, "Degenerate affine core"
+        assert evaluate(params["constant_term"], 0) == (1-r)*c, "Invalid fixed point"
         formula = add(params["fixed_point"], mul(params["amplitude"], power(params["ratio"], nat())))
         Q, R = params["ratio"], params["constant_term"]
     else:
@@ -49,6 +54,7 @@ def compile_blocks(recipe):
             assert other["kind"] == "geometric"
             r, s = params["ratio"], other["ratio"]
             assert r != s, "Repeated roots have a different construction rule"
+            assert evaluate(other["initial"], 0) != 0 and evaluate(s, 0) != 0
             formula = add(formula, mul(other["initial"], power(s, nat())))
             extra = {"p": num(evaluate(add(r, s), 0)), "q": num(-evaluate(mul(r, s), 0))}
             second_order = True

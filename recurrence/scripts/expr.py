@@ -134,7 +134,7 @@ def latex(expr):
     if op == "div": return rf"\frac{{{latex(args[0])}}}{{{latex(args[1])}}}"
     if op == "pow":
         base = latex(args[0])
-        if args[0]["op"] != "rational" or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
+        if args[0]["op"] not in {"rational", "index"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
             base = r"\left(" + base + r"\right)"
         return base + "^{" + latex(args[1]) + "}"
     raise ValueError(op)

@@ -8,7 +8,7 @@ theorem p001_base_valid : FirstCertificate p001 (4 : ℚ) (fun n x => ((1 : ℚ)
   · norm_num [p001]
   · intro n; positivity
   · intro n
-    simp only [p001, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p001, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p001_valid : FirstCertificate p001 (4 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p001_base_valid
 theorem p001_unique (a : ℕ → ℚ) (ha : FirstCertificate a (4 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p001 n := first_unique p001_valid ha
@@ -21,7 +21,7 @@ theorem p002_base_valid : FirstCertificate p002 (1 : ℚ) (fun n x => ((1 : ℚ)
   · norm_num [p002]
   · intro n; positivity
   · intro n
-    simp only [p002, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p002, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p002_valid : FirstCertificate p002 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p002_base_valid
 theorem p002_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p002 n := first_unique p002_valid ha
@@ -34,7 +34,7 @@ theorem p003_base_valid : FirstCertificate p003 (3 : ℚ) (fun n x => ((1 : ℚ)
   · norm_num [p003]
   · intro n; positivity
   · intro n
-    simp only [p003, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p003, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p003_valid : FirstCertificate p003 (3 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p003_base_valid
 theorem p003_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p003 n := first_unique p003_valid ha
@@ -47,7 +47,7 @@ theorem p004_base_valid : FirstCertificate p004 ((1 : ℚ) / 2) (fun n x => ((1 
   · norm_num [p004]
   · intro n; positivity
   · intro n
-    simp only [p004, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p004, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p004_valid : FirstCertificate p004 ((1 : ℚ) / 2) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p004_base_valid
 theorem p004_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((1 : ℚ) / 2) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p004 n := first_unique p004_valid ha
@@ -60,7 +60,7 @@ theorem p005_base_valid : FirstCertificate p005 (2 : ℚ) (fun n x => ((1 : ℚ)
   · norm_num [p005]
   · intro n; positivity
   · intro n
-    simp only [p005, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p005, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p005_valid : FirstCertificate p005 (2 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p005_base_valid
 theorem p005_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p005 n := first_unique p005_valid ha
@@ -73,7 +73,7 @@ theorem p006_base_valid : FirstCertificate p006 (4 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p006]
   · intro n; positivity
   · intro n
-    simp only [p006, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p006, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p006_valid : FirstCertificate p006 (4 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p006_base_valid
 theorem p006_unique (a : ℕ → ℚ) (ha : FirstCertificate a (4 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p006 n := first_unique p006_valid ha
@@ -86,7 +86,7 @@ theorem p007_base_valid : FirstCertificate p007 (1 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p007]
   · intro n; positivity
   · intro n
-    simp only [p007, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p007, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p007_valid : FirstCertificate p007 (1 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p007_base_valid
 theorem p007_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p007 n := first_unique p007_valid ha
@@ -99,7 +99,7 @@ theorem p008_base_valid : FirstCertificate p008 (3 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p008]
   · intro n; positivity
   · intro n
-    simp only [p008, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p008, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p008_valid : FirstCertificate p008 (3 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p008_base_valid
 theorem p008_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p008 n := first_unique p008_valid ha
@@ -112,7 +112,7 @@ theorem p009_base_valid : FirstCertificate p009 ((1 : ℚ) / 2) (fun n x => ((2 
   · norm_num [p009]
   · intro n; positivity
   · intro n
-    simp only [p009, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p009, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p009_valid : FirstCertificate p009 ((1 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p009_base_valid
 theorem p009_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((1 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p009 n := first_unique p009_valid ha
@@ -125,7 +125,7 @@ theorem p010_base_valid : FirstCertificate p010 (3 : ℚ) (fun n x => ((2 : ℚ)
   · norm_num [p010]
   · intro n; positivity
   · intro n
-    simp only [p010, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p010, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p010_valid : FirstCertificate p010 (3 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p010_base_valid
 theorem p010_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p010 n := first_unique p010_valid ha
@@ -138,7 +138,7 @@ theorem p011_base_valid : FirstCertificate p011 (5 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p011]
   · intro n; positivity
   · intro n
-    simp only [p011, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p011, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p011_valid : FirstCertificate p011 (5 : ℚ) (fun n x => ((3 : ℚ) * x + (-2 : ℚ)) / (1 : ℚ)) := p011_base_valid
 theorem p011_unique (a : ℕ → ℚ) (ha : FirstCertificate a (5 : ℚ) (fun n x => ((3 : ℚ) * x + (-2 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p011 n := first_unique p011_valid ha
@@ -151,7 +151,7 @@ theorem p012_base_valid : FirstCertificate p012 (3 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p012]
   · intro n; positivity
   · intro n
-    simp only [p012, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p012, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p012_valid : FirstCertificate p012 (3 : ℚ) (fun n x => ((3 : ℚ) * x + (-4 : ℚ)) / (1 : ℚ)) := p012_base_valid
 theorem p012_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((3 : ℚ) * x + (-4 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p012 n := first_unique p012_valid ha
@@ -164,7 +164,7 @@ theorem p013_base_valid : FirstCertificate p013 (5 : ℚ) (fun n x => ((3 : ℚ)
   · norm_num [p013]
   · intro n; positivity
   · intro n
-    simp only [p013, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p013, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p013_valid : FirstCertificate p013 (5 : ℚ) (fun n x => ((3 : ℚ) * x + (-4 : ℚ)) / (1 : ℚ)) := p013_base_valid
 theorem p013_unique (a : ℕ → ℚ) (ha : FirstCertificate a (5 : ℚ) (fun n x => ((3 : ℚ) * x + (-4 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p013 n := first_unique p013_valid ha
@@ -177,7 +177,7 @@ theorem p014_base_valid : FirstCertificate p014 ((3 : ℚ) / 2) (fun n x => ((2 
   · norm_num [p014]
   · intro n; positivity
   · intro n
-    simp only [p014, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p014, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p014_valid : FirstCertificate p014 ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ)) := p014_base_valid
 theorem p014_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p014 n := first_unique p014_valid ha
@@ -190,7 +190,7 @@ theorem p015_base_valid : FirstCertificate p015 (5 : ℚ) (fun n x => ((2 : ℚ)
   · norm_num [p015]
   · intro n; positivity
   · intro n
-    simp only [p015, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p015, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p015_valid : FirstCertificate p015 (5 : ℚ) (fun n x => ((2 : ℚ) * x + (-2 : ℚ)) / (1 : ℚ)) := p015_base_valid
 theorem p015_unique (a : ℕ → ℚ) (ha : FirstCertificate a (5 : ℚ) (fun n x => ((2 : ℚ) * x + (-2 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p015 n := first_unique p015_valid ha
@@ -203,7 +203,7 @@ theorem p016_base_valid : FirstCertificate p016 (3 : ℚ) (fun n x => (((((n : �
   · norm_num [p016]
   · intro n; positivity
   · intro n
-    simp only [p016, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p016, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p016_valid : FirstCertificate p016 (3 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p016_base_valid
 theorem p016_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p016 n := first_unique p016_valid ha
@@ -216,7 +216,7 @@ theorem p017_base_valid : FirstCertificate p017 (9 : ℚ) (fun n x => (((((n : �
   · norm_num [p017]
   · intro n; positivity
   · intro n
-    simp only [p017, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p017, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p017_valid : FirstCertificate p017 (9 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p017_base_valid
 theorem p017_unique (a : ℕ → ℚ) (ha : FirstCertificate a (9 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p017 n := first_unique p017_valid ha
@@ -229,7 +229,7 @@ theorem p018_base_valid : FirstCertificate p018 ((3 : ℚ) / 2) (fun n x => ((((
   · norm_num [p018]
   · intro n; positivity
   · intro n
-    simp only [p018, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p018, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p018_valid : FirstCertificate p018 ((3 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p018_base_valid
 theorem p018_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((3 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p018 n := first_unique p018_valid ha
@@ -242,7 +242,7 @@ theorem p019_base_valid : FirstCertificate p019 (6 : ℚ) (fun n x => (((((n : �
   · norm_num [p019]
   · intro n; positivity
   · intro n
-    simp only [p019, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p019, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p019_valid : FirstCertificate p019 (6 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p019_base_valid
 theorem p019_unique (a : ℕ → ℚ) (ha : FirstCertificate a (6 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p019 n := first_unique p019_valid ha
@@ -255,7 +255,7 @@ theorem p020_base_valid : FirstCertificate p020 (12 : ℚ) (fun n x => (((((n : 
   · norm_num [p020]
   · intro n; positivity
   · intro n
-    simp only [p020, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p020, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p020_valid : FirstCertificate p020 (12 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p020_base_valid
 theorem p020_unique (a : ℕ → ℚ) (ha : FirstCertificate a (12 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (0 : ℚ)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p020 n := first_unique p020_valid ha
@@ -268,7 +268,7 @@ theorem p021_base_valid : FirstCertificate p021 (1 : ℚ) (fun n x => (((((n : �
   · norm_num [p021]
   · intro n; positivity
   · intro n
-    simp only [p021, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p021, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p021_valid : FirstCertificate p021 (1 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((4 : ℚ) * ((n : ℚ) + 1)) + (6 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p021_base_valid
 theorem p021_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((4 : ℚ) * ((n : ℚ) + 1)) + (6 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p021 n := first_unique p021_valid ha
@@ -281,7 +281,7 @@ theorem p022_base_valid : FirstCertificate p022 ((1 : ℚ) / 2) (fun n x => ((((
   · norm_num [p022]
   · intro n; positivity
   · intro n
-    simp only [p022, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p022, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p022_valid : FirstCertificate p022 ((1 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p022_base_valid
 theorem p022_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((1 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p022 n := first_unique p022_valid ha
@@ -294,7 +294,7 @@ theorem p023_base_valid : FirstCertificate p023 (6 : ℚ) (fun n x => (((((n : �
   · norm_num [p023]
   · intro n; positivity
   · intro n
-    simp only [p023, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p023, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p023_valid : FirstCertificate p023 (6 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p023_base_valid
 theorem p023_unique (a : ℕ → ℚ) (ha : FirstCertificate a (6 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p023 n := first_unique p023_valid ha
@@ -307,7 +307,7 @@ theorem p024_base_valid : FirstCertificate p024 (0 : ℚ) (fun n x => (((((n : �
   · norm_num [p024]
   · intro n; positivity
   · intro n
-    simp only [p024, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p024, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p024_valid : FirstCertificate p024 (0 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p024_base_valid
 theorem p024_unique (a : ℕ → ℚ) (ha : FirstCertificate a (0 : ℚ) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p024 n := first_unique p024_valid ha
@@ -320,7 +320,7 @@ theorem p025_base_valid : FirstCertificate p025 ((-3 : ℚ) / 2) (fun n x => (((
   · norm_num [p025]
   · intro n; positivity
   · intro n
-    simp only [p025, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p025, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p025_valid : FirstCertificate p025 ((-3 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p025_base_valid
 theorem p025_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((-3 : ℚ) / 2) (fun n x => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + (((6 : ℚ) * ((n : ℚ) + 1)) + (9 : ℚ))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p025 n := first_unique p025_valid ha
@@ -333,7 +333,7 @@ theorem p026_base_valid : FirstCertificate p026 (9 : ℚ) (fun n x => (((3 : ℚ
   · norm_num [p026]
   · intro n; positivity
   · intro n
-    simp only [p026, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p026, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p026_valid : FirstCertificate p026 (9 : ℚ) (fun n x => (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p026_base_valid
 theorem p026_unique (a : ℕ → ℚ) (ha : FirstCertificate a (9 : ℚ) (fun n x => (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p026 n := first_unique p026_valid ha
@@ -346,7 +346,7 @@ theorem p027_base_valid : FirstCertificate p027 ((9 : ℚ) / 2) (fun n x => (((2
   · norm_num [p027]
   · intro n; positivity
   · intro n
-    simp only [p027, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p027, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p027_valid : FirstCertificate p027 ((9 : ℚ) / 2) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p027_base_valid
 theorem p027_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((9 : ℚ) / 2) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p027 n := first_unique p027_valid ha
@@ -359,7 +359,7 @@ theorem p028_base_valid : FirstCertificate p028 (6 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p028]
   · intro n; positivity
   · intro n
-    simp only [p028, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p028, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p028_valid : FirstCertificate p028 (6 : ℚ) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p028_base_valid
 theorem p028_unique (a : ℕ → ℚ) (ha : FirstCertificate a (6 : ℚ) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p028 n := first_unique p028_valid ha
@@ -372,7 +372,7 @@ theorem p029_base_valid : FirstCertificate p029 (6 : ℚ) (fun n x => (((3 : ℚ
   · norm_num [p029]
   · intro n; positivity
   · intro n
-    simp only [p029, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p029, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p029_valid : FirstCertificate p029 (6 : ℚ) (fun n x => (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p029_base_valid
 theorem p029_unique (a : ℕ → ℚ) (ha : FirstCertificate a (6 : ℚ) (fun n x => (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p029 n := first_unique p029_valid ha
@@ -385,7 +385,7 @@ theorem p030_base_valid : FirstCertificate p030 (9 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p030]
   · intro n; positivity
   · intro n
-    simp only [p030, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p030, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p030_valid : FirstCertificate p030 (9 : ℚ) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) := p030_base_valid
 theorem p030_unique (a : ℕ → ℚ) (ha : FirstCertificate a (9 : ℚ) (fun n x => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))) :
     ∀ n, a n = p030 n := first_unique p030_valid ha
@@ -458,7 +458,7 @@ theorem p036_base_valid : FirstCertificate p036 (4 : ℚ) (fun n x => (((3 : ℚ
   · norm_num [p036]
   · intro n; positivity
   · intro n
-    simp only [p036, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p036, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p036_valid : FirstCertificate p036 (4 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p036_base_valid
 theorem p036_unique (a : ℕ → ℚ) (ha : FirstCertificate a (4 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p036 n := first_unique p036_valid ha
@@ -471,7 +471,7 @@ theorem p037_base_valid : FirstCertificate p037 (1 : ℚ) (fun n x => (((3 : ℚ
   · norm_num [p037]
   · intro n; positivity
   · intro n
-    simp only [p037, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p037, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p037_valid : FirstCertificate p037 (1 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p037_base_valid
 theorem p037_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p037 n := first_unique p037_valid ha
@@ -484,7 +484,7 @@ theorem p038_base_valid : FirstCertificate p038 (3 : ℚ) (fun n x => (((3 : ℚ
   · norm_num [p038]
   · intro n; positivity
   · intro n
-    simp only [p038, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p038, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p038_valid : FirstCertificate p038 (3 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p038_base_valid
 theorem p038_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => (((3 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p038 n := first_unique p038_valid ha
@@ -497,7 +497,7 @@ theorem p039_base_valid : FirstCertificate p039 ((1 : ℚ) / 2) (fun n x => (((2
   · norm_num [p039]
   · intro n; positivity
   · intro n
-    simp only [p039, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p039, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p039_valid : FirstCertificate p039 ((1 : ℚ) / 2) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p039_base_valid
 theorem p039_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((1 : ℚ) / 2) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p039 n := first_unique p039_valid ha
@@ -510,7 +510,7 @@ theorem p040_base_valid : FirstCertificate p040 (3 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p040]
   · intro n; positivity
   · intro n
-    simp only [p040, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p040, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p040_valid : FirstCertificate p040 (3 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p040_base_valid
 theorem p040_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p040 n := first_unique p040_valid ha
@@ -524,13 +524,13 @@ theorem p041_base_valid : FirstCertificate p041_base (5 : ℚ) (fun n x => ((3 :
   · norm_num [p041_base]
   · intro n; positivity
   · intro n
-    simp only [p041_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p041_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p041_positive (n : ℕ) : 0 < p041_base n := by
   unfold p041_base
   positivity
 theorem p041_valid : FirstCertificate p041 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p041_base_valid p041_positive (by intro n; positivity)
-  simpa only [p041, p041_base] using h.1
+  convert h.1 using 1 <;> norm_num [p041, p041_base]
 theorem p041_domain : (∀ n : ℕ, (3 : ℚ) + (-2 : ℚ) * p041 n ≠ 0) ∧ (∀ n, p041 n ≠ 0) := by
   have h := reciprocal_certificate p041_base_valid p041_positive (by intro n; positivity)
   simpa only [p041, p041_base] using h.2
@@ -547,13 +547,13 @@ theorem p042_base_valid : FirstCertificate p042_base (3 : ℚ) (fun n x => ((3 :
   · norm_num [p042_base]
   · intro n; positivity
   · intro n
-    simp only [p042_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p042_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p042_positive (n : ℕ) : 0 < p042_base n := by
   unfold p042_base
   positivity
 theorem p042_valid : FirstCertificate p042 ((1 : ℚ) / 3) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-4 : ℚ) * x)) := by
   have h := reciprocal_certificate p042_base_valid p042_positive (by intro n; positivity)
-  simpa only [p042, p042_base] using h.1
+  convert h.1 using 1 <;> norm_num [p042, p042_base]
 theorem p042_domain : (∀ n : ℕ, (3 : ℚ) + (-4 : ℚ) * p042 n ≠ 0) ∧ (∀ n, p042 n ≠ 0) := by
   have h := reciprocal_certificate p042_base_valid p042_positive (by intro n; positivity)
   simpa only [p042, p042_base] using h.2
@@ -570,13 +570,13 @@ theorem p043_base_valid : FirstCertificate p043_base (5 : ℚ) (fun n x => ((3 :
   · norm_num [p043_base]
   · intro n; positivity
   · intro n
-    simp only [p043_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p043_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p043_positive (n : ℕ) : 0 < p043_base n := by
   unfold p043_base
   positivity
 theorem p043_valid : FirstCertificate p043 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-4 : ℚ) * x)) := by
   have h := reciprocal_certificate p043_base_valid p043_positive (by intro n; positivity)
-  simpa only [p043, p043_base] using h.1
+  convert h.1 using 1 <;> norm_num [p043, p043_base]
 theorem p043_domain : (∀ n : ℕ, (3 : ℚ) + (-4 : ℚ) * p043 n ≠ 0) ∧ (∀ n, p043 n ≠ 0) := by
   have h := reciprocal_certificate p043_base_valid p043_positive (by intro n; positivity)
   simpa only [p043, p043_base] using h.2
@@ -593,13 +593,13 @@ theorem p044_base_valid : FirstCertificate p044_base ((3 : ℚ) / 2) (fun n x =>
   · norm_num [p044_base]
   · intro n; positivity
   · intro n
-    simp only [p044_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p044_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p044_positive (n : ℕ) : 0 < p044_base n := by
   unfold p044_base
   positivity
 theorem p044_valid : FirstCertificate p044 ((2 : ℚ) / 3) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + (-1 : ℚ) * x)) := by
   have h := reciprocal_certificate p044_base_valid p044_positive (by intro n; positivity)
-  simpa only [p044, p044_base] using h.1
+  convert h.1 using 1 <;> norm_num [p044, p044_base]
 theorem p044_domain : (∀ n : ℕ, (2 : ℚ) + (-1 : ℚ) * p044 n ≠ 0) ∧ (∀ n, p044 n ≠ 0) := by
   have h := reciprocal_certificate p044_base_valid p044_positive (by intro n; positivity)
   simpa only [p044, p044_base] using h.2
@@ -616,13 +616,13 @@ theorem p045_base_valid : FirstCertificate p045_base (5 : ℚ) (fun n x => ((2 :
   · norm_num [p045_base]
   · intro n; positivity
   · intro n
-    simp only [p045_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p045_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p045_positive (n : ℕ) : 0 < p045_base n := by
   unfold p045_base
   positivity
 theorem p045_valid : FirstCertificate p045 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p045_base_valid p045_positive (by intro n; positivity)
-  simpa only [p045, p045_base] using h.1
+  convert h.1 using 1 <;> norm_num [p045, p045_base]
 theorem p045_domain : (∀ n : ℕ, (2 : ℚ) + (-2 : ℚ) * p045 n ≠ 0) ∧ (∀ n, p045 n ≠ 0) := by
   have h := reciprocal_certificate p045_base_valid p045_positive (by intro n; positivity)
   simpa only [p045, p045_base] using h.2
@@ -639,13 +639,13 @@ theorem p046_base_valid : FirstCertificate p046_base (8 : ℚ) (fun n x => (((3 
   · norm_num [p046_base]
   · intro n; positivity
   · intro n
-    simp only [p046_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p046_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p046_positive (n : ℕ) : 0 < p046_base n := by
   unfold p046_base
   positivity
 theorem p046_valid : FirstCertificate p046 ((1 : ℚ) / 8) (fun n x => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-20 : ℚ) * ((n : ℚ) + 1)) + (-18 : ℚ)) * x)) := by
   have h := reciprocal_certificate p046_base_valid p046_positive (by intro n; positivity)
-  simpa only [p046, p046_base] using h.1
+  convert h.1 using 1 <;> norm_num [p046, p046_base]
 theorem p046_domain : (∀ n : ℕ, ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-20 : ℚ) * ((n : ℚ) + 1)) + (-18 : ℚ)) * p046 n ≠ 0) ∧ (∀ n, p046 n ≠ 0) := by
   have h := reciprocal_certificate p046_base_valid p046_positive (by intro n; positivity)
   simpa only [p046, p046_base] using h.2
@@ -662,13 +662,13 @@ theorem p047_base_valid : FirstCertificate p047_base (8 : ℚ) (fun n x => (((2 
   · norm_num [p047_base]
   · intro n; positivity
   · intro n
-    simp only [p047_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p047_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p047_positive (n : ℕ) : 0 < p047_base n := by
   unfold p047_base
   positivity
 theorem p047_valid : FirstCertificate p047 ((1 : ℚ) / 8) (fun n x => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-12 : ℚ) * ((n : ℚ) + 1)) + (-12 : ℚ)) * x)) := by
   have h := reciprocal_certificate p047_base_valid p047_positive (by intro n; positivity)
-  simpa only [p047, p047_base] using h.1
+  convert h.1 using 1 <;> norm_num [p047, p047_base]
 theorem p047_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-12 : ℚ) * ((n : ℚ) + 1)) + (-12 : ℚ)) * p047 n ≠ 0) ∧ (∀ n, p047 n ≠ 0) := by
   have h := reciprocal_certificate p047_base_valid p047_positive (by intro n; positivity)
   simpa only [p047, p047_base] using h.2
@@ -685,13 +685,13 @@ theorem p048_base_valid : FirstCertificate p048_base (7 : ℚ) (fun n x => (((2 
   · norm_num [p048_base]
   · intro n; positivity
   · intro n
-    simp only [p048_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p048_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p048_positive (n : ℕ) : 0 < p048_base n := by
   unfold p048_base
   positivity
 theorem p048_valid : FirstCertificate p048 ((1 : ℚ) / 7) (fun n x => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-1 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-6 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * x)) := by
   have h := reciprocal_certificate p048_base_valid p048_positive (by intro n; positivity)
-  simpa only [p048, p048_base] using h.1
+  convert h.1 using 1 <;> norm_num [p048, p048_base]
 theorem p048_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-1 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-1 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-6 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * p048 n ≠ 0) ∧ (∀ n, p048 n ≠ 0) := by
   have h := reciprocal_certificate p048_base_valid p048_positive (by intro n; positivity)
   simpa only [p048, p048_base] using h.2
@@ -708,13 +708,13 @@ theorem p049_base_valid : FirstCertificate p049_base (10 : ℚ) (fun n x => (((3
   · norm_num [p049_base]
   · intro n; positivity
   · intro n
-    simp only [p049_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p049_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p049_positive (n : ℕ) : 0 < p049_base n := by
   unfold p049_base
   positivity
 theorem p049_valid : FirstCertificate p049 ((1 : ℚ) / 10) (fun n x => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-10 : ℚ) * ((n : ℚ) + 1)) + (-9 : ℚ)) * x)) := by
   have h := reciprocal_certificate p049_base_valid p049_positive (by intro n; positivity)
-  simpa only [p049, p049_base] using h.1
+  convert h.1 using 1 <;> norm_num [p049, p049_base]
 theorem p049_domain : (∀ n : ℕ, ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-10 : ℚ) * ((n : ℚ) + 1)) + (-9 : ℚ)) * p049 n ≠ 0) ∧ (∀ n, p049 n ≠ 0) := by
   have h := reciprocal_certificate p049_base_valid p049_positive (by intro n; positivity)
   simpa only [p049, p049_base] using h.2
@@ -731,13 +731,13 @@ theorem p050_base_valid : FirstCertificate p050_base (16 : ℚ) (fun n x => (((2
   · norm_num [p050_base]
   · intro n; positivity
   · intro n
-    simp only [p050_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring
+    simp only [p050_base, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring
 theorem p050_positive (n : ℕ) : 0 < p050_base n := by
   unfold p050_base
   positivity
 theorem p050_valid : FirstCertificate p050 ((1 : ℚ) / 16) (fun n x => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-1 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-6 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * x)) := by
   have h := reciprocal_certificate p050_base_valid p050_positive (by intro n; positivity)
-  simpa only [p050, p050_base] using h.1
+  convert h.1 using 1 <;> norm_num [p050, p050_base]
 theorem p050_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + (((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) + ((-1 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((-6 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * p050 n ≠ 0) ∧ (∀ n, p050 n ≠ 0) := by
   have h := reciprocal_certificate p050_base_valid p050_positive (by intro n; positivity)
   simpa only [p050, p050_base] using h.2

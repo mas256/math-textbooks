@@ -9,6 +9,8 @@ on:
       - "app.js"
       - "books.json"
       - "equashare/**"
+      - "recurrence/**"
+      - ".github/workflows/recurrence-check.yml"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -22,7 +24,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify-recurrence:
+    uses: ./.github/workflows/recurrence-check.yml
+
   deploy:
+    needs: verify-recurrence
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -55,11 +61,19 @@ jobs:
           print(f"Catalog validated: {len(books)} books")
           PY
 
+      - name: Download the verified problem bank
+        uses: actions/download-artifact@v4
+        with:
+          name: recurrence-verified
+          path: recurrence/build
+
       - name: Assemble site
         run: |
-          mkdir -p site/equashare
+          mkdir -p site/equashare site/recurrence/data
           cp index.html styles.css app.js books.json site/
           cp -a equashare/. site/equashare/
+          cp recurrence/index.html recurrence/styles.css recurrence/app.js recurrence/model.mjs recurrence/mathjax-config.js site/recurrence/
+          cp recurrence/build/problems.json recurrence/build/manifest.json site/recurrence/data/
           python3 - <<'PY'
           import os, re
           from pathlib import Path
@@ -68,6 +82,14 @@ jobs:
           page = re.sub(r'((?:src|href)="(?:app\.js|styles\.css))(?:\?[^"\s]*)?"',
                         lambda match: match[1] + "?v=" + os.environ["GITHUB_SHA"] + '"', page)
           path.write_text(page, encoding="utf-8")
+          recurrence = Path("site/recurrence")
+          index = recurrence / "index.html"
+          text = index.read_text(encoding="utf-8")
+          for name in ("styles.css", "app.js", "mathjax-config.js"):
+              text = text.replace('"' + name + '"', '"' + name + '?v=' + os.environ["GITHUB_SHA"] + '"')
+          index.write_text(text, encoding="utf-8")
+          app = recurrence / "app.js"
+          app.write_text(app.read_text(encoding="utf-8").replace("'./model.mjs'", "'./model.mjs?v=" + os.environ["GITHUB_SHA"] + "'"), encoding="utf-8")
           PY
 
       - name: Upload site artifact

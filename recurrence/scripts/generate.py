@@ -30,8 +30,9 @@ FAMILIES = {
 }
 
 
-def block(kind, input_id, **kwargs):
-    return {"id": "b" + str(block.counter()), "kind": kind, "input": input_id, **kwargs}
+def signed_tex(expr):
+    text = latex(expr)
+    return text if text.startswith("-") else "+" + text
 
 
 def route(title, operations, hint, discovery=0, domain=0, steps=None):
@@ -60,7 +61,7 @@ def compile_recipe(family, parameters):
     elif family == "affine":
         coefQ, coefR = r, q
         routes = [route("不動点を引いて等比数列にする", ["fixed_point", "geometric"], "毎回同じ値になる数を探し、それを引きます。", 1,
-                        steps=[rf"\(x={latex(r)}x+{latex(q)}\) を解くと \(x={latex(c)}\) です。",
+                        steps=[rf"\(x={latex(r)}x{signed_tex(q)}\) を解くと \(x={latex(c)}\) です。",
                                rf"\(b_n=a_n-{latex(c)}\) とおくと、\(b_{{n+1}}={latex(r)}b_n\)、\(b_1={latex(d)}\) になります。",
                                "等比数列の一般項を求め、置換を戻します。"])]
     elif family in {"scaled_constant", "shifted_scaled", "scaled_affine", "reciprocal_scaled"}:
@@ -83,7 +84,7 @@ def compile_recipe(family, parameters):
         elif family == "scaled_constant":
             steps.append(rf"係数の比は \({latex(div(PN, P))}\) です。\(b_n=a_n/({latex(P)})\) とおくと \(b_{{n+1}}=b_n\) になります。")
         else:
-            steps.append(rf"\(b_n=a_n/({latex(P)})\) とおくと \(b_{{n+1}}={latex(r)}b_n+{latex(q)}\) です。")
+            steps.append(rf"\(b_n=a_n/({latex(P)})\) とおくと \(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) です。")
             steps.append(rf"さらに \(b_n-{latex(c)}\) が等比数列になることを使います。")
         routes = [route("係数の比から正規化する", operations,
                         "n と n+1 の係数は、同じ式を一つずらした形になっています。", discovery, steps=steps)]
@@ -109,7 +110,7 @@ def compile_recipe(family, parameters):
         reciprocal = True
         routes = [route("逆数をとって不動点を引く", ["reciprocal", "fixed_point", "geometric"],
                         "分母と分子を a_n で割り、逆数の関係を調べます。", 1, 1,
-                        steps=[rf"\(b_n=1/a_n\) とおくと \(b_{{n+1}}={latex(r)}b_n+{latex(q)}\) です。",
+                        steps=[rf"\(b_n=1/a_n\) とおくと \(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) です。",
                                rf"\(b_n-{latex(c)}\) は公比 \({latex(r)}\) の等比数列です。初項を代入してから逆数を戻します。",
                                "得られた逆数はすべて正なので、各項と漸化式の分母は 0 になりません。"])]
     elif family == "second_order":
@@ -128,7 +129,7 @@ def compile_recipe(family, parameters):
         routes = [route("逆数をとり、定数を引いて正規化する", operations,
                         "まず逆数をとると、n の係数の規則が見える形になります。", 2, 1,
                         steps=[rf"\(v_n=1/a_n\) とおくと、\({latex(P)}v_{{n+1}}={latex(coefQ)}v_n+{latex(coefR)}\) です。",
-                               rf"\(b_n=(v_n-{latex(k)})/({latex(P)})\) とおくと、\(b_{{n+1}}={latex(r)}b_n+{latex(q)}\) になります。",
+                               rf"\(b_n=(v_n-{latex(k)})/({latex(P)})\) とおくと、\(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) になります。",
                                rf"不動点 \({latex(c)}\) を引いて等比数列を解き、二つの置換を戻します。",
                                "一般項の分母は正です。この正値性から、元の漸化式も全項で定義されます。"])]
     underlying = expr
@@ -196,14 +197,14 @@ def proofs(problem):
         lines += [f"theorem {name}_base_valid : FirstCertificate {underlying} {base_init} {base_step} := by",
                   f"  apply linear_certificate {underlying} {base_init} {Pfn} {Qfn} {Rfn}",
                   f"  · norm_num [{underlying}]", "  · intro n; positivity", "  · intro n",
-                  f"    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring"]
+                  f"    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring"]
         if ir["reciprocal"]:
             actual_step = f"(fun n x => {Pn} * x / ({Qn} + {Rn} * x))"
             lines += [f"theorem {name}_positive (n : ℕ) : 0 < {underlying} n := by",
                       f"  unfold {underlying}", "  positivity",
                       f"theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := by",
                       f"  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)",
-                      f"  simpa only [{name}, {underlying}] using h.1",
+                      f"  convert h.1 using 1 <;> norm_num [{name}, {underlying}]",
                       f"theorem {name}_domain : (∀ n : ℕ, {Qn} + {Rn} * {name} n ≠ 0) ∧ (∀ n, {name} n ≠ 0) := by",
                       f"  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)",
                       f"  simpa only [{name}, {underlying}] using h.2"]
