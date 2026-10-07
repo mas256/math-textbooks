@@ -82,7 +82,7 @@ function renderRecipe(p) {
   const wrapper = el('div', undefined, 'math-block'); wrapper.append(table);
   $('score-info').replaceChildren(wrapper, el('p', `難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。スコアは暫定値です。`, 'details-note'));
   const metrics = p.quality.metrics;
-  $('score-info').append(el('p', `完成式の評価：係数の最高次数 ${metrics.coefficient_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
+  $('score-info').append(el('p', `完成式の評価：多項式係数の最高次数 ${metrics.coefficient_degree}、指数の次数 ${metrics.exponent_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
   const proof = $('proof-info');
   proof.replaceChildren(document.createTextNode('検証：Lean 4.19.0 / mathlib v4.19.0　'));
   if (/^\d+$/.test(String(state.manifest.run_id))) {
@@ -96,7 +96,7 @@ function renderGenerationSummary() {
   const {comparison, generation_config: config, function_catalog: catalog} = state.bank;
   const summary = $('generation-summary');
   summary.replaceChildren(el('p', `旧版の ${comparison.before.count} 問を同じ基準で再評価し、${comparison.baseline_rejected_count} 問を採用条件から除外しました。調整版は ${comparison.after.count} 問です。`),
-    el('p', `係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
+    el('p', `多項式係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
     el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
     el('p', 'この比較は式の構造を測った結果です。学習者の正答率や、良問としての評価は今後確認します。'));
   const functions = $('function-catalog');

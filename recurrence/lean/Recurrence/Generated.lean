@@ -659,7 +659,9 @@ theorem p040_base_valid : FirstCertificate p040 (3 : ℚ) (fun n x => (((2 : ℚ
   · intro n; positivity
   · intro n
     have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by
-      simpa [Nat.add_assoc, Nat.choose_one_right, Nat.add_comm] using (Nat.choose_succ_succ (n + 1) 1)
+      have hs := Nat.choose_succ_succ (n + 1) 1
+      simp only [Nat.add_assoc, Nat.choose_one_right] at hs
+      omega
     simp only [p040, Nat.add_assoc]
     rw [he]
     simp only [pow_add] <;> ring
@@ -676,7 +678,9 @@ theorem p088_base_valid : FirstCertificate p088 (3 : ℚ) (fun n x => (((2 : ℚ
   · intro n; positivity
   · intro n
     have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by
-      simpa [Nat.add_assoc, Nat.add_comm] using (Nat.choose_succ_succ (n + 2) 2)
+      have hs := Nat.choose_succ_succ (n + 2) 2
+      simp only [Nat.add_assoc] at hs
+      omega
     simp only [p088, Nat.add_assoc]
     rw [he]
     simp only [pow_add] <;> ring
@@ -709,7 +713,9 @@ theorem p090_base_valid : FirstCertificate p090 (2 : ℚ) (fun n x => (((2 : ℚ
   · intro n; positivity
   · intro n
     have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by
-      simpa [Nat.add_assoc, Nat.choose_one_right, Nat.add_comm] using (Nat.choose_succ_succ (n + 1) 1)
+      have hs := Nat.choose_succ_succ (n + 1) 1
+      simp only [Nat.add_assoc, Nat.choose_one_right] at hs
+      omega
     simp only [p090, Nat.add_assoc]
     rw [he]
     simp only [pow_add] <;> ring
@@ -726,7 +732,9 @@ theorem p091_base_valid : FirstCertificate p091 (2 : ℚ) (fun n x => (((2 : ℚ
   · intro n; positivity
   · intro n
     have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by
-      simpa [Nat.add_assoc, Nat.add_comm] using (Nat.choose_succ_succ (n + 2) 2)
+      have hs := Nat.choose_succ_succ (n + 2) 2
+      simp only [Nat.add_assoc] at hs
+      omega
     simp only [p091, Nat.add_assoc]
     rw [he]
     simp only [pow_add] <;> ring
@@ -750,7 +758,11 @@ theorem p045_positive (n : ℕ) : 0 < p045_base n := by
   positivity
 theorem p045_valid : FirstCertificate p045 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p045_base_valid p045_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p045, p045_base, div_eq_mul_inv] <;> ring
+  have heq : p045 = (fun n => 1 / p045_base n) := by
+    funext n
+    simp [p045, p045_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p045_domain : (∀ n : ℕ, (2 : ℚ) + (-2 : ℚ) * p045 n ≠ 0) ∧ (∀ n, p045 n ≠ 0) := by
   have h := reciprocal_certificate p045_base_valid p045_positive (by intro n; positivity)
   simpa [p045, p045_base, div_eq_mul_inv] using h.2
@@ -774,7 +786,11 @@ theorem p092_positive (n : ℕ) : 0 < p092_base n := by
   positivity
 theorem p092_valid : FirstCertificate p092 ((1 : ℚ) / 9) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p092_base_valid p092_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p092, p092_base, div_eq_mul_inv] <;> ring
+  have heq : p092 = (fun n => 1 / p092_base n) := by
+    funext n
+    simp [p092, p092_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p092_domain : (∀ n : ℕ, (3 : ℚ) + (-2 : ℚ) * p092 n ≠ 0) ∧ (∀ n, p092 n ≠ 0) := by
   have h := reciprocal_certificate p092_base_valid p092_positive (by intro n; positivity)
   simpa [p092, p092_base, div_eq_mul_inv] using h.2
@@ -798,7 +814,11 @@ theorem p093_positive (n : ℕ) : 0 < p093_base n := by
   positivity
 theorem p093_valid : FirstCertificate p093 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + (-3 : ℚ) * x)) := by
   have h := reciprocal_certificate p093_base_valid p093_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p093, p093_base, div_eq_mul_inv] <;> ring
+  have heq : p093 = (fun n => 1 / p093_base n) := by
+    funext n
+    simp [p093, p093_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p093_domain : (∀ n : ℕ, (2 : ℚ) + (-3 : ℚ) * p093 n ≠ 0) ∧ (∀ n, p093 n ≠ 0) := by
   have h := reciprocal_certificate p093_base_valid p093_positive (by intro n; positivity)
   simpa [p093, p093_base, div_eq_mul_inv] using h.2
@@ -822,7 +842,11 @@ theorem p094_positive (n : ℕ) : 0 < p094_base n := by
   positivity
 theorem p094_valid : FirstCertificate p094 ((1 : ℚ) / 4) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-4 : ℚ) * x)) := by
   have h := reciprocal_certificate p094_base_valid p094_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p094, p094_base, div_eq_mul_inv] <;> ring
+  have heq : p094 = (fun n => 1 / p094_base n) := by
+    funext n
+    simp [p094, p094_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p094_domain : (∀ n : ℕ, (3 : ℚ) + (-4 : ℚ) * p094 n ≠ 0) ∧ (∀ n, p094 n ≠ 0) := by
   have h := reciprocal_certificate p094_base_valid p094_positive (by intro n; positivity)
   simpa [p094, p094_base, div_eq_mul_inv] using h.2
@@ -846,7 +870,11 @@ theorem p095_positive (n : ℕ) : 0 < p095_base n := by
   positivity
 theorem p095_valid : FirstCertificate p095 ((1 : ℚ) / 5) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + (-6 : ℚ) * x)) := by
   have h := reciprocal_certificate p095_base_valid p095_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p095, p095_base, div_eq_mul_inv] <;> ring
+  have heq : p095 = (fun n => 1 / p095_base n) := by
+    funext n
+    simp [p095, p095_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p095_domain : (∀ n : ℕ, (3 : ℚ) + (-6 : ℚ) * p095 n ≠ 0) ∧ (∀ n, p095 n ≠ 0) := by
   have h := reciprocal_certificate p095_base_valid p095_positive (by intro n; positivity)
   simpa [p095, p095_base, div_eq_mul_inv] using h.2
@@ -870,7 +898,11 @@ theorem p096_positive (n : ℕ) : 0 < p096_base n := by
   positivity
 theorem p096_valid : FirstCertificate p096 ((1 : ℚ) / 5) (fun n x => ((n : ℚ) + 1) * x / (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * x)) := by
   have h := reciprocal_certificate p096_base_valid p096_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p096, p096_base, div_eq_mul_inv] <;> ring
+  have heq : p096 = (fun n => 1 / p096_base n) := by
+    funext n
+    simp [p096, p096_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p096_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) + ((-2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * p096 n ≠ 0) ∧ (∀ n, p096 n ≠ 0) := by
   have h := reciprocal_certificate p096_base_valid p096_positive (by intro n; positivity)
   simpa [p096, p096_base, div_eq_mul_inv] using h.2
@@ -896,7 +928,11 @@ theorem p097_positive (n : ℕ) : 0 < p097_base n := by
   positivity
 theorem p097_valid : FirstCertificate p097 ((2 : ℚ) / 5) (fun n x => (((n : ℚ) + 1) + (2 : ℚ)) * x / (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p097_base_valid p097_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p097, p097_base, div_eq_mul_inv] <;> ring
+  have heq : p097 = (fun n => 1 / p097_base n) := by
+    funext n
+    simp [p097, p097_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p097_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) + (-2 : ℚ) * p097 n ≠ 0) ∧ (∀ n, p097 n ≠ 0) := by
   have h := reciprocal_certificate p097_base_valid p097_positive (by intro n; positivity)
   simpa [p097, p097_base, div_eq_mul_inv] using h.2
@@ -922,7 +958,11 @@ theorem p098_positive (n : ℕ) : 0 < p098_base n := by
   positivity
 theorem p098_valid : FirstCertificate p098 ((3 : ℚ) / 5) (fun n x => (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * x / (((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p098_base_valid p098_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p098, p098_base, div_eq_mul_inv] <;> ring
+  have heq : p098 = (fun n => 1 / p098_base n) := by
+    funext n
+    simp [p098, p098_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p098_domain : (∀ n : ℕ, ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) + (-2 : ℚ) * p098 n ≠ 0) ∧ (∀ n, p098 n ≠ 0) := by
   have h := reciprocal_certificate p098_base_valid p098_positive (by intro n; positivity)
   simpa [p098, p098_base, div_eq_mul_inv] using h.2
@@ -948,7 +988,11 @@ theorem p099_positive (n : ℕ) : 0 < p099_base n := by
   positivity
 theorem p099_valid : FirstCertificate p099 ((1 : ℚ) / 5) (fun n x => ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2) * x / (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p099_base_valid p099_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p099, p099_base, div_eq_mul_inv] <;> ring
+  have heq : p099 = (fun n => 1 / p099_base n) := by
+    funext n
+    simp [p099, p099_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p099_domain : (∀ n : ℕ, ((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + (-2 : ℚ) * p099 n ≠ 0) ∧ (∀ n, p099 n ≠ 0) := by
   have h := reciprocal_certificate p099_base_valid p099_positive (by intro n; positivity)
   simpa [p099, p099_base, div_eq_mul_inv] using h.2
@@ -974,7 +1018,11 @@ theorem p100_positive (n : ℕ) : 0 < p100_base n := by
   positivity
 theorem p100_valid : FirstCertificate p100 ((2 : ℚ) / 5) (fun n x => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x / (((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) + (-2 : ℚ) * x)) := by
   have h := reciprocal_certificate p100_base_valid p100_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p100, p100_base, div_eq_mul_inv] <;> ring
+  have heq : p100 = (fun n => 1 / p100_base n) := by
+    funext n
+    simp [p100, p100_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p100_domain : (∀ n : ℕ, ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) + (-2 : ℚ) * p100 n ≠ 0) ∧ (∀ n, p100 n ≠ 0) := by
   have h := reciprocal_certificate p100_base_valid p100_positive (by intro n; positivity)
   simpa [p100, p100_base, div_eq_mul_inv] using h.2
@@ -1069,7 +1117,11 @@ theorem p106_positive (n : ℕ) : 0 < p106_base n := by
   | succ n ih => rw [p106_base_valid.recurrence]; positivity
 theorem p106_valid : FirstCertificate p106 ((1 : ℚ) / 4) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + ((2 : ℚ) * ((n : ℚ) + 1)) * x)) := by
   have h := reciprocal_certificate p106_base_valid p106_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p106, p106_base, div_eq_mul_inv] <;> ring
+  have heq : p106 = (fun n => 1 / p106_base n) := by
+    funext n
+    simp [p106, p106_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p106_domain : (∀ n : ℕ, (2 : ℚ) + ((2 : ℚ) * ((n : ℚ) + 1)) * p106 n ≠ 0) ∧ (∀ n, p106 n ≠ 0) := by
   have h := reciprocal_certificate p106_base_valid p106_positive (by intro n; positivity)
   simpa [p106, p106_base, div_eq_mul_inv] using h.2
@@ -1094,7 +1146,11 @@ theorem p107_positive (n : ℕ) : 0 < p107_base n := by
   | succ n ih => rw [p107_base_valid.recurrence]; positivity
 theorem p107_valid : FirstCertificate p107 ((1 : ℚ) / 2) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + ((3 : ℚ) * ((n : ℚ) + 1)) * x)) := by
   have h := reciprocal_certificate p107_base_valid p107_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p107, p107_base, div_eq_mul_inv] <;> ring
+  have heq : p107 = (fun n => 1 / p107_base n) := by
+    funext n
+    simp [p107, p107_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p107_domain : (∀ n : ℕ, (2 : ℚ) + ((3 : ℚ) * ((n : ℚ) + 1)) * p107 n ≠ 0) ∧ (∀ n, p107 n ≠ 0) := by
   have h := reciprocal_certificate p107_base_valid p107_positive (by intro n; positivity)
   simpa [p107, p107_base, div_eq_mul_inv] using h.2
@@ -1119,7 +1175,11 @@ theorem p108_positive (n : ℕ) : 0 < p108_base n := by
   | succ n ih => rw [p108_base_valid.recurrence]; positivity
 theorem p108_valid : FirstCertificate p108 ((1 : ℚ) / 2) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + ((4 : ℚ) * ((n : ℚ) + 1)) * x)) := by
   have h := reciprocal_certificate p108_base_valid p108_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p108, p108_base, div_eq_mul_inv] <;> ring
+  have heq : p108 = (fun n => 1 / p108_base n) := by
+    funext n
+    simp [p108, p108_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p108_domain : (∀ n : ℕ, (3 : ℚ) + ((4 : ℚ) * ((n : ℚ) + 1)) * p108 n ≠ 0) ∧ (∀ n, p108 n ≠ 0) := by
   have h := reciprocal_certificate p108_base_valid p108_positive (by intro n; positivity)
   simpa [p108, p108_base, div_eq_mul_inv] using h.2
@@ -1144,7 +1204,11 @@ theorem p109_positive (n : ℕ) : 0 < p109_base n := by
   | succ n ih => rw [p109_base_valid.recurrence]; positivity
 theorem p109_valid : FirstCertificate p109 (1 : ℚ) (fun n x => (1 : ℚ) * x / ((2 : ℚ) + ((n : ℚ) + 1) * x)) := by
   have h := reciprocal_certificate p109_base_valid p109_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p109, p109_base, div_eq_mul_inv] <;> ring
+  have heq : p109 = (fun n => 1 / p109_base n) := by
+    funext n
+    simp [p109, p109_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p109_domain : (∀ n : ℕ, (2 : ℚ) + ((n : ℚ) + 1) * p109 n ≠ 0) ∧ (∀ n, p109 n ≠ 0) := by
   have h := reciprocal_certificate p109_base_valid p109_positive (by intro n; positivity)
   simpa [p109, p109_base, div_eq_mul_inv] using h.2
@@ -1169,7 +1233,11 @@ theorem p110_positive (n : ℕ) : 0 < p110_base n := by
   | succ n ih => rw [p110_base_valid.recurrence]; positivity
 theorem p110_valid : FirstCertificate p110 ((2 : ℚ) / 9) (fun n x => (1 : ℚ) * x / ((3 : ℚ) + ((2 : ℚ) * ((n : ℚ) + 1)) * x)) := by
   have h := reciprocal_certificate p110_base_valid p110_positive (by intro n; positivity)
-  convert h.1 using 1 <;> norm_num [p110, p110_base, div_eq_mul_inv] <;> ring
+  have heq : p110 = (fun n => 1 / p110_base n) := by
+    funext n
+    simp [p110, p110_base, div_eq_mul_inv] <;> ring
+  rw [heq]
+  convert h.1 using 1 <;> norm_num
 theorem p110_domain : (∀ n : ℕ, (3 : ℚ) + ((2 : ℚ) * ((n : ℚ) + 1)) * p110 n ≠ 0) ∧ (∀ n, p110 n ≠ 0) := by
   have h := reciprocal_certificate p110_base_valid p110_positive (by intro n; positivity)
   simpa [p110, p110_base, div_eq_mul_inv] using h.2

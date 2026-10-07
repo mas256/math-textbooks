@@ -86,12 +86,16 @@ def compile_recipe(family, parameters, profile='gap_2', config=None):
 def exponent_step(profile):
     if profile=='triangular':
         return ['    have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by',
-                '      simpa [Nat.add_assoc, Nat.choose_one_right, Nat.add_comm] using (Nat.choose_succ_succ (n + 1) 1)']
+                '      have hs := Nat.choose_succ_succ (n + 1) 1',
+                '      simp only [Nat.add_assoc, Nat.choose_one_right] at hs',
+                '      omega']
     if profile=='square_minus_one':
         return ['    have he : (n + 1) * (n + 3) = n * (n + 2) + (2 * (n + 1) + 1) := by ring']
     if profile=='tetrahedral':
         return ['    have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by',
-                '      simpa [Nat.add_assoc, Nat.add_comm] using (Nat.choose_succ_succ (n + 2) 2)']
+                '      have hs := Nat.choose_succ_succ (n + 2) 2',
+                '      simp only [Nat.add_assoc] at hs',
+                '      omega']
     raise ValueError(profile)
 
 
@@ -140,7 +144,11 @@ def proofs(problem):
             else: lines += [f'  unfold {underlying}','  positivity']
             lines += [f'theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := by',
                       f'  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)',
-                      f'  convert h.1 using 1 <;> norm_num [{name}, {underlying}, div_eq_mul_inv] <;> ring',
+                      f'  have heq : {name} = (fun n => 1 / {underlying} n) := by',
+                      '    funext n',
+                      f'    simp [{name}, {underlying}, div_eq_mul_inv] <;> ring',
+                      '  rw [heq]',
+                      '  convert h.1 using 1 <;> norm_num',
                       f'theorem {name}_domain : (∀ n : ℕ, {Qn} + {Rn} * {name} n ≠ 0) ∧ (∀ n, {name} n ≠ 0) := by',
                       f'  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)',
                       f'  simpa [{name}, {underlying}, div_eq_mul_inv] using h.2',f'#print axioms {name}_domain']
@@ -235,7 +243,7 @@ def comparison_report(problems,config,counters,rejections):
     return {'version':config['version'],'baseline_commit':baseline['commit'],
             'before':summarize(baseline['problems']),'after':summarize(problems),
             'candidate_counts':dict(counters),'rejection_reasons':dict(rejections),
-            'baseline_rejected_count':len(rejected),'baseline_rejected_examples':rejected[:5],
+            'baseline_rejected_count':len(rejected),'baseline_rejected_examples':rejected,
             'examples':examples,'limits':config,'status':'structural-comparison',
             'note':'式の構造と対応済み解法の比較です。学習者による難易度・良問性の実測は未実施です。'}
 
