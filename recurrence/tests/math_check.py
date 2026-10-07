@@ -19,6 +19,7 @@ for p in bank['problems']:
     assert p['routes'][0]['cost'] == min(r['cost'] for r in p['routes'])
     assert p['routes'][0]['parts']['U'] == 0
     assert p['scores']['level'] == level(p['scores']['difficulty'])
+    assert all('+-' not in step for route in p['routes'] for step in route['steps'])
 bad=dict(bank['problems'][0]['recipe'])
 bad['output']='unregistered'
 try: compile_blocks(bad)

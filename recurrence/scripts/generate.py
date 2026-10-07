@@ -162,6 +162,9 @@ def compile_recipe(family, parameters):
               "blocks": recipe_blocks, "output": previous,
               "parameters": {key: num(value) for key, value in parameters.items()}}
     ir = compile_blocks(recipe)
+    if family == "reciprocal_scaled":
+        linear_tex = (latex(mul(ir["P"], term(1))) + "=" + latex(add(mul(ir["Q"], term()), ir["R"]))).replace("a_{", "v_{")
+        routes[0]["steps"][0] = rf"\(v_n=1/a_n\) とおくと、\({linear_tex}\) です。"
     return {"family": family, "family_label": FAMILIES[family], "recipe": recipe,
             "ir": ir,
             "statement": {"initials_tex": [f"a_{{{i+1}}}={latex(v)}" for i, v in enumerate(ir["initials"])],
