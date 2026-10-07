@@ -1,0 +1,38 @@
+{
+  "version": "0.3.0",
+  "seed": 20261008,
+  "max_transforms": {
+    "add_constant": 1,
+    "constant_scale": 1,
+    "index_scale": 1,
+    "index_add": 1,
+    "reciprocal": 1,
+    "linear_combination": 1
+  },
+  "max_blocks": 3,
+  "scale_profiles": ["n", "n_plus_1", "n_squared", "consecutive", "gap_2", "odd"],
+  "allow_inverse_scales": true,
+  "exponent_profiles": ["triangular", "square_minus_one", "tetrahedral"],
+  "quality_limits": {
+    "max_coefficient_degree": 2,
+    "max_statement_nodes": 44,
+    "max_fraction_depth": 2,
+    "max_display_terms": 8,
+    "max_discovery": 3,
+    "max_numeric_cost": 8
+  },
+  "quotas": {
+    "constant": 5,
+    "geometric": 5,
+    "affine": 5,
+    "scaled_constant": 12,
+    "shifted_scaled": 6,
+    "scaled_affine": 6,
+    "second_order": 5,
+    "ratio_power": 6,
+    "reciprocal_affine": 5,
+    "reciprocal_scaled": 5,
+    "polynomial_forcing": 5,
+    "reciprocal_forcing": 5
+  }
+}

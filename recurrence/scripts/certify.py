@@ -11,6 +11,15 @@ BUILD = ROOT / "build"
 bank = json.loads((BUILD / "candidates.json").read_text(encoding="utf-8"))
 proof = (ROOT / "lean/Recurrence/Generated.lean").read_bytes()
 assert hashlib.sha256(proof).hexdigest() == bank["proof_source_sha256"]
+from compiler import compile_blocks
+from rules import normalize_recipe
+from scoring import assess, score_routes
+from solve import find_routes
+config = bank['generation_config']
+for p in bank['problems']:
+    assert normalize_recipe(p['recipe'], config) == p['recipe']
+    assert compile_blocks(p['recipe'], config) == p['ir']
+    assert assess(p['ir'], score_routes(p['ir'], find_routes(p['ir'], config)), config)['accepted']
 assert (ROOT / "lean/.lake/build/lib/lean/Recurrence/Generated.olean").is_file(), "Lean compilation did not produce Generated.olean"
 log = (BUILD / "lean.log").read_text(encoding="utf-8")
 assert "sorryAx" not in log, "Untrusted proof dependency"

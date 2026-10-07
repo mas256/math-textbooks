@@ -67,7 +67,7 @@ jobs:
           cp index.html styles.css app.js books.json site/
           cp -a equashare/. site/equashare/
           cp recurrence/index.html recurrence/styles.css recurrence/app.js recurrence/model.mjs recurrence/mathjax-config.js site/recurrence/
-          cp recurrence/build/problems.json recurrence/build/manifest.json site/recurrence/data/
+          cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/build/quality-report.json site/recurrence/data/
           python3 - <<'PY'
           import os, re
           from pathlib import Path

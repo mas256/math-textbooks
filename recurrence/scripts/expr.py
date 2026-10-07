@@ -1,5 +1,6 @@
 """A small, shared exact expression IR for LaTeX, Lean and arithmetic checks."""
 from fractions import Fraction
+from math import comb
 
 
 def num(value):
@@ -34,6 +35,10 @@ def mul(*args):
             else: flat.append(b)
     if not total: return num(0)
     args = ([num(total)] if total != 1 else []) + flat
+    if any(a['op']=='div' for a in args):
+        numerator=[a['args'][0] if a['op']=='div' else a for a in args]
+        denominator=[a['args'][1] for a in args if a['op']=='div']
+        return div(mul(*numerator),mul(*denominator))
     return args[0] if len(args) == 1 else {"op": "mul", "args": args} if args else num(1)
 
 
@@ -47,6 +52,15 @@ def sub(a, b):
 
 def div(a, b):
     return {"op": "div", "args": [a, b]}
+
+
+def reciprocal(expr):
+    if expr['op']=='div': return div(expr['args'][1],expr['args'][0])
+    if expr['op']=='mul':
+        denominators=[a['args'][1] for a in expr['args'] if a['op']=='div' and a['args'][0]==num(1)]
+        others=[a for a in expr['args'] if not (a['op']=='div' and a['args'][0]==num(1))]
+        if denominators: return div(mul(*denominators),mul(*others))
+    return div(num(1),expr)
 
 
 def power(a, exponent):
@@ -72,8 +86,13 @@ def shift(expr, offset=1):
         return nat(expr["offset"] + offset)
     if "args" in expr:
         args = [shift(a, offset) for a in expr["args"]]
-        if expr["op"] == "add": return add(*args)
-        if expr["op"] == "mul": return mul(*args)
+        if expr["op"] in {'add','mul'}:
+            result=(add if expr['op']=='add' else mul)(*args)
+            try:
+                p=polynomial(result)
+                if max(p,default=0)<=1: return from_polynomial(p)
+            except ValueError: pass
+            return result
         return {**expr, "args": args}
     return expr
 
@@ -94,6 +113,7 @@ def evaluate(expr, k, terms=None):
         return out
     if op == "div": return a[0] / a[1]
     if op == "pow": return a[0] ** a[1]
+    if op == "choose": return comb(int(a[0]), int(a[1]))
     raise ValueError(op)
 
 
@@ -127,7 +147,7 @@ def latex(expr):
                 negative = not negative
                 a = {**a, "num": -a["num"]}
             text = latex(a)
-            if a["op"] == "add" or (a["op"] == "rational" and a["num"] < 0):
+            if a["op"] == "add" or (a["op"] == "nat_index" and a['offset']!=1) or (a["op"] == "rational" and a["num"] < 0):
                 text = r"\left(" + text + r"\right)"
             out.append(text)
         return ("-" if negative else "") + (r"\,".join(out) or "1")
@@ -137,6 +157,7 @@ def latex(expr):
         if args[0]["op"] not in {"rational", "index"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
             base = r"\left(" + base + r"\right)"
         return base + "^{" + latex(args[1]) + "}"
+    if op == "choose": return rf"\binom{{{latex(args[0])}}}{{{latex(args[1])}}}"
     raise ValueError(op)
 
 
@@ -151,6 +172,7 @@ def lean(expr, sequence="f"):
     if op == "triangular": return "((n + 1).choose 2)"
     if op == "term": return f"({sequence} n)" if expr["offset"] == 0 else f"({sequence} (n + {expr['offset']}))"
     a = [lean(x, sequence) for x in expr["args"]]
+    if op == "choose": return f"({a[0]}).choose {a[1]}"
     symbol = {"add": " + ", "mul": " * ", "div": " / ", "pow": " ^ "}[op]
     return "(" + symbol.join(a) + ")"
 
@@ -169,7 +191,7 @@ def lean_step(expr):
 def polynomial(expr):
     """Exact expansion only for registered polynomials in the index."""
     op = expr["op"]
-    if op == "rational": return {0: Fraction(expr["num"], expr["den"])}
+    if op == "rational": return {0: Fraction(expr["num"], expr["den"])} if expr['num'] else {}
     if op == "index": return {1: Fraction(1)}
     if op == "pow" and expr["args"][1]["op"] == "nat_constant":
         result = {0: Fraction(1)}
@@ -197,5 +219,45 @@ def poly_mul(a, b):
 
 def expand_polynomial(expr):
     p = polynomial(expr)
+    return from_polynomial(p)
+
+
+def from_polynomial(p):
     return add(*(num(c) if d == 0 else mul(num(c), index() if d == 1 else power(index(), nat_const(d)))
-                 for d, c in sorted(p.items(), reverse=True)))
+                 for d, c in sorted(p.items(), reverse=True) if c))
+
+
+def poly_divmod(a, b):
+    assert b
+    rem, quotient = dict(a), {}
+    degree = max(b)
+    while rem and max(rem) >= degree:
+        d = max(rem) - degree
+        c = rem[max(rem)] / b[degree]
+        quotient[d] = quotient.get(d, 0) + c
+        for db, cb in b.items():
+            rem[db+d] = rem.get(db+d, 0) - c*cb
+        rem = {d:c for d,c in rem.items() if c}
+    return quotient, rem
+
+
+def poly_gcd(a, b):
+    while b:
+        a, b = b, poly_divmod(a, b)[1]
+    if not a: return {}
+    leading = a[max(a)]
+    return {d:c/leading for d,c in a.items()}
+
+
+def reduce_linear_coefficients(P, Q, R):
+    """Cancel a common *polynomial* factor before displaying/scoring a step."""
+    try:
+        ps = [polynomial(x) for x in (P,Q,R)]
+    except ValueError:
+        return P,Q,R
+    common = poly_gcd(poly_gcd(ps[0], ps[1]), ps[2])
+    if max(common, default=0) == 0:
+        return P,Q,R
+    quotients = [poly_divmod(p, common) for p in ps]
+    assert all(not r for _,r in quotients)
+    return tuple(from_polynomial(q) for q,_ in quotients)

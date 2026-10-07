@@ -34,6 +34,8 @@ export function validateBank(bank, manifest) {
       || p.verification?.status !== 'lean-verified'
       || !p.lean_theorems?.includes(p.id + '_unique')
       || !p.routes?.length || p.routes[0].parts.U !== 0
+      || p.quality?.accepted !== true || p.quality?.version !== bank.score_version
+      || !p.routes.every(r => r.complete && r.certificate)
       || !Number.isInteger(p.scores.level) || p.scores.level < 1 || p.scores.level > 4) {
       throw new Error('問題の検証情報を確認できません。');
     }

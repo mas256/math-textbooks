@@ -30,7 +30,7 @@ runs:
       shell: bash
       run: |
         mkdir -p recurrence/data
-        cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/data/
+        cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/build/quality-report.json recurrence/data/
         npm install --prefix /tmp/recurrence-browser --no-save --ignore-scripts playwright@1.55.1
         /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
         python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/recurrence-http.log 2>&1 &

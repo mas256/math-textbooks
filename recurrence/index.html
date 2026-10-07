@@ -14,7 +14,7 @@
 <body>
   <header class="header">
     <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">∫</span>数学書の本棚</a>
-    <span class="header-note">漸化式の問題生成 <span class="version">初版</span></span>
+    <span class="header-note">漸化式の問題生成 <span class="version">調整版</span></span>
   </header>
 
   <main>
@@ -95,8 +95,14 @@
     <details class="about">
       <summary>この問題生成について</summary>
       <p>定数数列・等比数列・特性方程式型（2項間）を出発点に、定数の移動、nに応じた倍率、逆数、数列の組合せを加えて作問しています。3項間の特性多項式は、2項間の不動点を使う方法と区別しています。</p>
-      <p>初版はビルド時に生成・検証した50問を出題します。表示中に新しい係数を作る方式ではありません。難易度は解法の操作数や発見の負担などに基づく暫定値です。対数型・一般の一次分数型・自由なブロック編集は今後の拡張対象です。</p>
+      <p>ビルド時に生成・検証した問題を出題します。難易度は解法の操作、発見の負担、式と途中の数値の扱いやすさから求めた暫定値です。定数の移動、正規化、逆数に加え、一次式の特解を使う問題も含みます。</p>
       <a href="https://github.com/mas256/math-textbooks/tree/main/recurrence" target="_blank" rel="noopener noreferrer">仕様と実装を見る ↗</a>
+    </details>
+    <details id="generation-details" class="about">
+      <summary>作問ルールと今回の比較</summary>
+      <div id="generation-summary"></div>
+      <div id="function-catalog"></div>
+      <a href="data/quality-report.json" download>比較結果をJSONで保存</a>
     </details>
   </main>
   <footer class="footer"><span>数学を、自分のペースで。</span><a href="../">数学書の本棚へ戻る <span aria-hidden="true">↗</span></a></footer>

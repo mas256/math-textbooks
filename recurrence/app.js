@@ -3,7 +3,7 @@ import { poolFor, chooseProblem, validateBank, texDocument } from './model.mjs';
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
 const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '定数数列・等比数列の基本を確認します。',
-  2: '一つの変形や、和・積の規則を使います。', 3: '複数の変形を組み合わせて解きます。', 4: '逆数・定数の移動・階比をつなぎます。'};
+  2: '一つの変形や、和・積の規則を使います。', 3: '正規化や特解を使い、基本形に帰着します。', 4: '逆数と正規化・特解を組み合わせます。'};
 let mathQueue = Promise.resolve();
 
 function showScrollHints() {
@@ -64,7 +64,7 @@ function updatePool() {
 
 function renderRecipe(p) {
   const names = {constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
-    index_scale:'n に応じた倍率', add_constant:'定数の移動', reciprocal:'逆数', linear_combination:'等比数列の組合せ'};
+    index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ'};
   const list = $('block-list');
   list.replaceChildren(el('span', names[p.recipe.core.kind], 'block'));
   for (const b of p.recipe.blocks) list.append(el('span', '→', 'block-arrow'), el('span', names[b.kind] || b.kind, 'block'));
@@ -81,6 +81,8 @@ function renderRecipe(p) {
   table.append(tbody);
   const wrapper = el('div', undefined, 'math-block'); wrapper.append(table);
   $('score-info').replaceChildren(wrapper, el('p', `難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。スコアは暫定値です。`, 'details-note'));
+  const metrics = p.quality.metrics;
+  $('score-info').append(el('p', `完成式の評価：係数の最高次数 ${metrics.coefficient_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
   const proof = $('proof-info');
   proof.replaceChildren(document.createTextNode('検証：Lean 4.19.0 / mathlib v4.19.0　'));
   if (/^\d+$/.test(String(state.manifest.run_id))) {
@@ -88,6 +90,20 @@ function renderRecipe(p) {
     link.href = `https://github.com/mas256/math-textbooks/actions/runs/${state.manifest.run_id}`;
     link.target = '_blank'; link.rel = 'noopener noreferrer'; proof.append(link);
   }
+}
+
+function renderGenerationSummary() {
+  const {comparison, generation_config: config, function_catalog: catalog} = state.bank;
+  const summary = $('generation-summary');
+  summary.replaceChildren(el('p', `旧版の ${comparison.before.count} 問を同じ基準で再評価し、${comparison.baseline_rejected_count} 問を採用条件から除外しました。調整版は ${comparison.after.count} 問です。`),
+    el('p', `係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
+    el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
+    el('p', 'この比較は式の構造を測った結果です。学習者の正答率や、良問としての評価は今後確認します。'));
+  const functions = $('function-catalog');
+  const normalizers = catalog.scales.filter(p => !p.id.startsWith('inverse:')).map(p => '\\(' + p.normalizer_tex + '\\)').join('、');
+  const increments = catalog.exponents.map(p => '\\(' + p.increment_tex + '\\)').join('、');
+  functions.replaceChildren(el('p', '正規化の候補：' + normalizers + ' と、それぞれの逆数。階比にはこれらの隣接比を使います。'),
+    el('p', '指数係数の指数：' + increments + '。和が閉じた式になる候補を使います。'));
 }
 
 function renderProblem(p, updateUrl = true) {
@@ -180,7 +196,8 @@ async function load() {
       const option = el('option', label); option.value = key; $('family').append(option);
     }
     $('family').disabled = false;
-    $('bank-status').textContent = `${manifest.count} 問・10系統 / Lean検証済み`;
+    $('bank-status').textContent = `${manifest.count} 問・${Object.keys(state.bank.families).length}系統 / Lean検証済み`;
+    renderGenerationSummary();
     const requested = new URL(location.href).searchParams.get('problem');
     const shared = state.bank.problems.find(p => p.id === requested);
     if (shared) state.level = shared.scores.level;
@@ -219,6 +236,7 @@ $('download-tex').addEventListener('click', () => download(texDocument(state.cur
 $('download-recipe').addEventListener('click', () => download(JSON.stringify(state.current.recipe,null,2), 'json', 'application/json'));
 $('download-lean').addEventListener('click', () => download(state.current.lean_source, 'lean'));
 $('print-problem').addEventListener('click', () => window.print());
+$('generation-details').addEventListener('toggle', () => { if ($('generation-details').open) typeset([$('function-catalog')]); });
 $('retry-math').addEventListener('click', () => {
   if (window.MathJax?.typesetPromise) { typeset([$('problem-content'),$('answer'),$('hints')]); return; }
   $('mathjax-script')?.remove();

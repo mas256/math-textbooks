@@ -1,270 +1,309 @@
 #!/usr/bin/env python3
-"""Compile block recipes to one exact IR, a bank, and Lean proof obligations.
-
-The browser selects certified instances. New parameters are introduced only in
-this build step, and the publication workflow must check their Lean obligations.
-"""
+"""Bounded composition, forward route recognition, screening, then Lean export."""
+import argparse
 import hashlib
 import itertools
 import json
 import random
+import re
+from collections import Counter, defaultdict
 from fractions import Fraction
 from pathlib import Path
 
-from expr import add, div, evaluate, index, latex, lean, lean_step, mul, nat, neg, num, power, shift, sub, term, triangular
-from scoring import level, numeric_cost, route_score
 from compiler import compile_blocks
+from expr import add, div, evaluate, index, latex, lean, mul, nat, neg, num, power, sub
+from profiles import EXPONENTS, profile_catalog, scale_options
+from rules import CONFIG_PATH, RuleViolation, load_config, normalize_recipe
+from scoring import assess, level, score_routes, statement_metrics, walk
+from solve import find_routes
 
-ROOT = Path(__file__).resolve().parents[1]
-BUILD = ROOT / "build"
-N = index()
-P = mul(N, add(N, num(2)))
-PN = shift(P)
-
-FAMILIES = {
-    "constant": "定数数列", "geometric": "等比数列", "affine": "特性方程式型（2項間）",
-    "scaled_constant": "階比型", "shifted_scaled": "階比型＋定数の移動",
-    "scaled_affine": "階比型＋特性方程式型", "second_order": "3項間漸化式",
-    "ratio_power": "指数係数の階比型", "reciprocal_affine": "逆数型＋特性方程式型",
-    "reciprocal_scaled": "逆数型＋階比型＋特性方程式型",
+ROOT=Path(__file__).resolve().parents[1]
+BUILD=ROOT/'build'
+FAMILIES={
+    'constant':'定数数列', 'geometric':'等比数列', 'affine':'特性方程式型（2項間）',
+    'scaled_constant':'階比型', 'shifted_scaled':'階比型＋定数の移動',
+    'scaled_affine':'階比型＋特性方程式型', 'second_order':'3項間漸化式',
+    'ratio_power':'指数係数の階比型', 'reciprocal_affine':'逆数型＋特性方程式型',
+    'reciprocal_scaled':'逆数型＋階比型',
+    'polynomial_forcing':'一次式の付加項', 'reciprocal_forcing':'逆数型＋一次式の付加項',
 }
+SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 
 
-def signed_tex(expr):
-    text = latex(expr)
-    return text if text.startswith("-") else "+" + text
+def compile_recipe(family, parameters, profile='gap_2', config=None):
+    config=config or load_config()
+    r,c,d,s=(Fraction(parameters[x]) for x in ('r','c','d','s'))
+    core='constant' if family in {'constant','scaled_constant','shifted_scaled','ratio_power'} else 'geometric' if family in {'geometric','second_order','polynomial_forcing','reciprocal_forcing'} else 'affine_fixed_point'
+    params={'initial':num(d)} if core=='constant' else {'ratio':num(r),'amplitude':num(d)}
+    if core=='affine_fixed_point': params.update(fixed_point=num(c),constant_term=num((1-r)*c))
+    blocks=[]
+    if family in SCALED:
+        factors=dict(scale_options(config))
+        if profile not in factors: raise RuleViolation('disabled_scale_profile')
+        blocks.append({'kind':'index_scale','profile':profile,'factor':factors[profile]})
+        if family=='shifted_scaled': blocks.append({'kind':'add_constant','value':num(-c)})
+    if family=='ratio_power':
+        if profile not in config['exponent_profiles']: raise RuleViolation('disabled_exponent_profile')
+        blocks.append({'kind':'index_scale','profile':profile,'factor':power(num(r),EXPONENTS[profile]['total'])})
+    if family in {'polynomial_forcing','reciprocal_forcing'}:
+        # u(n+1)-r*u(n)=c(r-1)n. Positivity follows from the
+        # positive initial value and the positive forcing recurrence.
+        if d-c-c/(r-1)<=0: raise RuleViolation('nonpositive_initial')
+        value=add(mul(num(-c),index()),num(-c/(r-1)))
+        blocks.append({'kind':'index_add','value':value})
+    if family=='second_order':
+        if r==s: raise RuleViolation('repeated_root')
+        blocks.append({'kind':'linear_combination','other_core':{'kind':'geometric','ratio':num(s),'initial':num(c)}})
+    if family in {'reciprocal_affine','reciprocal_scaled','reciprocal_forcing'}:
+        blocks.append({'kind':'reciprocal','requires':'positive_input'})
+    previous='core'
+    for i,b in enumerate(blocks,1):
+        b.update(id=f'b{i}',input=previous)
+        previous=b['id']
+    recipe={'schema_version':'0.2','rule_set_version':config['version'],
+            'domain':{'index_start':1,'sequence_type':'rational'},
+            'core':{'id':'core','kind':core,'parameters':params},
+            'blocks':blocks,'output':previous}
+    recipe=normalize_recipe(recipe,config)
+    ir=compile_blocks(recipe,config)
+    routes=score_routes(ir,find_routes(ir,config))
+    quality=assess(ir,routes,config)
+    main=routes[0] if routes else None
+    scores={'difficulty':main['cost'] if main else None,
+            'level':level(main['cost']) if main else None,
+            'cleanliness':main['numeric_cost'] if main else None,
+            'quality_proposal':max(0,30-2*main['parts']['P']-main['parts']['R']-main['parts']['A']) if main else 0,
+            'quality_status':'structural-heuristic','version':config['version']}
+    return {'family':family,'family_label':FAMILIES[family],'recipe':recipe,'ir':ir,
+            'statement':{'initials_tex':[f'a_{{{i+1}}}={latex(v)}' for i,v in enumerate(ir['initials'])],
+                         'recurrence_tex':latex(ir['lhs'])+'='+latex(ir['rhs']),
+                         'condition':'n は 1 以上の整数とする。数列の一般項 a_n を求めよ。'},
+            'answer_tex':'a_n='+latex(ir['formula']),'routes':routes,'scores':scores,'quality':quality,
+            'generation':{'profile':profile if family in SCALED|{'ratio_power'} else None,
+                          'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
-def route(title, operations, hint, discovery=0, domain=0, steps=None):
-    return {"title": title, "hint": hint, "steps": steps or [],
-            **route_score(operations, discovery=discovery, domain=domain)}
-
-
-def compile_recipe(family, parameters):
-    r, c, d, k, s = (num(parameters[x]) for x in ("r", "c", "d", "k", "s"))
-    q = num((1 - parameters["r"]) * parameters["c"])
-    bn = add(c, mul(d, power(r, nat())))
-    blocks, core = [], "constant" if family in {"constant", "scaled_constant", "shifted_scaled", "ratio_power"} else "geometric" if family in {"geometric", "second_order"} else "affine_fixed_point"
-    expr = d if core == "constant" else mul(d, power(r, nat())) if core == "geometric" else bn
-    coefP, coefQ, coefR = num(1), num(1), num(0)
-    reciprocal, second = False, False
-    extra = {}
-    core_params = {"initial": d} if core == "constant" else {"ratio": r, "amplitude": d}
-    if core == "affine_fixed_point": core_params.update({"fixed_point": c, "constant_term": q})
-    if family == "constant":
-        routes = [route("同じ値が続く", ["constant"], "隣り合う項の値は変わりますか。",
-                        steps=["漸化式から、すべての項が初項に等しいことがわかります。"])]
-    elif family == "geometric":
-        coefQ = r
-        routes = [route("公比を読む", ["geometric"], "前の項にかけられている定数に注目します。",
-                        steps=[rf"初項は \({latex(d)}\)、公比は \({latex(r)}\) です。等比数列の一般項を使います。"])]
-    elif family == "affine":
-        coefQ, coefR = r, q
-        routes = [route("不動点を引いて等比数列にする", ["fixed_point", "geometric"], "毎回同じ値になる数を探し、それを引きます。", 1,
-                        steps=[rf"\(x={latex(r)}x{signed_tex(q)}\) を解くと \(x={latex(c)}\) です。",
-                               rf"\(b_n=a_n-{latex(c)}\) とおくと、\(b_{{n+1}}={latex(r)}b_n\)、\(b_1={latex(d)}\) になります。",
-                               "等比数列の一般項を求め、置換を戻します。"])]
-    elif family in {"scaled_constant", "shifted_scaled", "scaled_affine", "reciprocal_scaled"}:
-        expr = mul(P, expr)
-        blocks.append({"kind": "index_scale", "factor": P})
-        coefP, coefQ = P, mul(r if core != "constant" else num(1), PN)
-        coefR = mul(q, P, PN) if core != "constant" else num(0)
-        operations = ["index_scale"] + (["constant"] if core == "constant" else ["fixed_point", "geometric"])
-        discovery = 0 if family == "scaled_constant" else 1 if family == "shifted_scaled" else 2
-        shift_value = k if family == "reciprocal_scaled" else neg(c) if family == "shifted_scaled" else num(0)
-        if shift_value != num(0):
-            expr = add(expr, shift_value)
-            coefR = add(coefR, mul(shift_value, sub(P, coefQ)))
-            blocks.append({"kind": "add_constant", "value": shift_value})
-            operations = ["shift"] + operations
-        steps = []
-        if family == "shifted_scaled":
-            steps.append(rf"\(b_n=a_n+{latex(c)}\) とおくと、\({latex(P)}b_{{n+1}}={latex(PN)}b_n\) です。")
-            steps.append(rf"\(b_n/{latex(P)}\) は一定なので、初項からその値を決めます。")
-        elif family == "scaled_constant":
-            steps.append(rf"係数の比は \({latex(div(PN, P))}\) です。\(b_n=a_n/({latex(P)})\) とおくと \(b_{{n+1}}=b_n\) になります。")
-        else:
-            steps.append(rf"\(b_n=a_n/({latex(P)})\) とおくと \(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) です。")
-            steps.append(rf"さらに \(b_n-{latex(c)}\) が等比数列になることを使います。")
-        routes = [route("係数の比から正規化する", operations,
-                        "n と n+1 の係数は、同じ式を一つずらした形になっています。", discovery, steps=steps)]
-        if family == "scaled_constant":
-            routes.append(route("積の約分を使う", ["ratio_product", "evaluate_product", "constant"],
-                                "隣り合う項の比を順にかけると、途中の因子が約分されます。", 1,
-                                steps=[rf"\(a_n=a_1\prod_{{j=1}}^{{n-1}}\frac{{(j+1)(j+3)}}{{j(j+2)}}\) とします。",
-                                       r"積は \(n(n+2)/3\) に約分できます。初項を代入します。"] ))
-    elif family == "ratio_power":
-        expr = mul(d, power(r, triangular()))
-        coefQ = power(r, nat(1))
-        blocks.append({"kind": "index_scale", "factor": power(r, triangular())})
-        routes = [route("比をかけて指数を足す", ["ratio_product", "evaluate_product"],
-                        "かけられる数の指数を、1 から n−1 まで足します。", 1,
-                        steps=[rf"\(a_n={latex(d)}\prod_{{j=1}}^{{n-1}}{latex(r)}^j\) です。",
-                               r"\(1+2+\cdots+(n-1)=n(n-1)/2\) を使って積を評価します。"]),
-                  route("対数をとって和にする", ["logarithm", "difference_sum", "evaluate_sum"],
-                        "すべての項が正なので、対数をとる方法も使えます。", 1, 1,
-                        steps=[rf"初項と係数は正なので全項が正です。\(b_n=\log_{{{latex(r)}}}a_n\) とおくと \(b_{{n+1}}-b_n=n\) です。",
-                               "差を足し合わせてから、指数の形に戻します。"])]
-    elif family == "reciprocal_affine":
-        expr, coefQ, coefR = bn, r, q
-        reciprocal = True
-        routes = [route("逆数をとって不動点を引く", ["reciprocal", "fixed_point", "geometric"],
-                        "分母と分子を a_n で割り、逆数の関係を調べます。", 1, 1,
-                        steps=[rf"\(b_n=1/a_n\) とおくと \(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) です。",
-                               rf"\(b_n-{latex(c)}\) は公比 \({latex(r)}\) の等比数列です。初項を代入してから逆数を戻します。",
-                               "得られた逆数はすべて正なので、各項と漸化式の分母は 0 になりません。"])]
-    elif family == "second_order":
-        second = True
-        A, B = d, c
-        expr = add(mul(A, power(r, nat())), mul(B, power(s, nat())))
-        blocks.append({"kind": "linear_combination", "other_core": {"kind": "geometric", "ratio": s, "initial": B}})
-        extra = {"p": num(parameters["r"] + parameters["s"]), "q": num(-parameters["r"] * parameters["s"])}
-        routes = [route("特性多項式の根を使う", ["characteristic_distinct"],
-                        "3項間なので、λ²−pλ−q=0 という特性多項式を作ります。", 1,
-                        steps=[rf"特性多項式は \((\lambda-{latex(r)})(\lambda-{latex(s)})=0\) です。",
-                               rf"\(a_n=A{latex(r)}^{{n-1}}+B{latex(s)}^{{n-1}}\) とおき、二つの初期値を代入すると \(A={latex(A)}\)、\(B={latex(B)}\) になります。"])]
-    if family == "reciprocal_scaled":
-        reciprocal = True
-        operations = ["reciprocal"] + routes[0]["operations"]
-        routes = [route("逆数をとり、定数を引いて正規化する", operations,
-                        "まず逆数をとると、n の係数の規則が見える形になります。", 2, 1,
-                        steps=[rf"\(v_n=1/a_n\) とおくと、\({latex(P)}v_{{n+1}}={latex(coefQ)}v_n+{latex(coefR)}\) です。",
-                               rf"\(b_n=(v_n-{latex(k)})/({latex(P)})\) とおくと、\(b_{{n+1}}={latex(r)}b_n{signed_tex(q)}\) になります。",
-                               rf"不動点 \({latex(c)}\) を引いて等比数列を解き、二つの置換を戻します。",
-                               "一般項の分母は正です。この正値性から、元の漸化式も全項で定義されます。"])]
-    underlying = expr
-    if reciprocal:
-        expr = div(num(1), underlying)
-        blocks.append({"kind": "reciprocal", "requires": "positive_input"})
-        step = div(mul(coefP, term()), add(coefQ, mul(coefR, term())))
-        lhs, rhs = term(1), step
-    elif second:
-        step = None
-        lhs, rhs = term(2), add(mul(extra["p"], term(1)), mul(extra["q"], term()))
-    else:
-        step = div(add(mul(coefQ, term()), coefR), coefP)
-        lhs, rhs = mul(coefP, term(1)), add(mul(coefQ, term()), coefR)
-    routes.sort(key=lambda rt: rt["cost"])
-    dcost = routes[0]["cost"]
-    initial = evaluate(expr, 0)
-    initials = [num(initial)] + ([num(evaluate(expr, 1))] if second else [])
-    statement_numbers = {Fraction(v) for v in parameters.values()} | {initial}
-    if second: statement_numbers.add(evaluate(expr, 1))
-    numeric = sum(numeric_cost(x) for x in statement_numbers)
-    recipe_blocks = []
-    previous = "core"
-    for i, b in enumerate(blocks, 1):
-        recipe_blocks.append({"id": f"b{i}", "input": previous, **b})
-        previous = f"b{i}"
-    recipe = {"schema_version": "0.2", "rule_set_version": "0.2.0",
-              "domain": {"index_start": 1, "sequence_type": "rational"},
-              "core": {"id": "core", "kind": core, "parameters": core_params},
-              "blocks": recipe_blocks, "output": previous,
-              "parameters": {key: num(value) for key, value in parameters.items()}}
-    ir = compile_blocks(recipe)
-    if family == "reciprocal_scaled":
-        linear_tex = (latex(mul(ir["P"], term(1))) + "=" + latex(add(mul(ir["Q"], term()), ir["R"]))).replace("a_{", "v_{")
-        routes[0]["steps"][0] = rf"\(v_n=1/a_n\) とおくと、\({linear_tex}\) です。"
-    return {"family": family, "family_label": FAMILIES[family], "recipe": recipe,
-            "ir": ir,
-            "statement": {"initials_tex": [f"a_{{{i+1}}}={latex(v)}" for i, v in enumerate(ir["initials"])],
-                          "recurrence_tex": latex(ir["lhs"]) + "=" + latex(ir["rhs"]),
-                          "condition": "n は 1 以上の整数とする。数列の一般項 a_n を求めよ。"},
-            "answer_tex": "a_n=" + latex(ir["formula"]), "routes": routes,
-            "scores": {"difficulty": dcost, "level": level(dcost), "cleanliness": numeric,
-                       "quality_proposal": 23 if family in {"constant", "geometric"} else 29,
-                       "quality_status": "heuristic", "version": "0.2.0"}}
+def exponent_step(profile):
+    if profile=='triangular':
+        return ['    have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by',
+                '      simpa [Nat.add_assoc, Nat.choose_one_right, Nat.add_comm] using (Nat.choose_succ_succ (n + 1) 1)']
+    if profile=='square_minus_one':
+        return ['    have he : (n + 1) * (n + 3) = n * (n + 2) + (2 * (n + 1) + 1) := by ring']
+    if profile=='tetrahedral':
+        return ['    have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by',
+                '      simpa [Nat.add_assoc, Nat.add_comm] using (Nat.choose_succ_succ (n + 2) 2)']
+    raise ValueError(profile)
 
 
 def proofs(problem):
-    name, ir = problem["id"], problem["ir"]
-    fexpr = lean(ir["formula"])
-    init = lean(ir["initials"][0])
-    lines = [f"def {name} (n : ℕ) : ℚ := {fexpr}"]
-    if ir["second_order"]:
-        p, q, sec = lean(ir["p"]), lean(ir["q"]), lean(ir["initials"][1])
-        cert = f"SecondCertificate {name} {init} {sec} {p} {q}"
-        lines += [f"theorem {name}_valid : {cert} := by", "  constructor",
-                  f"  · norm_num [{name}]", f"  · norm_num [{name}]",
-                  "  · intro n", f"    simp only [{name}, pow_succ, pow_add] <;> ring",
-                  f"theorem {name}_unique (a : ℕ → ℚ) (ha : SecondCertificate a {init} {sec} {p} {q}) :",
-                  f"    ∀ n, a n = {name} n := second_unique {name}_valid ha"]
+    name,ir=problem['id'],problem['ir']
+    init=lean(ir['initials'][0])
+    lines=[f"def {name} (n : ℕ) : ℚ := {lean(ir['formula'])}"]
+    if ir['second_order']:
+        p,q,sec=lean(ir['p']),lean(ir['q']),lean(ir['initials'][1])
+        cert=f'SecondCertificate {name} {init} {sec} {p} {q}'
+        lines += [f'theorem {name}_valid : {cert} := by','  constructor',
+                  f'  · norm_num [{name}]',f'  · norm_num [{name}]',
+                  '  · intro n',f'    simp only [{name}, pow_succ, pow_add] <;> ring',
+                  f'theorem {name}_unique (a : ℕ → ℚ) (ha : SecondCertificate a {init} {sec} {p} {q}) :',
+                  f'    ∀ n, a n = {name} n := second_unique {name}_valid ha']
     else:
-        Pn, Qn, Rn = [lean(ir[x]) for x in ("P", "Q", "R")]
-        Pfn, Qfn, Rfn = [f"(fun n : ℕ => {s})" for s in (Pn, Qn, Rn)]
-        underlying = name + "_base" if ir["reciprocal"] else name
-        if ir["reciprocal"]:
-            lines.append(f"def {underlying} (n : ℕ) : ℚ := {lean(ir['underlying'])}")
-        base_init = lean(num(evaluate(ir["underlying"], 0)))
-        base_step = f"(fun n x => ({Qn} * x + {Rn}) / {Pn})"
-        lines += [f"theorem {name}_base_valid : FirstCertificate {underlying} {base_init} {base_step} := by",
-                  f"  apply linear_certificate {underlying} {base_init} {Pfn} {Qfn} {Rfn}",
-                  f"  · norm_num [{underlying}]", "  · intro n; positivity", "  · intro n",
-                  f"    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_add] <;> ring"]
-        if ir["reciprocal"]:
-            actual_step = f"(fun n x => {Pn} * x / ({Qn} + {Rn} * x))"
-            lines += [f"theorem {name}_positive (n : ℕ) : 0 < {underlying} n := by",
-                      f"  unfold {underlying}", "  positivity",
-                      f"theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := by",
-                      f"  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)",
-                      f"  convert h.1 using 1 <;> norm_num [{name}, {underlying}]",
-                      f"theorem {name}_domain : (∀ n : ℕ, {Qn} + {Rn} * {name} n ≠ 0) ∧ (∀ n, {name} n ≠ 0) := by",
-                      f"  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)",
-                      f"  simpa only [{name}, {underlying}] using h.2"]
-            lines.append(f"#print axioms {name}_domain")
+        Pn,Qn,Rn=[lean(ir[x]) for x in ('P','Q','R')]
+        Pfn,Qfn,Rfn=[f'(fun n : ℕ => {s})' for s in (Pn,Qn,Rn)]
+        underlying=name+'_base' if ir['reciprocal'] else name
+        if ir['reciprocal']: lines.append(f"def {underlying} (n : ℕ) : ℚ := {lean(ir['underlying'])}")
+        base_init=lean(num(evaluate(ir['underlying'],0)))
+        base_step=f'(fun n x => ({Qn} * x + {Rn}) / {Pn})'
+        lines += [f'theorem {name}_base_valid : FirstCertificate {underlying} {base_init} {base_step} := by',
+                  f'  apply linear_certificate {underlying} {base_init} {Pfn} {Qfn} {Rfn}',
+                  f'  · norm_num [{underlying}]','  · intro n; positivity','  · intro n']
+        if 'exponent_profile' in ir:
+            lines += exponent_step(ir['exponent_profile'])
+            lines += [f'    simp only [{underlying}, Nat.add_assoc]', '    rw [he]', '    simp only [pow_add] <;> ring']
         else:
-            actual_step = base_step
-            lines.append(f"theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := {name}_base_valid")
-        lines += [f"theorem {name}_unique (a : ℕ → ℚ) (ha : FirstCertificate a {init} {actual_step}) :",
-                  f"    ∀ n, a n = {name} n := first_unique {name}_valid ha"]
-    lines += [f"#print axioms {name}_valid", f"#print axioms {name}_unique"]
-    return "\n".join(lines) + "\n"
+            denominators={lean(x['args'][1]) for x in walk(ir['underlying']) if x['op']=='div'}
+            for i,den in enumerate(sorted(denominators)):
+                next_den=re.sub(r'\bn\b','(n + 1)',den)
+                lines += [f'    have hd{i} : {den} ≠ 0 := by positivity',
+                          f'    have he{i} : {next_den} ≠ 0 := by positivity']
+            lines += [f'    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *']
+            if denominators:
+                facts=', '.join(f'{h}{i}' for i in range(len(denominators)) for h in ('hd','he'))
+                lines.append(f'    field_simp [{facts}] <;> ring')
+            else: lines.append('    ring')
+        if ir['reciprocal']:
+            actual_step=f'(fun n x => {Pn} * x / ({Qn} + {Rn} * x))'
+            lines += [f'theorem {name}_positive (n : ℕ) : 0 < {underlying} n := by']
+            if problem['family']=='reciprocal_forcing':
+                lines += ['  induction n with',f'  | zero => norm_num [{underlying}]',
+                          f'  | succ n ih => rw [{name}_base_valid.recurrence]; positivity']
+            else: lines += [f'  unfold {underlying}','  positivity']
+            lines += [f'theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := by',
+                      f'  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)',
+                      f'  convert h.1 using 1 <;> norm_num [{name}, {underlying}, div_eq_mul_inv] <;> ring',
+                      f'theorem {name}_domain : (∀ n : ℕ, {Qn} + {Rn} * {name} n ≠ 0) ∧ (∀ n, {name} n ≠ 0) := by',
+                      f'  have h := reciprocal_certificate {name}_base_valid {name}_positive (by intro n; positivity)',
+                      f'  simpa [{name}, {underlying}, div_eq_mul_inv] using h.2',f'#print axioms {name}_domain']
+        else:
+            actual_step=base_step
+            lines.append(f'theorem {name}_valid : FirstCertificate {name} {init} {actual_step} := {name}_base_valid')
+        lines += [f'theorem {name}_unique (a : ℕ → ℚ) (ha : FirstCertificate a {init} {actual_step}) :',
+                  f'    ∀ n, a n = {name} n := first_unique {name}_valid ha']
+    lines += [f'#print axioms {name}_valid',f'#print axioms {name}_unique']
+    return '\n'.join(lines)+'\n'
 
 
 def validate(problem):
-    ir = problem["ir"]
-    assert problem["scores"]["level"] in range(1, 5)
+    ir=problem['ir']
+    assert problem['scores']['level'] in range(1,5)
     for n in range(24):
-        xs = {i: evaluate(ir["formula"], n + i) for i in (0, 1, 2)}
-        assert evaluate(ir["lhs"], n, xs) == evaluate(ir["rhs"], n, xs), (problem["id"], n)
-        if ir["reciprocal"]:
-            assert xs[0] > 0
-            assert evaluate(add(ir["Q"], mul(ir["R"], term())), n, xs) != 0
+        xs={i:evaluate(ir['formula'],n+i) for i in (0,1,2)}
+        assert evaluate(ir['lhs'],n,xs)==evaluate(ir['rhs'],n,xs),(problem.get('id'),n)
+        for route in problem['routes']:
+            assert evaluate(route['formula'],n)==xs[0],('forward route',route['title'],n)
+        if ir['reciprocal']:
+            assert xs[0]>0
+            assert evaluate(add(ir['Q'],mul(ir['R'],{'op':'term','offset':0})),n,xs)!=0
     return 24
 
 
+def choose_diverse(candidates, quota, config=None):
+    config=config or load_config()
+    groups=defaultdict(list)
+    ordered=sorted(candidates,key=lambda p:(p['scores']['cleanliness'],p['routes'][0]['parts']['P'],p['scores']['difficulty'],p['statement']['recurrence_tex']))
+    profile_count=len({p['generation']['profile'] for p in candidates})
+    for p in ordered:
+        profile=p['generation']['profile']
+        if profile:
+            key=profile if quota>=profile_count else profile.removeprefix('inverse:')
+        else:
+            key=json.dumps([p['ir'][x] for x in ('P','Q','R')]+([p['ir']['p'],p['ir']['q']] if p['ir']['second_order'] else []),sort_keys=True)
+        groups[key].append(p)
+    if candidates and candidates[0]['generation']['profile'] and quota<profile_count:
+        for key,group in groups.items():
+            preferred_inverse=bool(config['scale_profiles'].index(key)%2) if key in config['scale_profiles'] else False
+            group.sort(key=lambda p:(p['generation']['profile'].startswith('inverse:')!=preferred_inverse,
+                                     p['scores']['cleanliness'],p['routes'][0]['parts']['P'],p['scores']['difficulty']))
+    chosen=[]
+    while len(chosen)<quota and groups:
+        for key in list(groups):
+            chosen.append(groups[key].pop(0))
+            if not groups[key]: del groups[key]
+            if len(chosen)==quota: break
+    return chosen
+
+
+def identity_key(ir):
+    """Keep existing public links only when recurrence and initials agree."""
+    from expr import polynomial, poly_gcd, poly_divmod
+    initial=[evaluate(x,0) for x in ir['initials']]
+    if ir['second_order']:
+        return str(['second',evaluate(ir['p'],0),evaluate(ir['q'],0),initial])
+    try:
+        ps=[polynomial(ir[k]) for k in ('P','Q','R')]
+        common=poly_gcd(poly_gcd(ps[0],ps[1]),ps[2])
+        ps=[poly_divmod(p,common)[0] for p in ps]
+        scale=ps[0][max(ps[0])]
+        coefficients=[sorted((d,str(c/scale)) for d,c in p.items()) for p in ps]
+    except ValueError:
+        coefficients=[ir[k] for k in ('P','Q','R')]
+    return str([ir['reciprocal'],coefficients,initial])
+
+
+def summarize(problems):
+    metrics=[statement_metrics(p['ir']) for p in problems]
+    return {'count':len(problems),'mean_nodes':round(sum(x['nodes'] for x in metrics)/len(metrics),2) if metrics else 0,
+            'max_nodes':max((x['nodes'] for x in metrics),default=0),
+            'max_coefficient_degree':max((x['coefficient_degree'] for x in metrics),default=0),
+            'levels':dict(Counter(str(p['scores']['level']) for p in problems)),
+            'families':dict(Counter(p['family'] for p in problems))}
+
+
+def comparison_report(problems,config,counters,rejections):
+    baseline=json.loads((ROOT/'reference/quality-baseline.json').read_text())
+    rejected=[]
+    for i,p in enumerate(baseline['problems'],1):
+        routes=score_routes(p['ir'],find_routes(p['ir'],config))
+        assessment=assess(p['ir'],routes,config)
+        if not assessment['accepted']:
+            rejected.append({'old_id':f'p{i:03}','family':p['family'],
+                             'recurrence_tex':p['statement']['recurrence_tex'],**assessment})
+    examples=[{'id':p['id'],'family':p['family'],'recurrence_tex':p['statement']['recurrence_tex'],
+               'initials_tex':p['statement']['initials_tex'],'answer_tex':p['answer_tex'],
+               'metrics':p['quality']['metrics'],'main_route':p['routes'][0]['title']}
+              for p in problems if p['family'] in {'shifted_scaled','reciprocal_forcing'}][:12]
+    return {'version':config['version'],'baseline_commit':baseline['commit'],
+            'before':summarize(baseline['problems']),'after':summarize(problems),
+            'candidate_counts':dict(counters),'rejection_reasons':dict(rejections),
+            'baseline_rejected_count':len(rejected),'baseline_rejected_examples':rejected[:5],
+            'examples':examples,'limits':config,'status':'structural-comparison',
+            'note':'式の構造と対応済み解法の比較です。学習者による難易度・良問性の実測は未実施です。'}
+
+
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--config',type=Path,default=CONFIG_PATH)
+    args=parser.parse_args()
+    config=load_config(args.config)
     BUILD.mkdir(exist_ok=True)
-    parameters = list(itertools.product((2, 3), (1, 2, 3), (1, 2, 3, 4, Fraction(1, 2)), (1, 2), (3, 4)))
-    rng = random.Random(20261007)
-    rng.shuffle(parameters)
-    problems, fingerprints = [], set()
+    parameters=list(itertools.product((2,3),(1,2,3),(1,2,3,4,5,6,8,9,Fraction(1,2)),(3,4)))
+    random.Random(config['seed']).shuffle(parameters)
+    baseline=json.loads((ROOT/'reference/quality-baseline.json').read_text())
+    previous_ids={identity_key(p['ir']):f'p{i:03}' for i,p in enumerate(baseline['problems'],1)}
+    next_id=len(baseline['problems'])+1
+    problems, fingerprints=[],set()
+    counters,rejections=Counter(),Counter()
     for family in FAMILIES:
-        candidates = []
-        for r, c, d, k, s in parameters:
-            if r == s: continue
-            p = compile_recipe(family, {"r": r, "c": c, "d": d, "k": k, "s": s})
-            fingerprint = json.dumps([p["ir"]["lhs"], p["ir"]["rhs"], p["ir"]["initials"]], sort_keys=True)
-            if fingerprint in fingerprints: continue
-            fingerprints.add(fingerprint)
-            candidates.append(p)
-        candidates.sort(key=lambda p: p["scores"]["cleanliness"])
-        for p in candidates[:5]:
-            p["id"] = f"p{len(problems)+1:03}"
+        quota=config['quotas'].get(family,0)
+        if not quota: continue
+        profiles=[name for name,_ in scale_options(config)] if family in SCALED else config['exponent_profiles'] if family=='ratio_power' else ['none']
+        candidates=[]
+        for profile in profiles:
+            for r,c,d,s in parameters:
+                counters['attempted']+=1
+                try: p=compile_recipe(family,{'r':r,'c':c,'d':d,'s':s},profile,config)
+                except RuleViolation as e:
+                    counters['rule_rejected']+=1
+                    rejections[str(e)]+=1
+                    continue
+                fingerprint=json.dumps([p['ir']['lhs'],p['ir']['rhs'],p['ir']['initials']],sort_keys=True)
+                if fingerprint in fingerprints:
+                    counters['duplicate']+=1
+                    continue
+                fingerprints.add(fingerprint)
+                counters['unique']+=1
+                if not p['quality']['accepted']:
+                    counters['quality_rejected']+=1
+                    rejections.update(p['quality']['reasons'])
+                    continue
+                counters['accepted_candidates']+=1
+                candidates.append(p)
+        selected=choose_diverse(candidates,quota,config)
+        if len(selected)!=quota:
+            raise RuntimeError(f'{family}: only {len(selected)} acceptable problems for quota {quota}; reasons={dict(rejections)}')
+        for p in selected:
+            previous_id=previous_ids.get(identity_key(p['ir']))
+            p['id']=previous_id or f'p{next_id:03}'
+            if previous_id is None: next_id+=1
             validate(p)
-            p["lean_theorems"] = [p["id"] + "_valid", p["id"] + "_unique"] + ([p["id"] + "_domain"] if p["ir"]["reciprocal"] else [])
-            p["lean_source"] = "import Recurrence.Theory\n\nnamespace Recurrence\n" + proofs(p) + "end Recurrence\n"
+            p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] else [])
+            p['lean_source']='import Recurrence.Theory\n\nnamespace Recurrence\n'+proofs(p)+'end Recurrence\n'
             problems.append(p)
-    assert len(problems) == 50
-    source = "import Recurrence.Theory\n\nnamespace Recurrence\n\n" + "\n".join(proofs(p) for p in problems) + "\nend Recurrence\n"
-    generated = ROOT / "lean/Recurrence/Generated.lean"
-    generated.write_text(source, encoding="utf-8")
-    payload = {"schema_version": "0.2", "score_version": "0.2.0", "generator_version": "0.1.0",
-               "families": FAMILIES, "problems": problems,
-               "checks": {"exact_arithmetic_cases": len(problems) * 24},
-               "proof_source_sha256": hashlib.sha256(source.encode()).hexdigest()}
-    (BUILD / "candidates.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Generated {len(problems)} problems / {len(FAMILIES)} families; 1200 exact term checks passed.")
+    if not problems: raise RuntimeError('No problems were selected')
+    source='import Recurrence.Theory\n\nnamespace Recurrence\n\n'+'\n'.join(proofs(p) for p in problems)+'\nend Recurrence\n'
+    (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
+    report=comparison_report(problems,config,counters,rejections)
+    (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.2.0',
+             'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
+             'generation_config':config,'function_catalog':profile_catalog(config),
+             'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count')},
+             'checks':{'exact_arithmetic_cases':len(problems)*24},
+             'proof_source_sha256':hashlib.sha256(source.encode()).hexdigest()}
+    (BUILD/'candidates.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+    print(f"Generated {len(problems)} problems / {len(payload['families'])} families; {len(problems)*24} exact term checks passed.")
+    print('Comparison:',json.dumps({k:report[k] for k in ('before','after','baseline_rejected_count')},ensure_ascii=False))
+    print('Candidate screening:',dict(counters),'reasons:',dict(rejections))
 
 
-if __name__ == "__main__": main()
+if __name__=='__main__': main()

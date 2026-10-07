@@ -23,6 +23,21 @@ test('unverified banks and mismatched manifests are rejected', () => {
   assert.throws(()=>validateBank({schema_version:'0.2',problems:[],verification:{status:'pending'}},{status:'lean-verified'}));
 });
 
+test('structurally rejected or incomplete problems cannot be served', () => {
+  const problem={id:'p001',verification:{status:'lean-verified'},lean_theorems:['p001_unique'],
+    scores:{level:2},quality:{accepted:true,version:'0.3.0'},
+    routes:[{parts:{U:0},complete:true,certificate:{kind:'polynomial-normalization'}}]};
+  const verified={schema_version:'0.2',score_version:'0.3.0',problems:[problem],
+    proof_source_sha256:'proof',verification:{status:'lean-verified',commit:'commit'}};
+  const manifest={status:'lean-verified',commit:'commit',proof_source_sha256:'proof',count:1};
+  assert.equal(validateBank(verified,manifest),verified);
+  problem.quality.accepted=false;
+  assert.throws(()=>validateBank(verified,manifest));
+  problem.quality.accepted=true;
+  problem.routes[0].complete=false;
+  assert.throws(()=>validateBank(verified,manifest));
+});
+
 test('TeX defaults to problem only and adds solutions on request', () => {
   const q={id:'p001',statement:{initials_tex:['a_1=1'],recurrence_tex:'a_{n+1}=2a_n'},
     answer_tex:'a_n=2^{n-1}',routes:[{title:'等比',steps:['公比は2です。']}]};

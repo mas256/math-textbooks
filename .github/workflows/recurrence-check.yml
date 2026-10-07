@@ -3,7 +3,7 @@ name: Verify recurrence generator
 on:
   workflow_call:
   push:
-    branches: ['codex/recurrence-generator']
+    branches: ['codex/recurrence-*']
     paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
   pull_request:
     paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
