@@ -70,7 +70,7 @@ def compile_recipe(family, parameters):
         coefP, coefQ = P, mul(r if core != "constant" else num(1), PN)
         coefR = mul(q, P, PN) if core != "constant" else num(0)
         operations = ["index_scale"] + (["constant"] if core == "constant" else ["fixed_point", "geometric"])
-        discovery = 0 if family == "scaled_constant" else 2
+        discovery = 0 if family == "scaled_constant" else 1 if family == "shifted_scaled" else 2
         shift_value = k if family == "reciprocal_scaled" else neg(c) if family == "shifted_scaled" else num(0)
         if shift_value != num(0):
             expr = add(expr, shift_value)

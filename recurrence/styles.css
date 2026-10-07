@@ -55,6 +55,7 @@ select { width:100%; padding:11px 28px 11px 10px; background:var(--white); borde
 .problem-content { margin-top:32px; min-height:150px; font-size:14px; line-height:1.9; }
 .problem-content > p { margin:0 0 16px; }
 .math-block { overflow-x:auto; padding:5px 0; scrollbar-width:thin; }
+.scroll-help { margin:-8px 0 18px; color:var(--muted); font-size:9px; line-height:1.8; }
 mjx-container[display=true] { margin:14px 0 !important; max-width:100%; }
 .problem-content .math-block { margin:5px 0 18px; font-size:115%; }
 .question-line { color:var(--muted); font-size:12px; }

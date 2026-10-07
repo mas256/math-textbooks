@@ -6,6 +6,21 @@ const levelText = {0: '基本から発展まで、すべての問題を含みま
   2: '一つの変形や、和・積の規則を使います。', 3: '複数の変形を組み合わせて解きます。', 4: '逆数・定数の移動・階比をつなぎます。'};
 let mathQueue = Promise.resolve();
 
+function showScrollHints() {
+  for (const box of document.querySelectorAll('.math-block')) {
+    if (!box.querySelector('mjx-container')) continue;
+    const wide = box.scrollWidth > box.clientWidth + 2;
+    let hint = box.nextElementSibling?.classList.contains('scroll-help') ? box.nextElementSibling : null;
+    if (wide) {
+      box.tabIndex = 0;
+      if (!hint) { hint = el('p', '長い数式は横にスクロールできます。', 'scroll-help'); box.after(hint); }
+    } else {
+      box.removeAttribute('tabindex');
+      hint?.remove();
+    }
+  }
+}
+
 function el(tag, text, className) {
   const node = document.createElement(tag);
   if (text !== undefined) node.textContent = text;
@@ -19,10 +34,14 @@ function mathBlock(tex, className = 'math-block') {
 
 function typeset(nodes) {
   mathQueue = mathQueue.then(async () => {
+    for (let attempt = 0; !window.MathJax?.startup?.promise && attempt < 150; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     if (!window.MathJax?.startup?.promise) throw new Error('MathJax is unavailable');
     await window.MathJax.startup.promise;
     if (!window.MathJax.typesetPromise) throw new Error('MathJax is unavailable');
     await window.MathJax.typesetPromise(nodes);
+    showScrollHints();
     $('math-warning').hidden = true;
   }).catch(() => { $('math-warning').hidden = false; });
 }
@@ -120,6 +139,7 @@ function toggleAnswer() {
   $('answer-button').setAttribute('aria-expanded', String(open));
   $('answer-button').replaceChildren(document.createTextNode(open ? '解答を閉じる ' : '解答を見る '), el('span', open ? '↑' : '↓'));
   if (!open) return;
+  if (window.MathJax?.typesetClear) window.MathJax.typesetClear([$('answer')]);
   $('method-title').textContent = p.routes[0].title;
   $('solution-steps').replaceChildren(...p.routes[0].steps.map(step => el('li', step)));
   $('answer-formula').replaceChildren(mathBlock(p.answer_tex));
@@ -208,3 +228,4 @@ $('retry-math').addEventListener('click', () => {
   document.head.append(script);
 });
 load();
+window.addEventListener('resize', showScrollHints);
