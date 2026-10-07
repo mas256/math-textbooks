@@ -1,0 +1,46 @@
+name: Verify recurrence generator
+
+on:
+  push:
+    branches: [main, 'codex/recurrence-generator']
+    paths: ['recurrence/**', '.github/workflows/recurrence-check.yml']
+  pull_request:
+    paths: ['recurrence/**', '.github/workflows/recurrence-check.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recurrence-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Generate recipes and proof obligations
+        run: python3 recurrence/scripts/generate.py
+      - name: Install Lean and check all generated theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: recurrence/lean
+          use-mathlib-cache: true
+          build: false
+          test: false
+          lint: false
+      - name: Compile and audit each theorem
+        working-directory: recurrence/lean
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee ../build/lean.log
+      - name: Certify the bank
+        run: python3 recurrence/scripts/certify.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recurrence-verified
+          path: recurrence/build/
