@@ -11,6 +11,7 @@ on:
       - "equashare/**"
       - "recurrence/**"
       - ".github/workflows/recurrence-check.yml"
+      - ".github/actions/verify-recurrence/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -24,11 +25,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  verify-recurrence:
-    uses: ./.github/workflows/recurrence-check.yml
-
   deploy:
-    needs: verify-recurrence
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -38,6 +35,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Generate and verify the recurrence bank
+        uses: ./.github/actions/verify-recurrence
 
       - name: Validate catalog
         run: |
@@ -60,12 +60,6 @@ jobs:
               ids.add(book["title"])
           print(f"Catalog validated: {len(books)} books")
           PY
-
-      - name: Download the verified problem bank
-        uses: actions/download-artifact@v4
-        with:
-          name: recurrence-verified
-          path: recurrence/build
 
       - name: Assemble site
         run: |

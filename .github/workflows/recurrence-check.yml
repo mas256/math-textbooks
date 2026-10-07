@@ -4,9 +4,9 @@ on:
   workflow_call:
   push:
     branches: ['codex/recurrence-generator']
-    paths: ['recurrence/**', '.github/workflows/recurrence-check.yml']
+    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
   pull_request:
-    paths: ['recurrence/**', '.github/workflows/recurrence-check.yml']
+    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
   workflow_dispatch:
 
 permissions:
@@ -24,34 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Generate recipes and proof obligations
-        run: |
-          python3 recurrence/scripts/generate.py
-          python3 recurrence/tests/math_check.py
-          node --test recurrence/tests/model.test.mjs
-      - name: Install Lean and check all generated theorems
-        uses: leanprover/lean-action@v1
-        with:
-          lake-package-directory: recurrence/lean
-          use-mathlib-cache: true
-          build: false
-          test: false
-          lint: false
-      - name: Compile and audit each theorem
-        working-directory: recurrence/lean
-        run: |
-          set -o pipefail
-          lake build 2>&1 | tee ../build/lean.log
-      - name: Certify the bank
-        run: python3 recurrence/scripts/certify.py
-      - name: Check browser rendering and interactions
-        run: |
-          mkdir -p recurrence/data
-          cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/data/
-          npm install --prefix /tmp/recurrence-browser --no-save --ignore-scripts playwright@1.55.1
-          /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
-          python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/recurrence-http.log 2>&1 &
-          NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/browser.cjs
+      - uses: ./.github/actions/verify-recurrence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
