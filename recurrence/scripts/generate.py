@@ -13,6 +13,7 @@ from pathlib import Path
 
 from expr import add, div, evaluate, index, latex, lean, lean_step, mul, nat, neg, num, power, shift, sub, term, triangular
 from scoring import level, numeric_cost, route_score
+from compiler import compile_blocks
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
@@ -159,14 +160,13 @@ def compile_recipe(family, parameters):
               "core": {"id": "core", "kind": core, "parameters": core_params},
               "blocks": recipe_blocks, "output": previous,
               "parameters": {key: num(value) for key, value in parameters.items()}}
+    ir = compile_blocks(recipe)
     return {"family": family, "family_label": FAMILIES[family], "recipe": recipe,
-            "ir": {"formula": expr, "initials": initials, "lhs": lhs, "rhs": rhs,
-                   "step": step, "P": coefP, "Q": coefQ, "R": coefR,
-                   "underlying": underlying, "reciprocal": reciprocal, "second_order": second, **extra},
-            "statement": {"initials_tex": [f"a_{{{i+1}}}={latex(v)}" for i, v in enumerate(initials)],
-                          "recurrence_tex": latex(lhs) + "=" + latex(rhs),
+            "ir": ir,
+            "statement": {"initials_tex": [f"a_{{{i+1}}}={latex(v)}" for i, v in enumerate(ir["initials"])],
+                          "recurrence_tex": latex(ir["lhs"]) + "=" + latex(ir["rhs"]),
                           "condition": "n は 1 以上の整数とする。数列の一般項 a_n を求めよ。"},
-            "answer_tex": "a_n=" + latex(expr), "routes": routes,
+            "answer_tex": "a_n=" + latex(ir["formula"]), "routes": routes,
             "scores": {"difficulty": dcost, "level": level(dcost), "cleanliness": numeric,
                        "quality_proposal": 23 if family in {"constant", "geometric"} else 29,
                        "quality_status": "heuristic", "version": "0.2.0"}}
@@ -182,7 +182,7 @@ def proofs(problem):
         cert = f"SecondCertificate {name} {init} {sec} {p} {q}"
         lines += [f"theorem {name}_valid : {cert} := by", "  constructor",
                   f"  · norm_num [{name}]", f"  · norm_num [{name}]",
-                  "  · intro n", f"    simp only [{name}, pow_succ, pow_add]", "    ring",
+                  "  · intro n", f"    simp only [{name}, pow_succ, pow_add] <;> ring",
                   f"theorem {name}_unique (a : ℕ → ℚ) (ha : SecondCertificate a {init} {sec} {p} {q}) :",
                   f"    ∀ n, a n = {name} n := second_unique {name}_valid ha"]
     else:
@@ -196,8 +196,7 @@ def proofs(problem):
         lines += [f"theorem {name}_base_valid : FirstCertificate {underlying} {base_init} {base_step} := by",
                   f"  apply linear_certificate {underlying} {base_init} {Pfn} {Qfn} {Rfn}",
                   f"  · norm_num [{underlying}]", "  · intro n; positivity", "  · intro n",
-                  f"    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add]",
-                  "    ring"]
+                  f"    simp only [{underlying}, Nat.cast_add, Nat.cast_one, pow_succ, Nat.choose_succ_succ, Nat.choose_one_right, pow_add] <;> ring"]
         if ir["reciprocal"]:
             actual_step = f"(fun n x => {Pn} * x / ({Qn} + {Rn} * x))"
             lines += [f"theorem {name}_positive (n : ℕ) : 0 < {underlying} n := by",

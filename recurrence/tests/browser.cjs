@@ -1,0 +1,58 @@
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('http://127.0.0.1:8787/recurrence/?problem=p021');
+  await page.locator('#bank-status').filter({hasText:'Lean検証済み'}).waitFor();
+  await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
+  assert.equal(await page.locator('#answer').isVisible(),false);
+  assert.equal(await page.locator('#problem-content').textContent().then(t=>t.includes('階比型')),false);
+  await page.screenshot({path:'recurrence/build/desktop.png',fullPage:true});
+  await page.locator('#hint-button').click();
+  assert.equal(await page.locator('.hint').count(),1);
+  await page.locator('#answer-button').click();
+  await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
+  assert.equal(await page.locator('#answer').isVisible(),true);
+  await page.locator('#answer-button').click();
+  assert.equal(await page.locator('#answer').isVisible(),false);
+  await page.locator('#family').selectOption('reciprocal_scaled');
+  await page.locator('[data-level="1"]').click();
+  assert.equal(await page.locator('#generate').isDisabled(),true);
+  await page.locator('[data-level="4"]').click();
+  await page.locator('#generate').click();
+  assert.ok((await page.locator('#problem-level').textContent()).includes('4'));
+  await page.locator('#answer-button').click();
+  await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
+  const downloadPromise=page.waitForEvent('download');
+  await page.locator('#download-tex').click();
+  const download=await downloadPromise;
+  await download.saveAs('recurrence/build/example.tex');
+  assert.ok(fs.readFileSync('recurrence/build/example.tex','utf8').includes('\\section*{解答}'));
+  await page.locator('#all-levels').click();
+  await page.locator('#family').selectOption('all');
+  const bank=JSON.parse(fs.readFileSync('recurrence/build/problems.json','utf8'));
+  for(const family of Object.keys(bank.families)) {
+    await page.locator('#family').selectOption(family);
+    await page.locator('#generate').click();
+    await page.locator('#answer-button').click();
+    await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
+    assert.equal(await page.locator('mjx-merror').count(),0,family);
+  }
+  await page.setViewportSize({width:375,height:900});
+  await page.goto('http://127.0.0.1:8787/recurrence/?problem=p046');
+  await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+  await page.screenshot({path:'recurrence/build/mobile.png',fullPage:true});
+  await page.locator('#answer-button').click();
+  await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
+  await page.screenshot({path:'recurrence/build/mobile-answer.png',fullPage:true});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+  assert.deepEqual(errors,[]);
+  console.log('Browser smoke checks passed: every family, hints, answer toggle, filters, TeX and mobile layout.');
+  await browser.close();
+})().catch(e=>{console.error(e);process.exit(1);});

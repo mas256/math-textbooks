@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ee">
+  <meta name="description" content="漸化式をブロックで組み立て、検証した問題を出題します。難易度を選び、ヒント・解答・別解で学べる漸化式演習。">
+  <title>漸化式の問題生成 — 数学書の本棚</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="mathjax-config.js"></script>
+  <script id="mathjax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-svg.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">∫</span>数学書の本棚</a>
+    <span class="header-note">漸化式の問題生成 <span class="version">初版</span></span>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">RECURRENCE LAB</p>
+        <h1 id="page-title">式のつながりを、<br class="mobile-break">一問ずつ。</h1>
+        <p class="intro-copy">難易度を選んで漸化式を出題。<br class="mobile-break">考える手がかりから、解答・別解まで。</p>
+      </div>
+      <div class="bank-status"><span class="status-dot" aria-hidden="true"></span><span id="bank-status" role="status">問題を読み込み中</span></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="controls" aria-labelledby="controls-title">
+        <p class="eyebrow">01 / SELECT</p>
+        <h2 id="controls-title">出題の設定</h2>
+        <fieldset>
+          <legend>難易度</legend>
+          <div class="level-grid" id="levels">
+            <button type="button" data-level="1" aria-pressed="false"><strong>1</strong><span>基本</span></button>
+            <button type="button" data-level="2" aria-pressed="true"><strong>2</strong><span>変形</span></button>
+            <button type="button" data-level="3" aria-pressed="false"><strong>3</strong><span>組合せ</span></button>
+            <button type="button" data-level="4" aria-pressed="false"><strong>4</strong><span>発展</span></button>
+          </div>
+          <button type="button" class="all-levels" id="all-levels" aria-pressed="false">すべての難易度から</button>
+          <p class="field-help" id="level-help">一つの変形で基本形に帰着する問題。</p>
+        </fieldset>
+        <label class="field-label" for="family">練習する型</label>
+        <select id="family" disabled><option value="all">指定しない（総合演習）</option></select>
+        <p class="field-help">総合演習では、解法の型を解答まで伏せます。</p>
+        <div class="selection-count" id="selection-count" aria-live="polite">読み込み中…</div>
+        <button class="primary-button" type="button" id="generate" disabled><span>問題を生成</span><span aria-hidden="true">↗</span></button>
+        <p class="control-note">同じ設定では、出題済みの問題を一巡するまで重複させません。</p>
+      </aside>
+
+      <section class="exercise" aria-labelledby="problem-title" aria-busy="true">
+        <div class="problem-heading">
+          <div><p class="eyebrow">02 / THINK</p><h2 id="problem-title">問題</h2></div>
+          <div class="problem-tags"><span id="problem-level" class="pill">—</span><span id="problem-id" class="problem-id">—</span></div>
+        </div>
+        <div class="error-message" id="load-error" role="alert" hidden></div>
+        <div id="problem-content" class="problem-content"><p class="muted">検証済みの問題を準備しています。</p></div>
+        <div class="math-warning" id="math-warning" role="status" hidden>数式の描画を読み込めませんでした。TeX表示で内容を確認できます。<button type="button" id="retry-math">数式を再読み込み</button></div>
+        <div class="problem-actions">
+          <button class="secondary-button" type="button" id="hint-button" disabled>ヒントを見る <span aria-hidden="true">＋</span></button>
+          <button class="secondary-button strong" type="button" id="answer-button" disabled aria-expanded="false" aria-controls="answer">解答を見る <span aria-hidden="true">↓</span></button>
+        </div>
+        <div id="hints" class="hints" aria-live="polite"></div>
+
+        <section id="answer" class="answer" aria-labelledby="answer-title" hidden>
+          <div class="answer-heading"><p class="eyebrow">03 / UNDERSTAND</p><h3 id="answer-title">解答</h3></div>
+          <p id="method-title" class="method-title"></p>
+          <ol id="solution-steps" class="solution-steps"></ol>
+          <div id="answer-formula" class="answer-formula"></div>
+          <div id="alternate-container"></div>
+          <p class="solution-note">問題の型：<span id="revealed-family"></span></p>
+        </section>
+
+        <div class="export-bar">
+          <button type="button" id="copy-link" disabled>この問題のリンクをコピー</button>
+          <button type="button" id="download-tex" disabled>TeXを保存</button>
+          <button type="button" id="print-problem" disabled>印刷</button>
+          <span id="action-status" role="status"></span>
+        </div>
+
+        <details id="recipe-details" class="recipe-details" hidden>
+          <summary>生成ブロック・スコア・検証情報</summary>
+          <p class="details-note">解法に関する情報を含みます。学習後の確認や、作問の検討に使えます。</p>
+          <div id="block-list" class="block-list"></div>
+          <div id="score-info"></div>
+          <p id="proof-info" class="details-note"></p>
+          <p class="details-note">Leanで初期値・全ての添字での漸化式・一般項の一意性を確認しています。逆数型の分母条件も全項で確認します。日本語の説明と別解は表示用の解説です。</p>
+          <div class="detail-actions"><button type="button" id="download-recipe">レシピJSON</button><button type="button" id="download-lean">Lean証明</button><a href="https://github.com/mas256/math-textbooks/tree/main/recurrence/lean" target="_blank" rel="noopener noreferrer">共通の証明ライブラリ ↗</a></div>
+        </details>
+      </section>
+    </div>
+
+    <details class="about">
+      <summary>この問題生成について</summary>
+      <p>定数数列・等比数列・特性方程式型（2項間）を出発点に、定数の移動、nに応じた倍率、逆数、数列の組合せを加えて作問しています。3項間の特性多項式は、2項間の不動点を使う方法と区別しています。</p>
+      <p>初版はビルド時に生成・検証した50問を出題します。表示中に新しい係数を作る方式ではありません。難易度は解法の操作数や発見の負担などに基づく暫定値です。対数型・一般の一次分数型・自由なブロック編集は今後の拡張対象です。</p>
+      <a href="https://github.com/mas256/math-textbooks/tree/main/recurrence" target="_blank" rel="noopener noreferrer">仕様と実装を見る ↗</a>
+    </details>
+  </main>
+  <footer class="footer"><span>数学を、自分のペースで。</span><a href="../">数学書の本棚へ戻る <span aria-hidden="true">↗</span></a></footer>
+  <noscript><p class="noscript">出題と数式の表示にはJavaScriptが必要です。</p></noscript>
+</body>
+</html>

@@ -38,7 +38,7 @@ theorem reciprocal_certificate {v : ℕ → ℚ} {initial : ℚ} {P Q R : ℕ �
   have hden (n : ℕ) : Q n + R n * (1 / v n) = P n * v (n + 1) / v n := by
     have hstep := (eq_div_iff (ne_of_gt (hp n))).1 (hv.recurrence n)
     apply (eq_div_iff (ne_of_gt (hpos n))).2
-    field_simp
+    field_simp [ne_of_gt (hpos n)]
     nlinarith [hstep]
   have hn (n : ℕ) : Q n + R n * (1 / v n) ≠ 0 := by
     rw [hden n]
