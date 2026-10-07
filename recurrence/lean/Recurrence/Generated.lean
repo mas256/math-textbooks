@@ -658,13 +658,7 @@ theorem p040_base_valid : FirstCertificate p040 (3 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p040]
   · intro n; positivity
   · intro n
-    have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by
-      have hs := Nat.choose_succ_succ (n + 1) 1
-      simp only [Nat.add_assoc, Nat.choose_one_right] at hs
-      omega
-    simp only [p040, Nat.add_assoc]
-    rw [he]
-    simp only [pow_add] <;> ring
+    simp only [p040, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_succ, pow_add] <;> ring
 theorem p040_valid : FirstCertificate p040 (3 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p040_base_valid
 theorem p040_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p040 n := first_unique p040_valid ha
@@ -677,13 +671,7 @@ theorem p088_base_valid : FirstCertificate p088 (3 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p088]
   · intro n; positivity
   · intro n
-    have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by
-      have hs := Nat.choose_succ_succ (n + 2) 2
-      simp only [Nat.add_assoc] at hs
-      omega
-    simp only [p088, Nat.add_assoc]
-    rw [he]
-    simp only [pow_add] <;> ring
+    simp only [p088, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_succ, pow_add] <;> ring
 theorem p088_valid : FirstCertificate p088 (3 : ℚ) (fun n x => (((2 : ℚ) ^ ((n + 2)).choose 2) * x + (0 : ℚ)) / (1 : ℚ)) := p088_base_valid
 theorem p088_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => (((2 : ℚ) ^ ((n + 2)).choose 2) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p088 n := first_unique p088_valid ha
@@ -712,13 +700,7 @@ theorem p090_base_valid : FirstCertificate p090 (2 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p090]
   · intro n; positivity
   · intro n
-    have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by
-      have hs := Nat.choose_succ_succ (n + 1) 1
-      simp only [Nat.add_assoc, Nat.choose_one_right] at hs
-      omega
-    simp only [p090, Nat.add_assoc]
-    rw [he]
-    simp only [pow_add] <;> ring
+    simp only [p090, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_succ, pow_add] <;> ring
 theorem p090_valid : FirstCertificate p090 (2 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := p090_base_valid
 theorem p090_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n x => (((2 : ℚ) ^ (n + 1)) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p090 n := first_unique p090_valid ha
@@ -731,13 +713,7 @@ theorem p091_base_valid : FirstCertificate p091 (2 : ℚ) (fun n x => (((2 : ℚ
   · norm_num [p091]
   · intro n; positivity
   · intro n
-    have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by
-      have hs := Nat.choose_succ_succ (n + 2) 2
-      simp only [Nat.add_assoc] at hs
-      omega
-    simp only [p091, Nat.add_assoc]
-    rw [he]
-    simp only [pow_add] <;> ring
+    simp only [p091, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_succ, pow_add] <;> ring
 theorem p091_valid : FirstCertificate p091 (2 : ℚ) (fun n x => (((2 : ℚ) ^ ((n + 2)).choose 2) * x + (0 : ℚ)) / (1 : ℚ)) := p091_base_valid
 theorem p091_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n x => (((2 : ℚ) ^ ((n + 2)).choose 2) * x + (0 : ℚ)) / (1 : ℚ))) :
     ∀ n, a n = p091 n := first_unique p091_valid ha

@@ -83,22 +83,6 @@ def compile_recipe(family, parameters, profile='gap_2', config=None):
                           'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
-def exponent_step(profile):
-    if profile=='triangular':
-        return ['    have he : (n + 2).choose 2 = (n + 1).choose 2 + (n + 1) := by',
-                '      have hs := Nat.choose_succ_succ (n + 1) 1',
-                '      simp only [Nat.add_assoc, Nat.choose_one_right] at hs',
-                '      omega']
-    if profile=='square_minus_one':
-        return ['    have he : (n + 1) * (n + 3) = n * (n + 2) + (2 * (n + 1) + 1) := by ring']
-    if profile=='tetrahedral':
-        return ['    have he : (n + 3).choose 3 = (n + 2).choose 3 + (n + 2).choose 2 := by',
-                '      have hs := Nat.choose_succ_succ (n + 2) 2',
-                '      simp only [Nat.add_assoc] at hs',
-                '      omega']
-    raise ValueError(profile)
-
-
 def proofs(problem):
     name,ir=problem['id'],problem['ir']
     init=lean(ir['initials'][0])
@@ -121,9 +105,11 @@ def proofs(problem):
         lines += [f'theorem {name}_base_valid : FirstCertificate {underlying} {base_init} {base_step} := by',
                   f'  apply linear_certificate {underlying} {base_init} {Pfn} {Qfn} {Rfn}',
                   f'  · norm_num [{underlying}]','  · intro n; positivity','  · intro n']
-        if 'exponent_profile' in ir:
-            lines += exponent_step(ir['exponent_profile'])
+        if ir.get('exponent_profile')=='square_minus_one':
+            lines += ['    have he : (n + 1) * (n + 3) = n * (n + 2) + (2 * (n + 1) + 1) := by ring']
             lines += [f'    simp only [{underlying}, Nat.add_assoc]', '    rw [he]', '    simp only [pow_add] <;> ring']
+        elif 'exponent_profile' in ir:
+            lines += [f'    simp only [{underlying}, Nat.choose_succ_succ, Nat.choose_one_right, Nat.choose_zero_right, pow_succ, pow_add] <;> ring']
         else:
             denominators={lean(x['args'][1]) for x in walk(ir['underlying']) if x['op']=='div'}
             for i,den in enumerate(sorted(denominators)):
