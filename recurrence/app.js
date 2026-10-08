@@ -2,8 +2,8 @@ import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } fr
 
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
-const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '定数数列・等比数列の基本を確認します。',
-  2: '一つの変形や、和・積の規則を使います。', 3: '正規化、総和の消去、指数の和などを使います。', 4: '3項間、階差、対数などを組み合わせ、段階的に解きます。'};
+const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '等差・等比数列と、基本的な階差の和を確認します。',
+  2: '総和を含む基本形と、単項式の積による階比を扱います。', 3: '連立、一般の階比、基本的な3項間漸化式を扱います。', 4: '一次分数、定数項付き3項間、難しい階比、等差と階差の組合せを扱います。', 5: '正規化・総和・階差・対数など、複数の変形を組み合わせる発展問題です。'};
 let mathQueue = Promise.resolve();
 
 function showScrollHints() {
@@ -63,9 +63,9 @@ function updatePool() {
 }
 
 function renderRecipe(p) {
-  const names = {constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
+  const names = {mobius_encode:'一次分数へ',factorial_product:'階比の総積',second_difference:'等差と階差の組合せ',constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
     index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ',
-    repeated_factor:'一次式を掛けて重解へ', difference_lift:'階差を元の数列へ', sum_encode:'総和を含む式へ', cumulative_sum:'差を足して一段戻す', power_sequence:'指数の数列を元の数列へ'};
+    repeated_factor:'一次式を掛けて重解へ', difference_lift:'階差を元の数列へ', sum_encode:'総和を含む式へ', cumulative_sum:'差を足して一段戻す', power_sequence:'指数の数列を元の数列へ',pair_mix:'独立した数列を連立へ',partial_sum_encode:'部分和の数列として与える',sum_relation_encode:'総和と一般項の関係へ',difference_polynomial:'多項式を階差にする'};
   const list = $('block-list');
   list.replaceChildren(el('span', names[p.recipe.core.kind], 'block'));
   for (const b of p.recipe.blocks) list.append(el('span', '→', 'block-arrow'), el('span', names[b.kind] || b.kind, 'block'));
@@ -81,7 +81,7 @@ function renderRecipe(p) {
   }
   table.append(tbody);
   const wrapper = el('div', undefined, 'math-block'); wrapper.append(table);
-  $('score-info').replaceChildren(wrapper, el('p', `難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。スコアは暫定値です。`, 'details-note'));
+  $('score-info').replaceChildren(wrapper, el('p', `教育上の難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。分類の目安：${p.routes[0].difficulty_rule}。`, 'details-note'));
   const metrics = p.quality.metrics;
   $('score-info').append(el('p', `完成式の評価：多項式係数の最高次数 ${metrics.coefficient_degree}、指数の次数 ${metrics.exponent_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
   const proof = $('proof-info');
@@ -122,14 +122,14 @@ function renderGenerationSummary() {
   const levelMix=$('level-diversity');
   levelMix.replaceChildren();
   if (comparison.level_diversity) {
-    levelMix.append(el('p', '発展問題には、正規化した3項間、階差から階比へ進む型、総和を消去する型、対数と二重の階差を使う型を加えました。Lv3・4では、逆数を使わない系統を各3種類以上、逆数型の割合を各40%以下にする条件も検査します。'));
+    levelMix.append(el('p', '発展問題には、正規化した3項間、階差から階比へ進む型、総和を消去する型、対数と二重の階差を使う型を加えました。Lv3〜5では、逆数を使わない系統を各3種類以上、逆数型の割合を各40%以下にする条件も検査します。'));
     const table=el('table',undefined,'score-table');
     table.append(el('caption','難易度別の構成（逆数型は一次分数型などの系統）'));
     const head=el('tr');
     for (const label of ['難易度','前版：逆数型 / 全問','今回：逆数型 / 全問','今回：逆数以外の系統数']) head.append(el('th',label));
     const thead=el('thead'); thead.append(head); table.append(thead);
     const tbody=el('tbody');
-    for (const lv of ['3','4']) {
+    for (const lv of ['3','4','5']) {
       const before=comparison.level_diversity.before[lv],after=comparison.level_diversity.after[lv];
       const count=data=>`${data.fraction_count} / ${data.count}問（${data.count?Math.round(100*data.fraction_count/data.count):0}%）`;
       const row=el('tr');
@@ -154,7 +154,7 @@ function renderProblem(p, updateUrl = true) {
   $('problem-id').textContent = p.id.toUpperCase();
   const content = $('problem-content');
   content.replaceChildren(el('p', '次の条件で定められる数列について、一般項を求めよ。'),
-    mathBlock(p.statement.initials_tex.join(',\\quad ')), mathBlock(p.statement.recurrence_tex),
+    mathBlock(p.statement.initials_tex.join(',\\quad ')), mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '')+p.statement.recurrence_tex),
     el('p', 'n は 1 以上の整数とする。', 'question-line'));
   $('hints').replaceChildren();
   $('answer').hidden = true;
@@ -248,7 +248,7 @@ async function load() {
     const shared = state.bank.problems.find(p => p.id === requested);
     if (shared) state.level = shared.scores.level;
     updatePool();
-    const first = shared || chooseProblem(poolFor(state.bank, state.level, state.family), state.seen);
+    const first = shared || chooseProblem(poolFor(state.bank, state.level, state.family), state.seen, Math.random, state.bank.selection_weights);
     if (shared) state.seen.add(shared.id);
     renderProblem(first);
     if (requested && !shared) $('action-status').textContent = '指定された問題がないため、別の問題を表示しました。';
@@ -269,7 +269,7 @@ document.querySelectorAll('[data-level]').forEach(button => button.addEventListe
 $('all-levels').addEventListener('click', () => { state.level = 0; updatePool(); });
 $('family').addEventListener('change', () => { state.family = $('family').value; updatePool(); });
 $('generate').addEventListener('click', () => {
-  const p = chooseProblem(poolFor(state.bank, state.level, state.family), state.seen);
+  const p = chooseProblem(poolFor(state.bank, state.level, state.family), state.seen, Math.random, state.bank.selection_weights);
   if (p) renderProblem(p);
 });
 $('hint-button').addEventListener('click', showHint);

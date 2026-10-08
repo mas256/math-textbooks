@@ -63,3 +63,10 @@ test('route explanations distinguish strict wins, numerical tie breaks and displ
   other.parts={...main.parts};
   assert.ok(routeComparison([main,other]).alternatives[0].includes('各項目のスコアも同じ'));
 });
+
+test('fractional family receives the configured weight and exhausted families disappear', () => {
+  const pool=[p('p001','a',4),p('p002','mobius',4)];
+  const seen=new Set();
+  assert.equal(chooseProblem(pool,seen,()=>0.4,{mobius:2}).family,'mobius');
+  assert.equal(chooseProblem(pool,seen,()=>0.9,{mobius:2}).family,'a');
+});

@@ -25,8 +25,14 @@ def advanced_proofs(problem):
     if shape=='linear_second':
         second=lean(ir['initials'][1])
         P,Q,R=[lean(ir[k]) for k in ('P2','Q2','R2')]
-        step=f'(fun n x y => ({Q} * y + {R} * x) / {P})'
+        F=lean(ir.get('F2',num(0)))
+        forcing=f' + {F}' if ir.get('F2',num(0))!=num(0) else ''
+        step=f'(fun n x y => ({Q} * y + {R} * x{forcing}) / {P})'
         cert=f'GeneralSecondCertificate {name} {init} {second} {step}'
+        if ir.get('F2',num(0))!=num(0):
+            lines += [f'theorem {name}_valid : {cert} := by','  constructor',f'  · norm_num [{name}]',f'  · norm_num [{name}]','  · intro n',f'    apply (eq_div_iff (show {P} ≠ 0 by positivity)).2',*ring_step(name,ir['formula']),f'theorem {name}_unique (a : ℕ → ℚ) (ha : GeneralSecondCertificate a {init} {second} {step}) :',f'    ∀ n, a n = {name} n := general_second_unique {name}_valid ha']
+            lines += [f'#print axioms {name}_valid',f'#print axioms {name}_unique']
+            return '\n'.join(lines)+'\n'
         lines += [f'theorem {name}_valid : {cert} := by',
                   f'  apply linear_second_certificate {name} {init} {second} (fun n => {P}) (fun n => {Q}) (fun n => {R})',
                   f'  · norm_num [{name}]',f'  · norm_num [{name}]','  · intro n; positivity','  · intro n',

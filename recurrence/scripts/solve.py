@@ -284,6 +284,9 @@ def check_derivation(ir, route, n):
 
 
 def find_routes(ir, config):
+    if ir.get("shape") in {"mobius","factorial_ratio"} or ir.get("F2",num(0))!=num(0):
+        from level_extensions import routes
+        return routes(ir,config)
     if ir.get('shape') in {'system','pure_sum','sum_relation'} or ir.get('difference_polynomial'):
         from variety import variety_routes
         return variety_routes(ir,config)

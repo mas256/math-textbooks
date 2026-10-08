@@ -22,10 +22,11 @@ def load_config(path=CONFIG_PATH):
     assert isinstance(config["max_blocks"], int) and config["max_blocks"] >= 0
     assert all(isinstance(v, int) and v >= 0 for v in config["quality_limits"].values())
     assert all(isinstance(v, int) and v >= 0 for v in config["quotas"].values())
-    assert set(config['selection']) == {'balance_parameters','prefer_existing_ids'}
-    assert all(isinstance(v,bool) for v in config['selection'].values())
+    assert {'balance_parameters','prefer_existing_ids'}<=set(config['selection'])<= {'balance_parameters','prefer_existing_ids','family_weights'}
+    assert all(isinstance(config['selection'][k],bool) for k in ('balance_parameters','prefer_existing_ids'))
+    assert all(isinstance(v,(int,float)) and v>0 for v in config['selection'].get('family_weights',{}).values())
     for lv,limits in config['difficulty_mix'].items():
-        assert lv in {'1','2','3','4'}
+        assert lv in {'1','2','3','4','5'}
         assert set(limits)=={'min_nonfraction_families','max_fraction_percent'}
         assert isinstance(limits['min_nonfraction_families'],int) and limits['min_nonfraction_families']>=0
         assert isinstance(limits['max_fraction_percent'],int) and 0<=limits['max_fraction_percent']<=100

@@ -123,6 +123,7 @@ def evaluate(expr, k, terms=None):
     if op == "div": return a[0] / a[1]
     if op == "pow": return a[0] ** a[1]
     if op == "choose": return comb(int(a[0]), int(a[1]))
+    if op == "factorial": return Fraction(factorial(int(a[0])))
     raise ValueError(op)
 
 
@@ -148,6 +149,7 @@ def latex(expr):
         return rf"\sum_{{k=1}}^{{n}}{body}"
     if op == 'log': return rf"\log_{{{latex(expr['args'][0])}}}\left({latex(expr['args'][1])}\right)"
     args = expr["args"]
+    if op == "factorial": return r"\left("+latex(args[0])+r"\right)!"
     if op == "add":
         # Simplify linear natural-index expressions for display; keep their
         # natural-number type in the proof AST used as an exponent.
@@ -203,6 +205,7 @@ def lean(expr, sequence="f"):
     if op == "nat_constant": return str(expr["value"])
     if op == "nat_index": return "n" if expr["offset"] == 0 else f"(n + {expr['offset']})"
     if op == "triangular": return "((n + 1).choose 2)"
+    if op == "factorial": return "(("+lean(expr["args"][0])+ ").factorial : ℚ)"
     if op == "term":
         name=sequence+"_b" if expr.get("variable")=="b" else sequence
         return f"({name} n)" if expr["offset"] == 0 else f"({name} (n + {expr['offset']}))"

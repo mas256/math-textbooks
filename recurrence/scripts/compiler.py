@@ -8,6 +8,9 @@ def compile_blocks(recipe, config=None):
     config = config or load_config()
     recipe = normalize_recipe(recipe, config)
     assert recipe["schema_version"] == "0.2"
+    if any(b["kind"] in {"mobius_encode","factorial_product","second_difference"} for b in recipe["blocks"]):
+        from level_extensions import compile_extension
+        return compile_extension(recipe)
     assert recipe["domain"] == {"index_start": 1, "sequence_type": "rational"}
     if any(b['kind'] in {'pair_mix','partial_sum_encode','sum_relation_encode','difference_polynomial'} for b in recipe['blocks']):
         from variety import compile_variety

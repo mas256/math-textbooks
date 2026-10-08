@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "seed": 20261008,
   "max_transforms": {
     "add_constant": 1,
@@ -16,12 +16,18 @@
     "pair_mix": 1,
     "partial_sum_encode": 1,
     "sum_relation_encode": 1,
-    "difference_polynomial": 1
+    "difference_polynomial": 1,
+    "mobius_encode": 1,
+    "factorial_product": 1,
+    "second_difference": 1
   },
   "max_blocks": 4,
   "selection": {
     "balance_parameters": true,
-    "prefer_existing_ids": true
+    "prefer_existing_ids": true,
+    "family_weights": {
+      "mobius": 2
+    }
   },
   "scale_profiles": [
     "n",
@@ -70,7 +76,11 @@
     "coupled_forced": 8,
     "pure_sum": 6,
     "pure_sum_scaled": 8,
-    "sum_relation": 8
+    "sum_relation": 8,
+    "mobius": 24,
+    "factorial_ratio": 21,
+    "forced_second": 12,
+    "arithmetic_difference": 8
   },
   "difficulty_mix": {
     "3": {
@@ -78,6 +88,10 @@
       "max_fraction_percent": 40
     },
     "4": {
+      "min_nonfraction_families": 3,
+      "max_fraction_percent": 40
+    },
+    "5": {
       "min_nonfraction_families": 3,
       "max_fraction_percent": 40
     }

@@ -207,12 +207,26 @@ print('Checks passed: recipe replay, forward routes, intermediate relations, not
 # Educational levels are independent of initial-value arithmetic and TeX length.
 for family,profile in [('scaled_second_order','inverse:n'),('scaled_second_order','inverse:consecutive')]:
     variants=[compile_recipe(family,{'r':2,'c':c,'d':d,'s':3},profile) for c,d in [(1,1),(3,9),(6,8)]]
-    assert {p['scores']['level'] for p in variants}=={3}
+    assert {p['scores']['level'] for p in variants}=={4}
 assert not any(p['family']=='constant' for p in bank['problems'])
 assert all(any(evaluate(p['ir']['formula'],k)!=evaluate(p['ir']['formula'],0) for k in range(1,8)) for p in bank['problems'])
 for shape in ['system','pure_sum','sum_relation']:
     assert any(p['ir'].get('shape')==shape for p in bank['problems']),shape
-for level in [3,4]:
+for level in [3,4,5]:
     assert any(p['ir'].get('shape')=='system' and p['scores']['level']==level for p in bank['problems'])
-    assert any(p['ir'].get('shape') in {'pure_sum','sum_relation','weighted_sum'} and p['scores']['level']==level for p in bank['problems'])
+    if level!=4: assert any(p['ir'].get('shape') in {'pure_sum','sum_relation','weighted_sum'} and p['scores']['level']==level for p in bank['problems'])
 print('New checks passed: nonconstant outputs, stable educational levels, paired modes and distinct summation shapes.')
+
+# The requested five-level teaching policy is stable across numeric variants.
+examples=[('pure_sum','identity',2),('sum_relation','identity',2),('coupled_symmetric','identity',3),
+ ('scaled_constant','n',2),('scaled_constant','n_plus_1',3),('factorial_ratio','monomial',2),('factorial_ratio','monomial_squared',2),
+ ('factorial_ratio','shifted_1',3),('factorial_ratio','pair_01',4),
+ ('mobius','identity',4),('forced_second','identity',4),('arithmetic_difference','identity',4),
+ ('difference_scaled','n',5),('multiplicative_second','n',5)]
+for family,profile,expected in examples:
+    q=compile_recipe(family,{'r':2,'c':2,'d':3,'s':3},profile)
+    assert q['scores']['level']==expected,(family,profile,q['scores'])
+    validate(q)
+assert set(p['scores']['level'] for p in bank['problems'])==set(range(1,6))
+assert bank['selection_weights']['mobius']==2
+print('Five-level policy passed: sums, systems, factorial products, fractions and advanced combinations.')

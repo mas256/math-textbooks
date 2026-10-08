@@ -96,6 +96,67 @@ def expression_cost(metrics):
                max(0,metrics['fraction_depth']-1)+max(0,metrics['exponent_degree']-1))
 
 
+
+def educational_cost(ir,route):
+    """Calibrate the minimum complete route by its mathematical structure.
+
+    B/R/T remain auditable operation counts. This separate teaching scale is
+    independent of coefficient magnitude and display length.
+    """
+    shape=ir.get('shape');cert=route['certificate'];kind=cert['kind']
+    base=route['parts']['B']+route['parts']['R']+route['parts']['T']
+    def result(cost,reason):return cost,reason
+    if shape=='mobius':return result(14,'シンプルな1次分数を不動点・逆数で解く')
+    if shape=='factorial_ratio':
+        offsets=cert['offsets']
+        if all(t==0 for t in offsets):return result(6,'単項式の階比を総積で処理する')
+        if len(offsets)==1:return result(9,'単項式以外の階比を総積で処理する')
+        return result(14,'複数の因子をもつ階比を総積で処理する')
+    if kind=='arithmetic-difference':return result(14,'階差を等差数列として解き、和で戻す')
+    if kind=='forced-second':return result(14,'定数項を消して3項間漸化式を解く')
+    if shape=='system':
+        degree=max(polynomial(ir['system_forcing']),default=0)
+        if degree>0:return result(20,'連立の分離と一次式の特解を組み合わせる')
+        if ir['system_scale']!=num_one():return result(14,'正規化してから連立を分離する')
+        return result(9,'連立を和・差や一次結合で分離する')
+    if shape=='pure_sum':
+        if ir['second_order']:return result(20,'部分和の正規化と3項間と差を組み合わせる')
+        return result(6,'部分和を求める、または差で総和を消す')
+    if shape=='sum_relation':return result(6,'隣接する式の差で総和を消す')
+    if shape=='weighted_sum':
+        if ir['sum_scale']!=num_one():return result(20,'重みをそろえ、総和を消し、3項間を解く')
+        repeated=route['certificate']['roots'][0]==route['certificate']['roots'][1]
+        return result(10 if repeated else 7,'総和を消して重解を処理する' if repeated else '総和を消して基本的な3項間に帰着する')
+    if shape=='power_second':return result(20,'対数と二重の階差を組み合わせる')
+    if kind=='difference-normalization':return result(20,'階差・階比・多項式と等比の和を組み合わせる')
+    if ir['reciprocal']:
+        if max(polynomial(ir['P']),default=0)==0 and max(polynomial(ir['Q']),default=0)==0 and max(polynomial(ir['R']),default=0)==0:
+            return result(14,'定数係数の1次分数を逆数に帰着させる')
+        return result(max(20,base),'逆数と変数係数・特解を組み合わせる')
+    if ir.get('exponent_profile'):
+        degree=natural_degree(ir['Q']['args'][1])
+        return result(14 if degree>=2 else 9,'指数係数の階比で指数の和を計算する')
+    if kind=='telescoping-product':
+        from profiles import SCALES
+        profile=cert['profile'].removeprefix('inverse:')
+        mono=len(polynomial(SCALES[profile]))==1
+        return result(6 if mono else 9,'単項式の倍率の階比を相殺する' if mono else '単項式以外の倍率の階比を相殺する')
+    if kind=='polynomial-normalization' and cert['profile']!='identity':
+        profile=cert['profile'].removeprefix('inverse:')
+        from profiles import SCALES
+        mono=len(polynomial(SCALES[profile]))==1
+        ratio=evaluate(cert['ratio'],0);forcing=evaluate(cert['forcing'],0);shift=evaluate(cert['shift'],0)
+        if forcing:return result(14,'階比の正規化と定数項の消去を組み合わせる')
+        if ratio==1 and not shift:return result(6 if mono else 9,'単項式の倍率で正規化する' if mono else '単項式以外の倍率で正規化する')
+        return result(10 if mono else 14,'階比の正規化と等比・定数移動を組み合わせる')
+    if shape=='linear_second' or ir['second_order']:
+        return result(14 if 'index_scale' in route['operations'] else 9,'正規化して3項間を解く' if 'index_scale' in route['operations'] else '基本的な3項間を解く')
+    return result(base,'必要な操作・発見・条件確認による評価')
+
+
+def num_one():
+    return {'op':'rational','num':1,'den':1}
+
 def score_routes(ir, routes):
     metrics=statement_metrics(ir)
     visible=fractions_in([ir['lhs'],ir['rhs'],*ir['initials']])
@@ -105,7 +166,9 @@ def score_routes(ir, routes):
         expression=max(expression_cost(metrics),expression_cost(expression_metrics([route['formula']])))
         route.update(route_score(route['operations'],route['discovery'],arithmetic,
                                  route['domain'],expression))
-        route['difficulty_cost']=route['parts']['B']+route['parts']['R']+route['parts']['T']
+        route['raw_difficulty_cost']=route['parts']['B']+route['parts']['R']+route['parts']['T']
+        route['difficulty_cost'],route['difficulty_rule']=educational_cost(ir,route)
+        route['difficulty_adjustment']=route['difficulty_cost']-route['raw_difficulty_cost']
         route['numeric_cost']=arithmetic
         route['observed_metrics']=metrics
     return sorted(routes,key=lambda r:(r['difficulty_cost'],r['cost'],r['numeric_cost'],r['title']))
@@ -126,7 +189,7 @@ def assess(ir, routes, config):
         main=routes[0]
         if main['discovery']>limits['max_discovery']: reasons.append('max_discovery')
         if main['numeric_cost']>limits['max_numeric_cost']: reasons.append('max_numeric_cost')
-        if level(main['difficulty_cost']) not in range(1,5): reasons.append('unsupported_level')
+        if level(main['difficulty_cost']) not in range(1,6): reasons.append('unsupported_level')
         if not main['complete'] or main['parts']['U']: reasons.append('unfinished_route')
         cert=main['certificate']
         if ir['reciprocal'] and cert['kind']=='polynomial-normalization' and cert['profile']!='identity':

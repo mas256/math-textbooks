@@ -17,6 +17,7 @@ def compile_advanced(recipe):
     formula=num(amplitude) if core['kind']=='constant' else mul(num(amplitude),power(num(ratio),nat()))
     P,Q,R=num(1),num(ratio),num(0)
     P2,Q2,R2=num(1),num(0),num(0)
+    F2=num(0)
     scale=num(1); underlying=formula
     second=False; sums=[]; forcing=None; shape='linear_second'
     p=q=None
@@ -52,6 +53,9 @@ def compile_advanced(recipe):
             else:
                 P,Q,R=mul(P,factor),mul(Q,shift(factor)),mul(R,factor,shift(factor))
             scale=mul(scale,factor);formula=mul(factor,formula)
+        elif kind=='add_constant':
+            assert second and not sums
+            h=block['value'];F2=add(F2,mul(h,sub(sub(P2,Q2),R2)));formula=add(formula,h)
         elif kind=='difference_lift':
             assert not second and not sums and R==num(0) and ratio!=1
             initial=evaluate(block['initial'],0)
@@ -95,11 +99,11 @@ def compile_advanced(recipe):
     initials=[num(evaluate(formula,0)),num(evaluate(formula,1))]
     if shape=='linear_second':
         P2,Q2,R2=reduce_linear_coefficients(P2,Q2,R2)
-        lhs=mul(P2,term(2));rhs=add(mul(Q2,term(1)),mul(R2,term()))
+        lhs=mul(P2,term(2));rhs=add(mul(Q2,term(1)),mul(R2,term()),F2)
     ir={'formula':formula,'initials':initials[:1] if shape=='weighted_sum' else initials,
         'lhs':lhs,'rhs':rhs,'step':None,'P':num(1),'Q':num(1),'R':num(0),
         'underlying':formula,'reciprocal':False,'second_order':True,'shape':shape}
-    if shape=='linear_second': ir.update(P2=P2,Q2=Q2,R2=R2)
+    if shape=='linear_second': ir.update(P2=P2,Q2=Q2,R2=R2,**({'F2':F2} if F2!=num(0) else {}))
     elif shape=='weighted_sum': ir.update(sum_scale=scale,sum_alpha=alpha,sum_beta=beta,sum_base=underlying,p=p,q=q)
     else: ir.update(power_base=base,power_increment=increment,power_exponent=exponent)
     return ir

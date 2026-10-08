@@ -1,4 +1,4 @@
-"""Select a structurally balanced 60-question review batch from the generated bank."""
+"""Select a structurally balanced 75-question review batch from the generated bank."""
 import argparse,copy,hashlib,json
 from collections import Counter
 from pathlib import Path
@@ -8,9 +8,10 @@ from generate import validate
 ROOT=Path(__file__).resolve().parents[1]
 TARGETS={
  1:{'geometric':5,'arithmetic':6,'polynomial_difference':4},
- 2:{'coupled_symmetric':3,'affine':2,'scaled_constant':3,'shifted_scaled':1,'second_order':2,'ratio_power':2,'pure_sum':1,'polynomial_difference':1},
- 3:{'coupled_weighted':2,'coupled_scaled':2,'coupled_forced':1,'weighted_sum':2,'pure_sum':1,'sum_relation':2,'scaled_second_order':2,'polynomial_forcing':1,'reciprocal_affine':1,'scaled_affine':1},
- 4:{'coupled_forced':3,'pure_sum_scaled':3,'weighted_sum':3,'difference_scaled':2,'multiplicative_second':2,'reciprocal_forcing':1,'reciprocal_scaled':1},
+ 2:{'affine':3,'scaled_constant':2,'pure_sum':3,'sum_relation':3,'factorial_ratio':3,'polynomial_difference':1},
+ 3:{'coupled_symmetric':3,'coupled_weighted':2,'scaled_constant':3,'factorial_ratio':3,'second_order':2,'ratio_power':2},
+ 4:{'mobius':4,'forced_second':3,'arithmetic_difference':3,'factorial_ratio':2,'scaled_second_order':2,'ratio_power':1},
+ 5:{'coupled_forced':2,'pure_sum_scaled':3,'weighted_sum':3,'difference_scaled':3,'multiplicative_second':2,'reciprocal_forcing':1,'reciprocal_scaled':1},
 }
 
 
@@ -35,7 +36,7 @@ def select(bank):
             'sums':sum(p['ir'].get('shape') in {'pure_sum','sum_relation','weighted_sum'} for p in chosen),
             'coefficient_patterns':len({identity_key(p['ir'],False) for p in chosen})}
         selected+=chosen
-    assert len({fingerprint(p['ir']) for p in selected})==60
+    assert len({fingerprint(p['ir']) for p in selected})==sum(sum(t.values()) for t in TARGETS.values())
     return {'date':'2026-10-08','score_version':bank['score_version'],'generator_commit':'pending',
         'problems':selected,'distribution':distribution,'generation_config':bank['generation_config'],
         'lean_theorems':[t for p in selected for t in p['lean_theorems']],

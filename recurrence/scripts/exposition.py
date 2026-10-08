@@ -78,6 +78,9 @@ def scalar_exposition(ir,route,variable='a'):
 
 def explain_route(ir,route):
     cert=route['certificate'];kind=cert['kind']
+    if kind in {'mobius-shift','factorial-product','forced-second','arithmetic-difference'}:
+        from level_extensions import exposition
+        return exposition(ir,route)
     if kind=='paired-modes':
         g=cert['scale'];t=evaluate(cert['weight'],0);u,v=cert['u'],cert['v']
         route['title']='和と差で連立を分離する' if t==1 and g==num(1) else '正規化して連立を分離する' if g!=num(1) else '一次結合で連立を分離する'

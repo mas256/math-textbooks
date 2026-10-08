@@ -3,7 +3,7 @@ export function poolFor(bank, level, family) {
     && (family === 'all' || p.family === family));
 }
 
-export function chooseProblem(pool, seen, random = Math.random) {
+export function chooseProblem(pool, seen, random = Math.random, familyWeights = {}) {
   if (!pool.length) return null;
   let remaining = pool.filter(p => !seen.has(p.id));
   if (!remaining.length) {
@@ -12,7 +12,9 @@ export function chooseProblem(pool, seen, random = Math.random) {
   }
   // Balance structural families before selecting a numerical variant.
   const families = [...new Set(remaining.map(p => p.family))];
-  const family = families[Math.floor(random() * families.length)];
+  const weights = families.map(f => familyWeights[f] || 1);
+  let cursor = random() * weights.reduce((sum, w) => sum + w, 0);
+  const family = families.find((f, i) => (cursor -= weights[i]) < 0) || families.at(-1);
   const variants = remaining.filter(p => p.family === family);
   const problem = variants[Math.floor(random() * variants.length)];
   seen.add(problem.id);
@@ -36,7 +38,7 @@ export function validateBank(bank, manifest) {
       || !p.routes?.length || p.routes[0].parts.U !== 0
       || p.quality?.accepted !== true || p.quality?.version !== bank.score_version
       || !p.routes.every(r => r.complete && r.certificate)
-      || !Number.isInteger(p.scores.level) || p.scores.level < 1 || p.scores.level > 4) {
+      || !Number.isInteger(p.scores.level) || p.scores.level < 1 || p.scores.level > 5) {
       throw new Error('問題の検証情報を確認できません。');
     }
     ids.add(p.id);
@@ -49,6 +51,11 @@ const scoreLabels = {B:'操作', R:'発見', A:'計算', T:'条件の確認', P:
 export function routeComparison(routes) {
   const main = routes[0];
   const others = routes.slice(1);
+  const difficulty = r => r.difficulty_cost ?? r.cost;
+  if (main.difficulty_cost !== undefined && others.some(r => difficulty(r) > difficulty(main))) {
+    return {reason:`登録済みの候補で教育上の難易度スコアが最小（${difficulty(main)}）なので、主解法にしています。`,
+      alternatives:others.map(r => `主解法との比較：難易度は${difficulty(r)}（主解法は${difficulty(main)}）、操作などの合計は${r.cost}（主解法は${main.cost}）。`)};
+  }
   let reason = '登録済みの候補では、この解法だけを検出しました。';
   if (others.length) {
     const tied = others.filter(r => r.cost === main.cost);

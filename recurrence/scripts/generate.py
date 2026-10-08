@@ -35,11 +35,15 @@ FAMILIES.update(arithmetic='等差数列',polynomial_difference='多項式の階
     coupled_symmetric='対称な連立',coupled_weighted='一次結合で分離する連立',
     coupled_scaled='正規化する連立',coupled_forced='付加項のある連立',
     pure_sum='純総和',pure_sum_scaled='正規化する純総和',sum_relation='総和と一般項の関係')
+FAMILIES.update(mobius='1次分数型',factorial_ratio='総積で解く階比型',forced_second='定数項を含む3項間',arithmetic_difference='等差と階差の組合せ')
 SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 
 
 def compile_recipe(family, parameters, profile='gap_2', config=None):
     config=config or load_config()
+    from level_extensions import FAMILIES as EXTENSIONS,recipe as extension_recipe
+    if family in EXTENSIONS:
+        return problem_from_recipe(family,extension_recipe(family,parameters,profile,config),profile,config)
     from variety import VARIETY_FAMILIES, variety_recipe
     if family in VARIETY_FAMILIES:
         recipe=variety_recipe(family,parameters,profile,config)
@@ -131,11 +135,14 @@ def problem_from_recipe(family,recipe,profile,config):
                          'definitions_tex':r'S_n=\sum_{k=1}^{n}a_k' if ir.get('shape') in {'pure_sum','sum_relation'} else None,
                          'condition':'n は 1 以上の整数とする。数列の一般項 a_n を求めよ。'},
             'answer_tex':answer,'routes':routes,'scores':scores,'quality':quality,
-            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'}|VARIETY_FAMILIES else None,
+            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'}|VARIETY_FAMILIES|{'mobius','factorial_ratio','forced_second','arithmetic_difference'} else None,
                           'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
 def proofs(problem):
+    if problem['ir'].get('shape') in {'mobius','factorial_ratio'}:
+        from level_extensions import proofs as extension_proofs
+        return extension_proofs(problem)
     if problem['ir'].get('shape') in {'system','pure_sum','sum_relation'}:
         from variety_proofs import variety_proofs
         return variety_proofs(problem)
@@ -207,7 +214,7 @@ def proofs(problem):
 
 def validate(problem):
     ir=problem['ir']
-    assert problem['scores']['level'] in range(1,5)
+    assert problem['scores']['level'] in range(1,6)
     for n in range(24):
         xs={i:evaluate(ir['formula'],n+i) for i in range(-n,3)}
         if ir.get('shape')=='system':
@@ -222,7 +229,10 @@ def validate(problem):
                 from variety import check_variety_route
                 check_variety_route(ir,route,n,xs)
             else: check_derivation(ir,route,n)
-        if ir['reciprocal']:
+        if ir.get('shape')=='mobius':
+            p,q,r,s=[evaluate(x,0) for x in ir['mobius_coefficients']]
+            assert r*xs[0]+s!=0 and xs[0]!=evaluate(ir['mobius_shift'],0)
+        elif ir['reciprocal']:
             assert xs[0]>0
             assert evaluate(add(ir['Q'],mul(ir['R'],{'op':'term','offset':0})),n,xs)!=0
     return 24
@@ -239,7 +249,7 @@ def summarize(problems):
 
 def level_diversity(problems):
     result={}
-    for lv in range(1,5):
+    for lv in range(1,6):
         ps=[p for p in problems if p['scores']['level']==lv]
         fraction=sum(p['ir']['reciprocal'] for p in ps)
         result[str(lv)]={'count':len(ps),'fraction_count':fraction,
@@ -277,6 +287,9 @@ def comparison_report(problems,config,counters,rejections):
 
 
 def family_profiles(family,config):
+    if family=='factorial_ratio':
+        from level_extensions import FACTOR_PROFILES
+        return list(FACTOR_PROFILES)
     if family in SCALED or family=='scaled_second_order': return [name for name,_ in scale_options(config)]
     if family=='ratio_power': return config['exponent_profiles']
     if family=='difference_scaled': return ['n','n_plus_1','odd']
@@ -312,7 +325,7 @@ def main():
             family_parameters=list(itertools.product((-2,-1,Fraction(1,2),Fraction(2,3),2,3),(1,),(1,2,3,4,5,6,8,9),(3,)))
         if family=='arithmetic':
             family_parameters=list(itertools.product((2,),(-3,-2,-1,Fraction(1,2),1,2,3,4),(1,2,3,4,5,6,8,9),(3,)))
-        if family.startswith('coupled_') or family in {'second_order','scaled_second_order','pure_sum_scaled'}:
+        if family.startswith('coupled_') or family in {'second_order','scaled_second_order','pure_sum_scaled','forced_second'}:
             family_parameters=list(itertools.product((2,3),(1,2,3),(1,2,3,4,5,6,8,9),(-2,-1,1,2,3,4)))
         for profile in profiles:
             for r,c,d,s in family_parameters:
@@ -355,9 +368,9 @@ def main():
     (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
     report=comparison_report(problems,config,counters,rejections)
     (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.6.0',
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.7.0',
              'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
-             'generation_config':config,'function_catalog':profile_catalog(config),
+             'generation_config':config,'function_catalog':profile_catalog(config),'selection_weights':config['selection'].get('family_weights',{}),
              'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity','level_diversity')},
              'checks':{'exact_arithmetic_cases':len(problems)*24},
              'proof_source_sha256':hashlib.sha256(source.encode()).hexdigest()}

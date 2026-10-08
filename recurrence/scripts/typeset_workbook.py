@@ -18,6 +18,7 @@ def symbolic(e):
  if op=='add':return sum(map(symbolic,a))
  if op=='mul':return sp.prod(map(symbolic,a))
  if op=='div':return symbolic(a[0])/symbolic(a[1])
+ if op=='factorial':return sp.factorial(symbolic(a[0]))
  if op=='pow':return symbolic(a[0])**symbolic(a[1])
  raise ValueError(op)
 def clean(e):
@@ -108,13 +109,13 @@ preamble=r'''\documentclass[dvipdfmx,a4paper,11pt,fleqn,openany]{jsbook}
 \tableofcontents
 \chapter{問題演習}
 \begin{multicols*}{2}
-以下、\,$n$は正の整数とする。Lv1〜Lv4に各15問を収録した。
+以下、\,$n$は正の整数とする。Lv1〜Lv5に各15問を収録した。
 連立漸化式では両方の数列の一般項を求める。
 部分和を使う問題では\,$S_0=0$,\,$S_n=\sum_{k=1}^n a_k$とする。
 \par
 '''
-out=[preamble];names={1:'基本',2:'標準',3:'応用',4:'発展'}
-for lv in range(1,5):
+out=[preamble];names={1:'基本',2:'標準',3:'応用',4:'応用',5:'発展'}
+for lv in range(1,6):
  group=[q for q in qs if q['scores']['level']==lv];assert len(group)==15
  out.append(r'\section{Lv'+str(lv)+' '+names[lv]+'}')
  out.append(r'\subsection{問題}')
@@ -123,7 +124,7 @@ for lv in range(1,5):
   out.append(r'\item\label{問題：'+q['id']+'}'+statement(q))
  out.append(r'\end{enumerate}')
 out.append(r'\end{multicols*}\chapter{方針・解答・解法}\begin{multicols*}{2}')
-for lv in range(1,5):
+for lv in range(1,6):
  group=[q for q in qs if q['scores']['level']==lv]
  out.append(r'\section{Lv'+str(lv)+' '+names[lv]+'}')
  for section in ['方針','解答','解法']:

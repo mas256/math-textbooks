@@ -266,4 +266,20 @@ theorem system_unique {f g a b : ℕ → ℚ} {first second : ℚ}
     · simpa only [ha.recurrence_a, hf.recurrence_a, ih.1, ih.2]
     · simpa only [ha.recurrence_b, hf.recurrence_b, ih.1, ih.2]
 
+theorem shifted_fraction_certificate {f : ℕ → ℚ} {initial : ℚ}
+    {P Q R : ℕ → ℚ}
+    (hf : FirstCertificate f initial (fun n x => P n * x / (Q n + R n * x)))
+    (hden : ∀ n, Q n + R n * f n ≠ 0) (h : ℚ) :
+    FirstCertificate (fun n => f n + h) (initial + h)
+      (fun n x => ((P n + h * R n) * x + h * Q n - h * P n - h ^ 2 * R n) /
+        (R n * x + Q n - h * R n)) := by
+  constructor
+  · rw [hf.init]
+  · intro n
+    change f (n + 1) + h = _
+    rw [hf.recurrence]
+    have hd : R n * (f n + h) + Q n - h * R n = Q n + R n * f n := by ring
+    rw [hd]
+    field_simp [hden n] <;> ring
+
 end Recurrence

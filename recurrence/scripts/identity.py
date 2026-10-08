@@ -11,7 +11,9 @@ REGISTRY_PATH = Path(__file__).resolve().parents[1] / 'reference/public-problem-
 
 def identity_key(ir, include_initials=True):
     initials = [str(evaluate(x,0)) for x in ir['initials']] if include_initials else []
-    if ir.get('shape') in {'system','pure_sum','sum_relation'}:
+    if ir.get('shape') in {'mobius','factorial_ratio'} or ir.get('F2'):
+        value=[ir.get('shape'),ir['lhs'],ir['rhs'],initials]
+    elif ir.get('shape') in {'system','pure_sum','sum_relation'}:
         value=[ir['shape'],ir['lhs'],ir['rhs'],ir.get('b_lhs'),ir.get('b_rhs'),initials,ir.get('b_initial') if include_initials else None]
     elif ir.get('shape')=='linear_second':
         ps=[polynomial(ir[k]) for k in ('P2','Q2','R2')]
