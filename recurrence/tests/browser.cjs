@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 (async () => {
+  const {textbookText} = await import('../model.mjs');
   const browser = await chromium.launch();
   const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
   const bank=JSON.parse(fs.readFileSync('recurrence/build/problems.json','utf8'));
@@ -17,15 +18,19 @@ const fs = require('node:fs');
   await page.screenshot({path:'recurrence/build/desktop.png',fullPage:true});
   await page.locator('#hint-button').click();
   assert.equal(await page.locator('.hint').count(),1);
+  assert.equal(await page.locator('.hint span').textContent(), textbookText(first.routes[0].hint));
+  assert.equal(await page.locator('#hint-button').isDisabled(),true);
+  assert.equal(await page.locator('#answer').isVisible(),false);
   await page.locator('#answer-button').click();
   await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
   assert.equal(await page.locator('#answer').isVisible(),true);
-  assert.equal(await page.locator('#method-observation').textContent(), '着眼点：'+first.routes[0].hint);
-  assert.ok((await page.locator('#method-choice').textContent()).includes('登録済みの候補'));
+  assert.equal(await page.locator('#method-observation').textContent(), '方針：'+textbookText(first.routes[0].hint));
+  assert.equal(await page.locator('#method-choice').isVisible(),false);
+  assert.ok((await page.locator('#score-info').textContent()).includes('登録済みの候補'));
   for (const alternate of await page.locator('.alternate').all()) {
     await alternate.locator('summary').click();
-    assert.ok((await alternate.textContent()).includes('主解法との比較：'));
-    assert.ok((await alternate.textContent()).includes('着眼点：'));
+    assert.ok(!(await alternate.textContent()).includes('スコア')); 
+    assert.ok((await alternate.textContent()).includes('方針：'));
   }
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('#answer').isVisible(),false);
@@ -36,13 +41,24 @@ const fs = require('node:fs');
   await page.locator('[data-level="5"]').click();
   await page.locator('#generate').click();
   assert.ok((await page.locator('#problem-level').textContent()).includes('5'));
+  assert.equal(await page.locator('.exercise').count(),1);
+  assert.equal(await page.locator('#answer').isVisible(),false);
+  assert.equal(await page.locator('.hint').count(),0);
+  const previousId=new URL(page.url()).searchParams.get('problem');
+  await page.locator('#generate').click();
+  assert.notEqual(new URL(page.url()).searchParams.get('problem'),previousId);
+  assert.equal(await page.locator('.exercise').count(),1);
   await page.locator('#answer-button').click();
   await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
   const downloadPromise=page.waitForEvent('download');
   await page.locator('#download-tex').click();
   const download=await downloadPromise;
   await download.saveAs('recurrence/build/example.tex');
-  assert.ok(fs.readFileSync('recurrence/build/example.tex','utf8').includes('\\section*{解答}'));
+  const exported=fs.readFileSync('recurrence/build/example.tex','utf8');
+  assert.ok(exported.includes('\\section*{解答}'));
+  assert.ok(exported.includes('{jsbook}'));
+  assert.ok(exported.includes('\\begin{multicols*}{2}'));
+  assert.ok(!exported.includes('スコア'));
   await page.locator('#all-levels').click();
   await page.locator('#family').selectOption('all');
   for(const family of Object.keys(bank.families)) {
@@ -60,8 +76,8 @@ const fs = require('node:fs');
   assert.equal(await page.locator('.alternate').count(),Math.min(2,multiple.routes.length-1));
   for (const alternate of await page.locator('.alternate').all()) {
     await alternate.locator('summary').click();
-    assert.ok((await alternate.textContent()).includes('主解法との比較：'));
-    assert.ok((await alternate.textContent()).includes('着眼点：'));
+    assert.ok(!(await alternate.textContent()).includes('スコア')); 
+    assert.ok((await alternate.textContent()).includes('方針：'));
   }
   const formulas=bank.problems.flatMap(p=>[...p.statement.initials_tex,p.statement.recurrence_tex,p.answer_tex,
     ...p.routes.flatMap(r=>r.steps.flatMap(s=>[...s.matchAll(/\\\((.*?)\\\)/gs)].map(m=>m[1]))) ]);

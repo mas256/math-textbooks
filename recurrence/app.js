@@ -1,4 +1,4 @@
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } from './model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText } from './model.mjs';
 
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
@@ -82,6 +82,9 @@ function renderRecipe(p) {
   table.append(tbody);
   const wrapper = el('div', undefined, 'math-block'); wrapper.append(table);
   $('score-info').replaceChildren(wrapper, el('p', `教育上の難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。分類の目安：${p.routes[0].difficulty_rule}。`, 'details-note'));
+  const comparison = routeComparison(p.routes);
+  $('score-info').append(el('p', comparison.reason + ' スコアは暫定値です。', 'details-note'),
+    ...comparison.alternatives.map(note => el('p', note, 'details-note')));
   const metrics = p.quality.metrics;
   $('score-info').append(el('p', `完成式の評価：多項式係数の最高次数 ${metrics.coefficient_degree}、指数の次数 ${metrics.exponent_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
   const proof = $('proof-info');
@@ -177,14 +180,13 @@ function renderProblem(p, updateUrl = true) {
 function showHint() {
   const p = state.current;
   if (!p) return;
-  const hints = [p.routes[0].hint, p.routes[0].steps[0] || '初項を使って、変形後の数列の定数を求めます。'];
-  if (state.hints >= hints.length) return;
+  if (state.hints) return;
   const hint = el('div', undefined, 'hint');
-  hint.append(el('strong', 'HINT ' + (state.hints + 1)), el('span', hints[state.hints]));
+  hint.append(el('strong', '方針'), el('span', textbookText(p.routes[0].hint)));
   $('hints').append(hint);
-  state.hints += 1;
-  $('hint-button').disabled = state.hints === hints.length;
-  $('hint-button').replaceChildren(document.createTextNode(state.hints === hints.length ? 'ヒントを表示しました' : 'もう一つヒントを見る'), el('span', '＋'));
+  state.hints = 1;
+  $('hint-button').disabled = true;
+  $('hint-button').replaceChildren(document.createTextNode('方針を表示しました'), el('span', '＋'));
   typeset([hint]);
 }
 
@@ -198,20 +200,18 @@ function toggleAnswer() {
   if (!open) return;
   if (window.MathJax?.typesetClear) window.MathJax.typesetClear([$('answer')]);
   $('method-title').textContent = p.routes[0].title;
-  const comparison = routeComparison(p.routes);
-  $('method-observation').textContent = '着眼点：' + p.routes[0].hint;
-  $('method-choice').textContent = comparison.reason + ' スコアは暫定値です。';
-  $('solution-steps').replaceChildren(...p.routes[0].steps.map(step => el('li', step)));
+  $('method-observation').textContent = '方針：' + textbookText(p.routes[0].hint);
+  $('method-choice').hidden = true;
+  $('solution-steps').replaceChildren(...p.routes[0].steps.map(step => el('li', textbookText(step))));
   $('answer-formula').replaceChildren(mathBlock(p.answer_tex));
   $('revealed-family').textContent = p.family_label;
   const alternates = $('alternate-container'); alternates.replaceChildren();
-  for (const [index, route] of p.routes.slice(1, 3).entries()) {
+  for (const route of p.routes.slice(1, 3)) {
     const box = el('details', undefined, 'alternate');
     box.append(el('summary', '別解：' + route.title));
-    box.append(el('p', '着眼点：' + route.hint, 'method-observation'),
-      el('p', comparison.alternatives[index], 'details-note'));
+    box.append(el('p', '方針：' + textbookText(route.hint), 'method-observation'));
     const steps = el('ol', undefined, 'solution-steps');
-    steps.append(...route.steps.map(step => el('li', step))); box.append(steps);
+    steps.append(...route.steps.map(step => el('li', textbookText(step)))); box.append(steps);
     box.addEventListener('toggle', () => { if (box.open) typeset([box]); });
     alternates.append(box);
   }

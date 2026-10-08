@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } from '../model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText } from '../model.mjs';
 
 const p = (id, family, level) => ({id,family,scores:{level}});
 const bank = {problems:[p('p001','a',1),p('p002','a',1),p('p003','b',2)]};
@@ -46,7 +46,11 @@ test('TeX defaults to problem only and adds solutions on request', () => {
     answer_tex:'a_n=2^{n-1}',routes:[{title:'等比',hint:'係数が一定です。',steps:['公比は2です。']}]};
   assert.ok(!texDocument(q).includes('\\section*{解答}'));
   assert.ok(texDocument(q,true).includes(q.answer_tex));
-  assert.ok(texDocument(q,true).includes('着眼点：係数が一定です。'));
+  assert.ok(texDocument(q,true).includes('\\documentclass[dvipdfmx,a4paper,11pt,fleqn,openany]{jsbook}'));
+  assert.ok(texDocument(q,true).includes('\\begin{multicols*}{2}'));
+  assert.ok(!texDocument(q,true).includes('スコア'));
+  assert.equal(textbookText('\\(a_n=2^{n-1}\\) です。'), '\\(a_n=2^{n-1}\\) である。');
+  assert.ok(texDocument(q,true).includes('係数が一定である。'));
 });
 
 test('route explanations distinguish strict wins, numerical tie breaks and display ties', () => {
