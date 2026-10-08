@@ -2,75 +2,33 @@ import Recurrence.Theory
 
 namespace Recurrence
 
-def p002 (n : ℕ) : ℚ := (1 : ℚ)
-theorem p002_base_valid : FirstCertificate p002 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p002 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p002]
+def p248 (n : ℕ) : ℚ := ((-2 : ℚ) ^ n)
+theorem p248_base_valid : FirstCertificate p248 (1 : ℚ) (fun n x => ((-2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p248 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (-2 : ℚ)) (fun n : ℕ => (0 : ℚ))
+  · norm_num [p248]
   · intro n; positivity
   · intro n
-    simp only [p002, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p248, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p002_valid : FirstCertificate p002 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p002_base_valid
-theorem p002_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p002 n := first_unique p002_valid ha
-#print axioms p002_valid
-#print axioms p002_unique
+theorem p248_valid : FirstCertificate p248 (1 : ℚ) (fun n x => ((-2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p248_base_valid
+theorem p248_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((-2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p248 n := first_unique p248_valid ha
+#print axioms p248_valid
+#print axioms p248_unique
 
-def p005 (n : ℕ) : ℚ := (2 : ℚ)
-theorem p005_base_valid : FirstCertificate p005 (2 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p005 (2 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p005]
+def p249 (n : ℕ) : ℚ := ((-1 : ℚ) ^ n)
+theorem p249_base_valid : FirstCertificate p249 (1 : ℚ) (fun n x => ((-1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p249 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (-1 : ℚ)) (fun n : ℕ => (0 : ℚ))
+  · norm_num [p249]
   · intro n; positivity
   · intro n
-    simp only [p005, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p249, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p005_valid : FirstCertificate p005 (2 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p005_base_valid
-theorem p005_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p005 n := first_unique p005_valid ha
-#print axioms p005_valid
-#print axioms p005_unique
-
-def p003 (n : ℕ) : ℚ := (3 : ℚ)
-theorem p003_base_valid : FirstCertificate p003 (3 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p003 (3 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p003]
-  · intro n; positivity
-  · intro n
-    simp only [p003, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p003_valid : FirstCertificate p003 (3 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p003_base_valid
-theorem p003_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p003 n := first_unique p003_valid ha
-#print axioms p003_valid
-#print axioms p003_unique
-
-def p001 (n : ℕ) : ℚ := (4 : ℚ)
-theorem p001_base_valid : FirstCertificate p001 (4 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p001 (4 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p001]
-  · intro n; positivity
-  · intro n
-    simp only [p001, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p001_valid : FirstCertificate p001 (4 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p001_base_valid
-theorem p001_unique (a : ℕ → ℚ) (ha : FirstCertificate a (4 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p001 n := first_unique p001_valid ha
-#print axioms p001_valid
-#print axioms p001_unique
-
-def p052 (n : ℕ) : ℚ := (5 : ℚ)
-theorem p052_base_valid : FirstCertificate p052 (5 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p052 (5 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p052]
-  · intro n; positivity
-  · intro n
-    simp only [p052, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p052_valid : FirstCertificate p052 (5 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p052_base_valid
-theorem p052_unique (a : ℕ → ℚ) (ha : FirstCertificate a (5 : ℚ) (fun n x => ((1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p052 n := first_unique p052_valid ha
-#print axioms p052_valid
-#print axioms p052_unique
+theorem p249_valid : FirstCertificate p249 (1 : ℚ) (fun n x => ((-1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p249_base_valid
+theorem p249_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((-1 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p249 n := first_unique p249_valid ha
+#print axioms p249_valid
+#print axioms p249_unique
 
 def p054 (n : ℕ) : ℚ := ((2 : ℚ) * ((2 : ℚ) ^ n))
 theorem p054_base_valid : FirstCertificate p054 (2 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
@@ -100,47 +58,19 @@ theorem p007_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n 
 #print axioms p007_valid
 #print axioms p007_unique
 
-def p010 (n : ℕ) : ℚ := ((3 : ℚ) * ((2 : ℚ) ^ n))
-theorem p010_base_valid : FirstCertificate p010 (3 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p010 (3 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p010]
+def p253 (n : ℕ) : ℚ := (((1 : ℚ) / 2) ^ n)
+theorem p253_base_valid : FirstCertificate p253 (1 : ℚ) (fun n x => (((1 : ℚ) / 2) * x + (0 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p253 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((1 : ℚ) / 2)) (fun n : ℕ => (0 : ℚ))
+  · norm_num [p253]
   · intro n; positivity
   · intro n
-    simp only [p010, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p253, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p010_valid : FirstCertificate p010 (3 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p010_base_valid
-theorem p010_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p010 n := first_unique p010_valid ha
-#print axioms p010_valid
-#print axioms p010_unique
-
-def p008 (n : ℕ) : ℚ := ((3 : ℚ) * ((3 : ℚ) ^ n))
-theorem p008_base_valid : FirstCertificate p008 (3 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p008 (3 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (3 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p008]
-  · intro n; positivity
-  · intro n
-    simp only [p008, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p008_valid : FirstCertificate p008 (3 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p008_base_valid
-theorem p008_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((3 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p008 n := first_unique p008_valid ha
-#print axioms p008_valid
-#print axioms p008_unique
-
-def p056 (n : ℕ) : ℚ := ((8 : ℚ) * ((2 : ℚ) ^ n))
-theorem p056_base_valid : FirstCertificate p056 (8 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := by
-  apply linear_certificate p056 (8 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (0 : ℚ))
-  · norm_num [p056]
-  · intro n; positivity
-  · intro n
-    simp only [p056, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p056_valid : FirstCertificate p056 (8 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ)) := p056_base_valid
-theorem p056_unique (a : ℕ → ℚ) (ha : FirstCertificate a (8 : ℚ) (fun n x => ((2 : ℚ) * x + (0 : ℚ)) / (1 : ℚ))) :
-    ∀ n, a n = p056 n := first_unique p056_valid ha
-#print axioms p056_valid
-#print axioms p056_unique
+theorem p253_valid : FirstCertificate p253 (1 : ℚ) (fun n x => (((1 : ℚ) / 2) * x + (0 : ℚ)) / (1 : ℚ)) := p253_base_valid
+theorem p253_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => (((1 : ℚ) / 2) * x + (0 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p253 n := first_unique p253_valid ha
+#print axioms p253_valid
+#print axioms p253_unique
 
 def p057 (n : ℕ) : ℚ := (((8 : ℚ) * ((2 : ℚ) ^ n)) + (1 : ℚ))
 theorem p057_base_valid : FirstCertificate p057 (9 : ℚ) (fun n x => ((2 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ)) := by
@@ -576,6 +506,54 @@ theorem p117_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n 
 #print axioms p117_valid
 #print axioms p117_unique
 
+def p185 (n : ℕ) : ℚ := (((3 : ℚ) ^ n) + ((-1 : ℚ) ^ n))
+theorem p185_valid : SecondCertificate p185 (2 : ℚ) (2 : ℚ) (2 : ℚ) (3 : ℚ) := by
+  constructor
+  · norm_num [p185]
+  · norm_num [p185]
+  · intro n
+    simp only [p185, pow_succ, pow_add] <;> ring
+theorem p185_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (2 : ℚ) (2 : ℚ) (3 : ℚ)) :
+    ∀ n, a n = p185 n := second_unique p185_valid ha
+#print axioms p185_valid
+#print axioms p185_unique
+
+def p173 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n))
+theorem p173_valid : SecondCertificate p173 (2 : ℚ) (3 : ℚ) (3 : ℚ) (-2 : ℚ) := by
+  constructor
+  · norm_num [p173]
+  · norm_num [p173]
+  · intro n
+    simp only [p173, pow_succ, pow_add] <;> ring
+theorem p173_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (3 : ℚ) (3 : ℚ) (-2 : ℚ)) :
+    ∀ n, a n = p173 n := second_unique p173_valid ha
+#print axioms p173_valid
+#print axioms p173_unique
+
+def p239 (n : ℕ) : ℚ := (((3 : ℚ) ^ n) + ((1 : ℚ) ^ n))
+theorem p239_valid : SecondCertificate p239 (2 : ℚ) (4 : ℚ) (4 : ℚ) (-3 : ℚ) := by
+  constructor
+  · norm_num [p239]
+  · norm_num [p239]
+  · intro n
+    simp only [p239, pow_succ, pow_add] <;> ring
+theorem p239_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (4 : ℚ) (4 : ℚ) (-3 : ℚ)) :
+    ∀ n, a n = p239 n := second_unique p239_valid ha
+#print axioms p239_valid
+#print axioms p239_unique
+
+def p243 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n))
+theorem p243_valid : SecondCertificate p243 (2 : ℚ) (0 : ℚ) (0 : ℚ) (4 : ℚ) := by
+  constructor
+  · norm_num [p243]
+  · norm_num [p243]
+  · intro n
+    simp only [p243, pow_succ, pow_add] <;> ring
+theorem p243_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (0 : ℚ) (0 : ℚ) (4 : ℚ)) :
+    ∀ n, a n = p243 n := second_unique p243_valid ha
+#print axioms p243_valid
+#print axioms p243_unique
+
 def p086 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((3 : ℚ) ^ n))
 theorem p086_valid : SecondCertificate p086 (2 : ℚ) (5 : ℚ) (5 : ℚ) (-6 : ℚ) := by
   constructor
@@ -587,54 +565,6 @@ theorem p086_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (5 : �
     ∀ n, a n = p086 n := second_unique p086_valid ha
 #print axioms p086_valid
 #print axioms p086_unique
-
-def p035 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((4 : ℚ) ^ n))
-theorem p035_valid : SecondCertificate p035 (2 : ℚ) (6 : ℚ) (6 : ℚ) (-8 : ℚ) := by
-  constructor
-  · norm_num [p035]
-  · norm_num [p035]
-  · intro n
-    simp only [p035, pow_succ, pow_add] <;> ring
-theorem p035_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (6 : ℚ) (6 : ℚ) (-8 : ℚ)) :
-    ∀ n, a n = p035 n := second_unique p035_valid ha
-#print axioms p035_valid
-#print axioms p035_unique
-
-def p085 (n : ℕ) : ℚ := (((3 : ℚ) ^ n) + ((4 : ℚ) ^ n))
-theorem p085_valid : SecondCertificate p085 (2 : ℚ) (7 : ℚ) (7 : ℚ) (-12 : ℚ) := by
-  constructor
-  · norm_num [p085]
-  · norm_num [p085]
-  · intro n
-    simp only [p085, pow_succ, pow_add] <;> ring
-theorem p085_unique (a : ℕ → ℚ) (ha : SecondCertificate a (2 : ℚ) (7 : ℚ) (7 : ℚ) (-12 : ℚ)) :
-    ∀ n, a n = p085 n := second_unique p085_valid ha
-#print axioms p085_valid
-#print axioms p085_unique
-
-def p034 (n : ℕ) : ℚ := (((3 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) ^ n))
-theorem p034_valid : SecondCertificate p034 (4 : ℚ) (9 : ℚ) (5 : ℚ) (-6 : ℚ) := by
-  constructor
-  · norm_num [p034]
-  · norm_num [p034]
-  · intro n
-    simp only [p034, pow_succ, pow_add] <;> ring
-theorem p034_unique (a : ℕ → ℚ) (ha : SecondCertificate a (4 : ℚ) (9 : ℚ) (5 : ℚ) (-6 : ℚ)) :
-    ∀ n, a n = p034 n := second_unique p034_valid ha
-#print axioms p034_valid
-#print axioms p034_unique
-
-def p084 (n : ℕ) : ℚ := (((4 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((4 : ℚ) ^ n)))
-theorem p084_valid : SecondCertificate p084 (6 : ℚ) (16 : ℚ) (6 : ℚ) (-8 : ℚ) := by
-  constructor
-  · norm_num [p084]
-  · norm_num [p084]
-  · intro n
-    simp only [p084, pow_succ, pow_add] <;> ring
-theorem p084_unique (a : ℕ → ℚ) (ha : SecondCertificate a (6 : ℚ) (16 : ℚ) (6 : ℚ) (-8 : ℚ)) :
-    ∀ n, a n = p084 n := second_unique p084_valid ha
-#print axioms p084_valid
-#print axioms p084_unique
 
 def p089 (n : ℕ) : ℚ := ((2 : ℚ) * ((2 : ℚ) ^ (n * (n + 2))))
 theorem p089_base_valid : FirstCertificate p089 (2 : ℚ) (fun n x => (((2 : ℚ) ^ ((2 * (n + 1)) + 1)) * x + (0 : ℚ)) / (1 : ℚ)) := by
@@ -1223,6 +1153,26 @@ theorem p110_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((2 : ℚ) / 9) (
 #print axioms p110_valid
 #print axioms p110_unique
 
+def p180 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((2 : ℚ) * ((-2 : ℚ) ^ n))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))
+theorem p180_valid : GeneralSecondCertificate p180 (1 : ℚ) ((-2 : ℚ) / 5) (fun n x y => ((0 : ℚ) * y + ((4 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) := by
+  apply linear_second_certificate p180 (1 : ℚ) ((-2 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => (0 : ℚ)) (fun n => ((4 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))))
+  · norm_num [p180]
+  · norm_num [p180]
+  · intro n; positivity
+  · intro n
+    have h0_0 : (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
+    have h1_0 : (((2 : ℚ) * (((n + 1) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
+    have h2_0 : (((2 : ℚ) * (((n + 2) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
+    simp only [p180, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    field_simp [h0_0, h1_0, h2_0] <;> ring
+theorem p180_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((-2 : ℚ) / 5))
+    (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 2) = (0 : ℚ) * a (n + 1) + ((4 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * a n) :
+    ∀ n, a n = p180 n := by
+  apply general_second_unique p180_valid
+  exact linear_second_certificate a (1 : ℚ) ((-2 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => (0 : ℚ)) (fun n => ((4 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p180_valid
+#print axioms p180_unique
+
 def p139 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((3 : ℚ) ^ n)) / ((n : ℚ) + 1))
 theorem p139_valid : GeneralSecondCertificate p139 (2 : ℚ) ((5 : ℚ) / 2) (fun n x y => (((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * y + ((-6 : ℚ) * ((n : ℚ) + 1)) * x) / (((n : ℚ) + 1) + (2 : ℚ))) := by
   apply linear_second_certificate p139 (2 : ℚ) ((5 : ℚ) / 2) (fun n => (((n : ℚ) + 1) + (2 : ℚ))) (fun n => ((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((-6 : ℚ) * ((n : ℚ) + 1)))
@@ -1263,187 +1213,167 @@ theorem p130_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (2 : �
 #print axioms p130_valid
 #print axioms p130_unique
 
-def p132 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((2 : ℚ) * ((3 : ℚ) ^ n))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))
-theorem p132_valid : GeneralSecondCertificate p132 (1 : ℚ) ((8 : ℚ) / 5) (fun n x y => (((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * y + ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) := by
-  apply linear_second_certificate p132 (1 : ℚ) ((8 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))))
-  · norm_num [p132]
-  · norm_num [p132]
+def p238 (n : ℕ) : ℚ := ((((3 : ℚ) ^ n) + ((2 : ℚ) * ((-1 : ℚ) ^ n))) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))
+theorem p238_valid : GeneralSecondCertificate p238 (1 : ℚ) ((1 : ℚ) / 8) (fun n x y => (((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * y + ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (4 : ℚ)))) := by
+  apply linear_second_certificate p238 (1 : ℚ) ((1 : ℚ) / 8) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (4 : ℚ)))) (fun n => ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p238]
+  · norm_num [p238]
   · intro n; positivity
   · intro n
-    have h0_0 : (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    have h1_0 : (((2 : ℚ) * (((n + 1) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    have h2_0 : (((2 : ℚ) * (((n + 2) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    simp only [p132, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    have h0_0 : (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) ≠ 0 := by positivity
+    have h1_0 : ((((n + 1) : ℚ) + 1) * ((((n + 1) : ℚ) + 1) + (2 : ℚ))) ≠ 0 := by positivity
+    have h2_0 : ((((n + 2) : ℚ) + 1) * ((((n + 2) : ℚ) + 1) + (2 : ℚ))) ≠ 0 := by positivity
+    simp only [p238, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     field_simp [h0_0, h1_0, h2_0] <;> ring
-theorem p132_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((8 : ℚ) / 5))
-    (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 2) = ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a (n + 1) + ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * a n) :
-    ∀ n, a n = p132 n := by
-  apply general_second_unique p132_valid
-  exact linear_second_certificate a (1 : ℚ) ((8 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p132_valid
-#print axioms p132_unique
+theorem p238_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((1 : ℚ) / 8))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (4 : ℚ))) * a (n + 2) = ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a (n + 1) + ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p238 n := by
+  apply general_second_unique p238_valid
+  exact linear_second_certificate a (1 : ℚ) ((1 : ℚ) / 8) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (4 : ℚ)))) (fun n => ((2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p238_valid
+#print axioms p238_unique
 
-def p128 (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((4 : ℚ) ^ n)))
-theorem p128_valid : GeneralSecondCertificate p128 (3 : ℚ) (16 : ℚ) (fun n x y => (((6 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-8 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
-  apply linear_second_certificate p128 (3 : ℚ) (16 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((6 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-8 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
-  · norm_num [p128]
-  · norm_num [p128]
+def p205 (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+theorem p205_valid : GeneralSecondCertificate p205 (6 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)) * x) / ((n : ℚ) + 1)) := by
+  apply linear_second_certificate p205 (6 : ℚ) (0 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)))
+  · norm_num [p205]
+  · norm_num [p205]
   · intro n; positivity
   · intro n
-    simp only [p128, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p205, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p128_unique (a : ℕ → ℚ) (hi : a 0 = (3 : ℚ)) (hj : a 1 = (16 : ℚ))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((6 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-8 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
-    ∀ n, a n = p128 n := by
-  apply general_second_unique p128_valid
-  exact linear_second_certificate a (3 : ℚ) (16 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((6 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-8 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p128_valid
-#print axioms p128_unique
+theorem p205_unique (a : ℕ → ℚ) (hi : a 0 = (6 : ℚ)) (hj : a 1 = (0 : ℚ))
+    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (0 : ℚ) * a (n + 1) + (((4 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)) * a n) :
+    ∀ n, a n = p205 n := by
+  apply general_second_unique p205_valid
+  exact linear_second_certificate a (6 : ℚ) (0 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p205_valid
+#print axioms p205_unique
 
-def p145 (n : ℕ) : ℚ := ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((3 : ℚ) ^ n)))
-theorem p145_valid : GeneralSecondCertificate p145 (6 : ℚ) (25 : ℚ) (fun n x y => (((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * y + ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * x) / ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) := by
-  apply linear_second_certificate p145 (6 : ℚ) (25 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))))
-  · norm_num [p145]
-  · norm_num [p145]
+def p191 (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+theorem p191_valid : GeneralSecondCertificate p191 (2 : ℚ) (6 : ℚ) (fun n x y => (((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  apply linear_second_certificate p191 (2 : ℚ) (6 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p191]
+  · norm_num [p191]
   · intro n; positivity
   · intro n
-    simp only [p145, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p191, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p145_unique (a : ℕ → ℚ) (hi : a 0 = (6 : ℚ)) (hj : a 1 = (25 : ℚ))
-    (ha : ∀ n : ℕ, ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a (n + 2) = ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a (n + 1) + ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a n) :
-    ∀ n, a n = p145 n := by
-  apply general_second_unique p145_valid
-  exact linear_second_certificate a (6 : ℚ) (25 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((5 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p145_valid
-#print axioms p145_unique
+theorem p191_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p191 n := by
+  apply general_second_unique p191_valid
+  exact linear_second_certificate a (2 : ℚ) (6 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p191_valid
+#print axioms p191_unique
 
-def p154 (n : ℕ) : ℚ := ((((n : ℚ) + 1) + (1 : ℚ)) * ((((1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((4 : ℚ) ^ n))))
-theorem p154_valid : GeneralSecondCertificate p154 (5 : ℚ) (27 : ℚ) (fun n x y => (((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * y + ((-8 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x) / ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) := by
-  apply linear_second_certificate p154 (5 : ℚ) (27 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((-8 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))))
-  · norm_num [p154]
-  · norm_num [p154]
+def p201 (n : ℕ) : ℚ := ((((3 : ℚ) ^ n) + ((1 : ℚ) ^ n)) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+theorem p201_valid : GeneralSecondCertificate p201 (1 : ℚ) ((2 : ℚ) / 3) (fun n x y => (((4 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) := by
+  apply linear_second_certificate p201 (1 : ℚ) ((2 : ℚ) / 3) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((4 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  · norm_num [p201]
+  · norm_num [p201]
   · intro n; positivity
   · intro n
-    simp only [p154, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p154_unique (a : ℕ → ℚ) (hi : a 0 = (5 : ℚ)) (hj : a 1 = (27 : ℚ))
-    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 2) = ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a (n + 1) + ((-8 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a n) :
-    ∀ n, a n = p154 n := by
-  apply general_second_unique p154_valid
-  exact linear_second_certificate a (5 : ℚ) (27 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((-8 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p154_valid
-#print axioms p154_unique
-
-def p137 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((4 : ℚ) ^ n)) / ((n : ℚ) + 1))
-theorem p137_valid : GeneralSecondCertificate p137 (2 : ℚ) (3 : ℚ) (fun n x y => (((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * y + ((-8 : ℚ) * ((n : ℚ) + 1)) * x) / (((n : ℚ) + 1) + (2 : ℚ))) := by
-  apply linear_second_certificate p137 (2 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (2 : ℚ))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((-8 : ℚ) * ((n : ℚ) + 1)))
-  · norm_num [p137]
-  · norm_num [p137]
-  · intro n; positivity
-  · intro n
-    have h0_0 : ((n : ℚ) + 1) ≠ 0 := by positivity
-    have h1_0 : (((n + 1) : ℚ) + 1) ≠ 0 := by positivity
-    have h2_0 : (((n + 2) : ℚ) + 1) ≠ 0 := by positivity
-    simp only [p137, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    have h0_0 : (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) ≠ 0 := by positivity
+    have h1_0 : ((((n + 1) : ℚ) + 1) * ((((n + 1) : ℚ) + 1) + (1 : ℚ))) ≠ 0 := by positivity
+    have h2_0 : ((((n + 2) : ℚ) + 1) * ((((n + 2) : ℚ) + 1) + (1 : ℚ))) ≠ 0 := by positivity
+    simp only [p201, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     field_simp [h0_0, h1_0, h2_0] <;> ring
-theorem p137_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (3 : ℚ))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (2 : ℚ)) * a (n + 2) = ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 1) + ((-8 : ℚ) * ((n : ℚ) + 1)) * a n) :
-    ∀ n, a n = p137 n := by
-  apply general_second_unique p137_valid
-  exact linear_second_certificate a (2 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (2 : ℚ))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((-8 : ℚ) * ((n : ℚ) + 1))) hi hj (by intro n; positivity) ha
-#print axioms p137_valid
-#print axioms p137_unique
+theorem p201_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((2 : ℚ) / 3))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a (n + 2) = ((4 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
+    ∀ n, a n = p201 n := by
+  apply general_second_unique p201_valid
+  exact linear_second_certificate a (1 : ℚ) ((2 : ℚ) / 3) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((4 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p201_valid
+#print axioms p201_unique
 
-def p155 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((3 : ℚ) ^ n)) / (((n : ℚ) + 1) + (1 : ℚ)))
-theorem p155_valid : GeneralSecondCertificate p155 (1 : ℚ) ((5 : ℚ) / 3) (fun n x y => (((5 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / (((n : ℚ) + 1) + (3 : ℚ))) := by
-  apply linear_second_certificate p155 (1 : ℚ) ((5 : ℚ) / 3) (fun n => (((n : ℚ) + 1) + (3 : ℚ))) (fun n => ((5 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))))
-  · norm_num [p155]
-  · norm_num [p155]
+def p247 (n : ℕ) : ℚ := ((((2 : ℚ) ^ n) + ((-1 : ℚ) ^ n)) / (((n : ℚ) + 1) ^ 2))
+theorem p247_valid : GeneralSecondCertificate p247 (2 : ℚ) ((1 : ℚ) / 4) (fun n x y => (((((n : ℚ) + 1) + (1 : ℚ)) ^ 2) * y + ((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) * x) / ((((n : ℚ) + 1) + (2 : ℚ)) ^ 2)) := by
+  apply linear_second_certificate p247 (2 : ℚ) ((1 : ℚ) / 4) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) ^ 2)) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) (fun n => ((2 : ℚ) * (((n : ℚ) + 1) ^ 2)))
+  · norm_num [p247]
+  · norm_num [p247]
   · intro n; positivity
   · intro n
-    have h0_0 : (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 := by positivity
-    have h1_0 : ((((n + 1) : ℚ) + 1) + (1 : ℚ)) ≠ 0 := by positivity
-    have h2_0 : ((((n + 2) : ℚ) + 1) + (1 : ℚ)) ≠ 0 := by positivity
-    simp only [p155, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    have h0_0 : (((n : ℚ) + 1) ^ 2) ≠ 0 := by positivity
+    have h1_0 : ((((n + 1) : ℚ) + 1) ^ 2) ≠ 0 := by positivity
+    have h2_0 : ((((n + 2) : ℚ) + 1) ^ 2) ≠ 0 := by positivity
+    simp only [p247, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     field_simp [h0_0, h1_0, h2_0] <;> ring
-theorem p155_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((5 : ℚ) / 3))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (3 : ℚ)) * a (n + 2) = ((5 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
-    ∀ n, a n = p155 n := by
-  apply general_second_unique p155_valid
-  exact linear_second_certificate a (1 : ℚ) ((5 : ℚ) / 3) (fun n => (((n : ℚ) + 1) + (3 : ℚ))) (fun n => ((5 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p155_valid
-#print axioms p155_unique
+theorem p247_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = ((1 : ℚ) / 4))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (2 : ℚ)) ^ 2) * a (n + 2) = ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2) * a (n + 1) + ((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) * a n) :
+    ∀ n, a n = p247 n := by
+  apply general_second_unique p247_valid
+  exact linear_second_certificate a (2 : ℚ) ((1 : ℚ) / 4) (fun n => ((((n : ℚ) + 1) + (2 : ℚ)) ^ 2)) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) (fun n => ((2 : ℚ) * (((n : ℚ) + 1) ^ 2))) hi hj (by intro n; positivity) ha
+#print axioms p247_valid
+#print axioms p247_unique
 
-def p163 (n : ℕ) : ℚ := ((((2 : ℚ) * ((2 : ℚ) ^ n)) + ((4 : ℚ) ^ n)) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))
-theorem p163_valid : GeneralSecondCertificate p163 (1 : ℚ) ((8 : ℚ) / 5) (fun n x y => (((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * y + ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) := by
-  apply linear_second_certificate p163 (1 : ℚ) ((8 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))))
-  · norm_num [p163]
-  · norm_num [p163]
+def p174 (n : ℕ) : ℚ := ((((n : ℚ) + 1) ^ 2) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+theorem p174_valid : GeneralSecondCertificate p174 (2 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((16 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)) * x) / (((n : ℚ) + 1) ^ 2)) := by
+  apply linear_second_certificate p174 (2 : ℚ) (0 : ℚ) (fun n => (((n : ℚ) + 1) ^ 2)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((16 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)))
+  · norm_num [p174]
+  · norm_num [p174]
   · intro n; positivity
   · intro n
-    have h0_0 : (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    have h1_0 : (((2 : ℚ) * (((n + 1) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    have h2_0 : (((2 : ℚ) * (((n + 2) : ℚ) + 1)) + (1 : ℚ)) ≠ 0 := by positivity
-    simp only [p163, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    field_simp [h0_0, h1_0, h2_0] <;> ring
-theorem p163_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = ((8 : ℚ) / 5))
-    (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 2) = ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a (n + 1) + ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) * a n) :
-    ∀ n, a n = p163 n := by
-  apply general_second_unique p163_valid
-  exact linear_second_certificate a (1 : ℚ) ((8 : ℚ) / 5) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p163_valid
-#print axioms p163_unique
-
-def p124 (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((2 : ℚ) * ((3 : ℚ) ^ n))))
-theorem p124_valid : GeneralSecondCertificate p124 (3 : ℚ) (16 : ℚ) (fun n x y => (((5 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
-  apply linear_second_certificate p124 (3 : ℚ) (16 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((5 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
-  · norm_num [p124]
-  · norm_num [p124]
-  · intro n; positivity
-  · intro n
-    simp only [p124, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p174, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p124_unique (a : ℕ → ℚ) (hi : a 0 = (3 : ℚ)) (hj : a 1 = (16 : ℚ))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((5 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
-    ∀ n, a n = p124 n := by
-  apply general_second_unique p124_valid
-  exact linear_second_certificate a (3 : ℚ) (16 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((5 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p124_valid
-#print axioms p124_unique
+theorem p174_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (0 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) ^ 2) * a (n + 2) = (0 : ℚ) * a (n + 1) + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((16 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ)) * a n) :
+    ∀ n, a n = p174 n := by
+  apply general_second_unique p174_valid
+  exact linear_second_certificate a (2 : ℚ) (0 : ℚ) (fun n => (((n : ℚ) + 1) ^ 2)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((16 : ℚ) * ((n : ℚ) + 1)) + (16 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p174_valid
+#print axioms p174_unique
 
-def p150 (n : ℕ) : ℚ := ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * ((((1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + ((4 : ℚ) ^ n)))
-theorem p150_valid : GeneralSecondCertificate p150 ((9 : ℚ) / 2) (25 : ℚ) (fun n x y => (((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * y + ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * x) / ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) := by
-  apply linear_second_certificate p150 ((9 : ℚ) / 2) (25 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))))
-  · norm_num [p150]
-  · norm_num [p150]
+def p199 (n : ℕ) : ℚ := ((((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+theorem p199_valid : GeneralSecondCertificate p199 (4 : ℚ) (3 : ℚ) (fun n x y => (((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * y + ((6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x) / ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) := by
+  apply linear_second_certificate p199 (4 : ℚ) (3 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))))
+  · norm_num [p199]
+  · norm_num [p199]
   · intro n; positivity
   · intro n
-    simp only [p150, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p199, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p150_unique (a : ℕ → ℚ) (hi : a 0 = ((9 : ℚ) / 2)) (hj : a 1 = (25 : ℚ))
-    (ha : ∀ n : ℕ, ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a (n + 2) = ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a (n + 1) + ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a n) :
-    ∀ n, a n = p150 n := by
-  apply general_second_unique p150_valid
-  exact linear_second_certificate a ((9 : ℚ) / 2) (25 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((6 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-8 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p150_valid
-#print axioms p150_unique
+theorem p199_unique (a : ℕ → ℚ) (hi : a 0 = (4 : ℚ)) (hj : a 1 = (3 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 2) = ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a (n + 1) + ((6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a n) :
+    ∀ n, a n = p199 n := by
+  apply general_second_unique p199_valid
+  exact linear_second_certificate a (4 : ℚ) (3 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p199_valid
+#print axioms p199_unique
 
-def p148 (n : ℕ) : ℚ := ((((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) ^ n)))
-theorem p148_valid : GeneralSecondCertificate p148 (8 : ℚ) (27 : ℚ) (fun n x y => (((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * y + ((-6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * x) / ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) := by
-  apply linear_second_certificate p148 (8 : ℚ) (27 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))))
-  · norm_num [p148]
-  · norm_num [p148]
+def p233 (n : ℕ) : ℚ := ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((4 : ℚ) ^ n)))
+theorem p233_valid : GeneralSecondCertificate p233 (6 : ℚ) (35 : ℚ) (fun n x y => (((7 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * y + ((-12 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * x) / ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) := by
+  apply linear_second_certificate p233 (6 : ℚ) (35 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((7 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-12 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))))
+  · norm_num [p233]
+  · norm_num [p233]
   · intro n; positivity
   · intro n
-    simp only [p148, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p233, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p148_unique (a : ℕ → ℚ) (hi : a 0 = (8 : ℚ)) (hj : a 1 = (27 : ℚ))
-    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 2) = ((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a (n + 1) + ((-6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ))) * a n) :
-    ∀ n, a n = p148 n := by
-  apply general_second_unique p148_valid
-  exact linear_second_certificate a (8 : ℚ) (27 : ℚ) (fun n => ((((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((5 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) (fun n => ((-6 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)) * (((n : ℚ) + 1) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p148_valid
-#print axioms p148_unique
+theorem p233_unique (a : ℕ → ℚ) (hi : a 0 = (6 : ℚ)) (hj : a 1 = (35 : ℚ))
+    (ha : ∀ n : ℕ, ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a (n + 2) = ((7 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a (n + 1) + ((-12 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) * a n) :
+    ∀ n, a n = p233 n := by
+  apply general_second_unique p233_valid
+  exact linear_second_certificate a (6 : ℚ) (35 : ℚ) (fun n => ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) (fun n => ((7 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) (fun n => ((-12 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p233_valid
+#print axioms p233_unique
+
+def p217 (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p217_valid : GeneralSecondCertificate p217 (10 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  apply linear_second_certificate p217 (10 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)))
+  · norm_num [p217]
+  · norm_num [p217]
+  · intro n; positivity
+  · intro n
+    simp only [p217, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p217_unique (a : ℕ → ℚ) (hi : a 0 = (10 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)) * a (n + 2) = ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * a (n + 1) + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * a n) :
+    ∀ n, a n = p217 n := by
+  apply general_second_unique p217_valid
+  exact linear_second_certificate a (10 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p217_valid
+#print axioms p217_unique
 
 def p134 (n : ℕ) : ℚ := (((((n : ℚ) + 1) + (-2 : ℚ)) * ((2 : ℚ) ^ n)) + (2 : ℚ))
 theorem p134_valid : GeneralSecondCertificate p134 (1 : ℚ) (2 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
@@ -1461,6 +1391,57 @@ theorem p134_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (2 : �
   exact linear_second_certificate a (1 : ℚ) (2 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
 #print axioms p134_valid
 #print axioms p134_unique
+
+def p176 (n : ℕ) : ℚ := ((((((1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-1 : ℚ) / 4)) * ((3 : ℚ) ^ n)) + ((3 : ℚ) / 4))
+theorem p176_valid : GeneralSecondCertificate p176 (1 : ℚ) (3 : ℚ) (fun n x y => ((((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  apply linear_second_certificate p176 (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p176]
+  · norm_num [p176]
+  · intro n; positivity
+  · intro n
+    simp only [p176, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p176_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (1 : ℚ)) * a (n + 2) = (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * a (n + 1) + ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p176 n := by
+  apply general_second_unique p176_valid
+  exact linear_second_certificate a (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p176_valid
+#print axioms p176_unique
+
+def p146 (n : ℕ) : ℚ := (((((2 : ℚ) * ((n : ℚ) + 1)) + (-3 : ℚ)) * ((2 : ℚ) ^ n)) + (2 : ℚ))
+theorem p146_valid : GeneralSecondCertificate p146 (1 : ℚ) (4 : ℚ) (fun n x y => ((((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
+  apply linear_second_certificate p146 (1 : ℚ) (4 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))))
+  · norm_num [p146]
+  · norm_num [p146]
+  · intro n; positivity
+  · intro n
+    simp only [p146, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p146_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (4 : ℚ))
+    (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * a (n + 2) = (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a n) :
+    ∀ n, a n = p146 n := by
+  apply general_second_unique p146_valid
+  exact linear_second_certificate a (1 : ℚ) (4 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p146_valid
+#print axioms p146_unique
+
+def p153 (n : ℕ) : ℚ := ((((((1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-3 : ℚ) / 4)) * ((3 : ℚ) ^ n)) + ((5 : ℚ) / 4))
+theorem p153_valid : GeneralSecondCertificate p153 (1 : ℚ) (2 : ℚ) (fun n x y => ((((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
+  apply linear_second_certificate p153 (1 : ℚ) (2 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))))
+  · norm_num [p153]
+  · norm_num [p153]
+  · intro n; positivity
+  · intro n
+    simp only [p153, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p153_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (2 : ℚ))
+    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * a (n + 1) + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
+    ∀ n, a n = p153 n := by
+  apply general_second_unique p153_valid
+  exact linear_second_certificate a (1 : ℚ) (2 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p153_valid
+#print axioms p153_unique
 
 def p156 (n : ℕ) : ℚ := ((((((1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-1 : ℚ) / 2)) * ((2 : ℚ) ^ n)) + (1 : ℚ))
 theorem p156_valid : GeneralSecondCertificate p156 (1 : ℚ) (2 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
@@ -1496,56 +1477,56 @@ theorem p133_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (10 : �
 #print axioms p133_valid
 #print axioms p133_unique
 
-def p153 (n : ℕ) : ℚ := ((((((1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-3 : ℚ) / 4)) * ((3 : ℚ) ^ n)) + ((5 : ℚ) / 4))
-theorem p153_valid : GeneralSecondCertificate p153 (1 : ℚ) (2 : ℚ) (fun n x y => ((((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
-  apply linear_second_certificate p153 (1 : ℚ) (2 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))))
-  · norm_num [p153]
-  · norm_num [p153]
+def p129 (n : ℕ) : ℚ := (((((2 : ℚ) * ((n : ℚ) + 1)) + (-4 : ℚ)) * ((2 : ℚ) ^ n)) + (3 : ℚ))
+theorem p129_valid : GeneralSecondCertificate p129 (1 : ℚ) (3 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
+  apply linear_second_certificate p129 (1 : ℚ) (3 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))))
+  · norm_num [p129]
+  · norm_num [p129]
   · intro n; positivity
   · intro n
-    simp only [p153, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p129, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p153_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (2 : ℚ))
-    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * a (n + 1) + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
-    ∀ n, a n = p153 n := by
-  apply general_second_unique p153_valid
-  exact linear_second_certificate a (1 : ℚ) (2 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p153_valid
-#print axioms p153_unique
+theorem p129_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : ℚ))
+    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
+    ∀ n, a n = p129 n := by
+  apply general_second_unique p129_valid
+  exact linear_second_certificate a (1 : ℚ) (3 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p129_valid
+#print axioms p129_unique
 
-def p120 (n : ℕ) : ℚ := (((((n : ℚ) + 1) + (-1 : ℚ)) * ((2 : ℚ) ^ n)) + (1 : ℚ))
-theorem p120_valid : GeneralSecondCertificate p120 (1 : ℚ) (3 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
-  apply linear_second_certificate p120 (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
-  · norm_num [p120]
-  · norm_num [p120]
+def p212 (n : ℕ) : ℚ := (((((n : ℚ) + 1) + ((-1 : ℚ) / 2)) * ((3 : ℚ) ^ n)) + ((1 : ℚ) / 2))
+theorem p212_valid : GeneralSecondCertificate p212 (1 : ℚ) (5 : ℚ) (fun n x y => ((((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  apply linear_second_certificate p212 (1 : ℚ) (5 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p212]
+  · norm_num [p212]
   · intro n; positivity
   · intro n
-    simp only [p120, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p212, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p120_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : ℚ))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (1 : ℚ)) * a (n + 2) = (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
-    ∀ n, a n = p120 n := by
-  apply general_second_unique p120_valid
-  exact linear_second_certificate a (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p120_valid
-#print axioms p120_unique
+theorem p212_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (5 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (1 : ℚ)) * a (n + 2) = (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * a (n + 1) + ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p212 n := by
+  apply general_second_unique p212_valid
+  exact linear_second_certificate a (1 : ℚ) (5 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p212_valid
+#print axioms p212_unique
 
-def p146 (n : ℕ) : ℚ := (((((2 : ℚ) * ((n : ℚ) + 1)) + (-3 : ℚ)) * ((2 : ℚ) ^ n)) + (2 : ℚ))
-theorem p146_valid : GeneralSecondCertificate p146 (1 : ℚ) (4 : ℚ) (fun n x y => ((((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
-  apply linear_second_certificate p146 (1 : ℚ) (4 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))))
-  · norm_num [p146]
-  · norm_num [p146]
+def p161 (n : ℕ) : ℚ := (((((4 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * ((2 : ℚ) ^ n)) + (3 : ℚ))
+theorem p161_valid : GeneralSecondCertificate p161 (1 : ℚ) (7 : ℚ) (fun n x y => ((((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
+  apply linear_second_certificate p161 (1 : ℚ) (7 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))))
+  · norm_num [p161]
+  · norm_num [p161]
   · intro n; positivity
   · intro n
-    simp only [p146, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p161, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p146_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (4 : ℚ))
+theorem p161_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (7 : ℚ))
     (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * a (n + 2) = (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a n) :
-    ∀ n, a n = p146 n := by
-  apply general_second_unique p146_valid
-  exact linear_second_certificate a (1 : ℚ) (4 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p146_valid
-#print axioms p146_unique
+    ∀ n, a n = p161 n := by
+  apply general_second_unique p161_valid
+  exact linear_second_certificate a (1 : ℚ) (7 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p161_valid
+#print axioms p161_unique
 
 def p158 (n : ℕ) : ℚ := (((((n : ℚ) + 1) + ((-3 : ℚ) / 2)) * ((3 : ℚ) ^ n)) + ((3 : ℚ) / 2))
 theorem p158_valid : GeneralSecondCertificate p158 (1 : ℚ) (3 : ℚ) (fun n x y => ((((4 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
@@ -1564,22 +1545,22 @@ theorem p158_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : �
 #print axioms p158_valid
 #print axioms p158_unique
 
-def p119 (n : ℕ) : ℚ := (((((2 : ℚ) * ((n : ℚ) + 1)) + (-2 : ℚ)) * ((2 : ℚ) ^ n)) + (1 : ℚ))
-theorem p119_valid : GeneralSecondCertificate p119 (1 : ℚ) (5 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
-  apply linear_second_certificate p119 (1 : ℚ) (5 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
-  · norm_num [p119]
-  · norm_num [p119]
+def p120 (n : ℕ) : ℚ := (((((n : ℚ) + 1) + (-1 : ℚ)) * ((2 : ℚ) ^ n)) + (1 : ℚ))
+theorem p120_valid : GeneralSecondCertificate p120 (1 : ℚ) (3 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  apply linear_second_certificate p120 (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p120]
+  · norm_num [p120]
   · intro n; positivity
   · intro n
-    simp only [p119, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p120, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p119_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (5 : ℚ))
+theorem p120_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : ℚ))
     (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (1 : ℚ)) * a (n + 2) = (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
-    ∀ n, a n = p119 n := by
-  apply general_second_unique p119_valid
-  exact linear_second_certificate a (1 : ℚ) (5 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p119_valid
-#print axioms p119_unique
+    ∀ n, a n = p120 n := by
+  apply general_second_unique p120_valid
+  exact linear_second_certificate a (1 : ℚ) (3 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p120_valid
+#print axioms p120_unique
 
 def p123 (n : ℕ) : ℚ := (((((5 : ℚ) * ((n : ℚ) + 1)) + (-5 : ℚ)) * ((3 : ℚ) ^ n)) + (1 : ℚ))
 theorem p123_valid : GeneralSecondCertificate p123 (1 : ℚ) (16 : ℚ) (fun n x y => ((((8 : ℚ) * ((n : ℚ) + 1)) + (10 : ℚ)) * y + ((-3 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
@@ -1597,57 +1578,6 @@ theorem p123_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (16 : �
   exact linear_second_certificate a (1 : ℚ) (16 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((8 : ℚ) * ((n : ℚ) + 1)) + (10 : ℚ))) (fun n => ((-3 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
 #print axioms p123_valid
 #print axioms p123_unique
-
-def p129 (n : ℕ) : ℚ := (((((2 : ℚ) * ((n : ℚ) + 1)) + (-4 : ℚ)) * ((2 : ℚ) ^ n)) + (3 : ℚ))
-theorem p129_valid : GeneralSecondCertificate p129 (1 : ℚ) (3 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * x) / ((n : ℚ) + 1)) := by
-  apply linear_second_certificate p129 (1 : ℚ) (3 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))))
-  · norm_num [p129]
-  · norm_num [p129]
-  · intro n; positivity
-  · intro n
-    simp only [p129, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p129_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (3 : ℚ))
-    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ))) * a n) :
-    ∀ n, a n = p129 n := by
-  apply general_second_unique p129_valid
-  exact linear_second_certificate a (1 : ℚ) (3 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p129_valid
-#print axioms p129_unique
-
-def p152 (n : ℕ) : ℚ := (((((4 : ℚ) * ((n : ℚ) + 1)) + (-4 : ℚ)) * ((2 : ℚ) ^ n)) + (1 : ℚ))
-theorem p152_valid : GeneralSecondCertificate p152 (1 : ℚ) (9 : ℚ) (fun n x y => ((((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) + (1 : ℚ))) := by
-  apply linear_second_certificate p152 (1 : ℚ) (9 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))))
-  · norm_num [p152]
-  · norm_num [p152]
-  · intro n; positivity
-  · intro n
-    simp only [p152, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p152_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (9 : ℚ))
-    (ha : ∀ n : ℕ, (((n : ℚ) + 1) + (1 : ℚ)) * a (n + 2) = (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
-    ∀ n, a n = p152 n := by
-  apply general_second_unique p152_valid
-  exact linear_second_certificate a (1 : ℚ) (9 : ℚ) (fun n => (((n : ℚ) + 1) + (1 : ℚ))) (fun n => (((3 : ℚ) * ((n : ℚ) + 1)) + (5 : ℚ))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p152_valid
-#print axioms p152_unique
-
-def p161 (n : ℕ) : ℚ := (((((4 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)) * ((2 : ℚ) ^ n)) + (3 : ℚ))
-theorem p161_valid : GeneralSecondCertificate p161 (1 : ℚ) (7 : ℚ) (fun n x y => ((((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * y + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
-  apply linear_second_certificate p161 (1 : ℚ) (7 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))))
-  · norm_num [p161]
-  · norm_num [p161]
-  · intro n; positivity
-  · intro n
-    simp only [p161, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
-    ring
-theorem p161_unique (a : ℕ → ℚ) (hi : a 0 = (1 : ℚ)) (hj : a 1 = (7 : ℚ))
-    (ha : ∀ n : ℕ, (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * a (n + 2) = (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ)) * a (n + 1) + ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) * a n) :
-    ∀ n, a n = p161 n := by
-  apply general_second_unique p161_valid
-  exact linear_second_certificate a (1 : ℚ) (7 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n => (((6 : ℚ) * ((n : ℚ) + 1)) + (7 : ℚ))) (fun n => ((-2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))) hi hj (by intro n; positivity) ha
-#print axioms p161_valid
-#print axioms p161_unique
 
 def p122 (n : ℕ) : ℚ := (((-1 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((3 : ℚ) ^ n)))
 def p122_base (n : ℕ) : ℚ := (((-1 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((3 : ℚ) ^ n)))
@@ -1733,26 +1663,26 @@ theorem p121_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (1 : ℚ) (
 #print axioms p121_valid
 #print axioms p121_unique
 
-def p138 (n : ℕ) : ℚ := ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((-1 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((3 : ℚ) ^ n))))
-def p138_base (n : ℕ) : ℚ := (((-1 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((3 : ℚ) ^ n)))
-theorem p138_base_valid : SecondCertificate p138_base (1 : ℚ) (4 : ℚ) (5 : ℚ) (-6 : ℚ) := by
+def p200 (n : ℕ) : ℚ := ((((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((-2 : ℚ) * ((3 : ℚ) ^ n)) + ((3 : ℚ) * ((4 : ℚ) ^ n))))
+def p200_base (n : ℕ) : ℚ := (((-2 : ℚ) * ((3 : ℚ) ^ n)) + ((3 : ℚ) * ((4 : ℚ) ^ n)))
+theorem p200_base_valid : SecondCertificate p200_base (1 : ℚ) (6 : ℚ) (7 : ℚ) (-12 : ℚ) := by
   constructor
-  · norm_num [p138_base]
-  · norm_num [p138_base]
+  · norm_num [p200_base]
+  · norm_num [p200_base]
   · intro n
-    simp only [p138_base, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p200_base, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p138_valid : WeightedSumCertificate p138 (3 : ℚ) (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (6 : ℚ) (-2 : ℚ) := by
-  apply weighted_sum_from_second p138 p138_base (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (3 : ℚ) (1 : ℚ) (4 : ℚ) (6 : ℚ) (-2 : ℚ)
-  · convert p138_base_valid using 1 <;> norm_num
+theorem p200_valid : WeightedSumCertificate p200 (3 : ℚ) (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (12 : ℚ) (-6 : ℚ) := by
+  apply weighted_sum_from_second p200 p200_base (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (3 : ℚ) (1 : ℚ) (6 : ℚ) (12 : ℚ) (-6 : ℚ)
+  · convert p200_base_valid using 1 <;> norm_num
   · norm_num
   · intro n; positivity
-  · intro n; simp only [p138, p138_base] <;> ring
-  · norm_num [p138]
-theorem p138_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (3 : ℚ) (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (6 : ℚ) (-2 : ℚ)) :
-    ∀ n, a n = p138 n := weighted_sum_unique p138_valid ha
-#print axioms p138_valid
-#print axioms p138_unique
+  · intro n; simp only [p200, p200_base] <;> ring
+  · norm_num [p200]
+theorem p200_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (3 : ℚ) (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (12 : ℚ) (-6 : ℚ)) :
+    ∀ n, a n = p200 n := weighted_sum_unique p200_valid ha
+#print axioms p200_valid
+#print axioms p200_unique
 
 def p125 (n : ℕ) : ℚ := ((((n : ℚ) + 1) + (1 : ℚ)) * ((((-1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + (((3 : ℚ) / 2) * ((4 : ℚ) ^ n))))
 def p125_base (n : ℕ) : ℚ := ((((-1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + (((3 : ℚ) / 2) * ((4 : ℚ) ^ n)))
@@ -1817,26 +1747,26 @@ theorem p126_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (1 : ℚ) (
 #print axioms p126_valid
 #print axioms p126_unique
 
-def p136 (n : ℕ) : ℚ := ((((-1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + (((3 : ℚ) / 2) * ((4 : ℚ) ^ n)))
-def p136_base (n : ℕ) : ℚ := ((((-1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + (((3 : ℚ) / 2) * ((4 : ℚ) ^ n)))
-theorem p136_base_valid : SecondCertificate p136_base (1 : ℚ) (5 : ℚ) (6 : ℚ) (-8 : ℚ) := by
+def p186 (n : ℕ) : ℚ := (((-2 : ℚ) * ((3 : ℚ) ^ n)) + ((3 : ℚ) * ((4 : ℚ) ^ n)))
+def p186_base (n : ℕ) : ℚ := (((-2 : ℚ) * ((3 : ℚ) ^ n)) + ((3 : ℚ) * ((4 : ℚ) ^ n)))
+theorem p186_base_valid : SecondCertificate p186_base (1 : ℚ) (6 : ℚ) (7 : ℚ) (-12 : ℚ) := by
   constructor
-  · norm_num [p136_base]
-  · norm_num [p136_base]
+  · norm_num [p186_base]
+  · norm_num [p186_base]
   · intro n
-    simp only [p136_base, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    simp only [p186_base, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
     ring
-theorem p136_valid : WeightedSumCertificate p136 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (8 : ℚ) (-3 : ℚ) := by
-  apply weighted_sum_from_second p136 p136_base (fun n : ℕ => (1 : ℚ)) (1 : ℚ) (1 : ℚ) (5 : ℚ) (8 : ℚ) (-3 : ℚ)
-  · convert p136_base_valid using 1 <;> norm_num
+theorem p186_valid : WeightedSumCertificate p186 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (12 : ℚ) (-6 : ℚ) := by
+  apply weighted_sum_from_second p186 p186_base (fun n : ℕ => (1 : ℚ)) (1 : ℚ) (1 : ℚ) (6 : ℚ) (12 : ℚ) (-6 : ℚ)
+  · convert p186_base_valid using 1 <;> norm_num
   · norm_num
   · intro n; positivity
-  · intro n; simp only [p136, p136_base] <;> ring
-  · norm_num [p136]
-theorem p136_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (8 : ℚ) (-3 : ℚ)) :
-    ∀ n, a n = p136 n := weighted_sum_unique p136_valid ha
-#print axioms p136_valid
-#print axioms p136_unique
+  · intro n; simp only [p186, p186_base] <;> ring
+  · norm_num [p186]
+theorem p186_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (12 : ℚ) (-6 : ℚ)) :
+    ∀ n, a n = p186 n := weighted_sum_unique p186_valid ha
+#print axioms p186_valid
+#print axioms p186_unique
 
 def p140 (n : ℕ) : ℚ := (((((2 : ℚ) / 3) * (((n : ℚ) + 1) + (-1 : ℚ))) + (1 : ℚ)) * ((3 : ℚ) ^ n))
 def p140_base (n : ℕ) : ℚ := (((((2 : ℚ) / 3) * (((n : ℚ) + 1) + (-1 : ℚ))) + (1 : ℚ)) * ((3 : ℚ) ^ n))
@@ -2176,5 +2106,1405 @@ theorem p162_unique (a : ℕ → ℚ) (hi : a 0 = (3 : ℚ)) (hj : a 1 = (9 : �
 #print axioms p162_domain
 #print axioms p162_valid
 #print axioms p162_unique
+
+def p167 (n : ℕ) : ℚ := ((n : ℚ) + 1)
+theorem p167_base_valid : FirstCertificate p167 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (1 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p167 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ))
+  · norm_num [p167]
+  · intro n; positivity
+  · intro n
+    simp only [p167, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p167_valid : FirstCertificate p167 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (1 : ℚ)) / (1 : ℚ)) := p167_base_valid
+theorem p167_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p167 n := first_unique p167_valid ha
+#print axioms p167_valid
+#print axioms p167_unique
+
+def p240 (n : ℕ) : ℚ := (((2 : ℚ) * ((n : ℚ) + 1)) + (-1 : ℚ))
+theorem p240_base_valid : FirstCertificate p240 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (2 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p240 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ))
+  · norm_num [p240]
+  · intro n; positivity
+  · intro n
+    simp only [p240, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p240_valid : FirstCertificate p240 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (2 : ℚ)) / (1 : ℚ)) := p240_base_valid
+theorem p240_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (2 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p240 n := first_unique p240_valid ha
+#print axioms p240_valid
+#print axioms p240_unique
+
+def p234 (n : ℕ) : ℚ := (((3 : ℚ) * ((n : ℚ) + 1)) + (-2 : ℚ))
+theorem p234_base_valid : FirstCertificate p234 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (3 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p234 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (3 : ℚ))
+  · norm_num [p234]
+  · intro n; positivity
+  · intro n
+    simp only [p234, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p234_valid : FirstCertificate p234 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (3 : ℚ)) / (1 : ℚ)) := p234_base_valid
+theorem p234_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (3 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p234 n := first_unique p234_valid ha
+#print axioms p234_valid
+#print axioms p234_unique
+
+def p251 (n : ℕ) : ℚ := (((4 : ℚ) * ((n : ℚ) + 1)) + (-3 : ℚ))
+theorem p251_base_valid : FirstCertificate p251 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (4 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p251 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (4 : ℚ))
+  · norm_num [p251]
+  · intro n; positivity
+  · intro n
+    simp only [p251, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p251_valid : FirstCertificate p251 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (4 : ℚ)) / (1 : ℚ)) := p251_base_valid
+theorem p251_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (4 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p251 n := first_unique p251_valid ha
+#print axioms p251_valid
+#print axioms p251_unique
+
+def p252 (n : ℕ) : ℚ := ((((1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((1 : ℚ) / 2))
+theorem p252_base_valid : FirstCertificate p252 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((1 : ℚ) / 2)) / (1 : ℚ)) := by
+  apply linear_certificate p252 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((1 : ℚ) / 2))
+  · norm_num [p252]
+  · intro n; positivity
+  · intro n
+    simp only [p252, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p252_valid : FirstCertificate p252 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((1 : ℚ) / 2)) / (1 : ℚ)) := p252_base_valid
+theorem p252_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((1 : ℚ) / 2)) / (1 : ℚ))) :
+    ∀ n, a n = p252 n := first_unique p252_valid ha
+#print axioms p252_valid
+#print axioms p252_unique
+
+def p250 (n : ℕ) : ℚ := (((-1 : ℚ) * ((n : ℚ) + 1)) + (2 : ℚ))
+theorem p250_base_valid : FirstCertificate p250 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p250 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (-1 : ℚ))
+  · norm_num [p250]
+  · intro n; positivity
+  · intro n
+    simp only [p250, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p250_valid : FirstCertificate p250 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ)) := p250_base_valid
+theorem p250_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (-1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p250 n := first_unique p250_valid ha
+#print axioms p250_valid
+#print axioms p250_unique
+
+def p210 (n : ℕ) : ℚ := (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + (-1 : ℚ))
+theorem p210_base_valid : FirstCertificate p210 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) / (1 : ℚ)) := by
+  apply linear_certificate p210 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))))
+  · norm_num [p210]
+  · intro n; positivity
+  · intro n
+    simp only [p210, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p210_valid : FirstCertificate p210 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) / (1 : ℚ)) := p210_base_valid
+theorem p210_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) / (1 : ℚ))) :
+    ∀ n, a n = p210 n := first_unique p210_valid ha
+#print axioms p210_valid
+#print axioms p210_unique
+
+def p215 (n : ℕ) : ℚ := ((((n : ℚ) + 1) ^ 2) + ((-1 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))
+theorem p215_base_valid : FirstCertificate p215 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1))) / (1 : ℚ)) := by
+  apply linear_certificate p215 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((2 : ℚ) * ((n : ℚ) + 1)))
+  · norm_num [p215]
+  · intro n; positivity
+  · intro n
+    simp only [p215, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p215_valid : FirstCertificate p215 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1))) / (1 : ℚ)) := p215_base_valid
+theorem p215_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1))) / (1 : ℚ))) :
+    ∀ n, a n = p215 n := first_unique p215_valid ha
+#print axioms p215_valid
+#print axioms p215_unique
+
+def p241 (n : ℕ) : ℚ := ((((2 : ℚ) / 3) * (((n : ℚ) + 1) ^ 3)) + (((-2 : ℚ) / 3) * ((n : ℚ) + 1)) + (1 : ℚ))
+theorem p241_base_valid : FirstCertificate p241 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ)) := by
+  apply linear_certificate p241 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  · norm_num [p241]
+  · intro n; positivity
+  · intro n
+    simp only [p241, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p241_valid : FirstCertificate p241 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ)) := p241_base_valid
+theorem p241_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ))) :
+    ∀ n, a n = p241 n := first_unique p241_valid ha
+#print axioms p241_valid
+#print axioms p241_unique
+
+def p224 (n : ℕ) : ℚ := (((n : ℚ) + 1) ^ 2)
+theorem p224_base_valid : FirstCertificate p224 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) / (1 : ℚ)) := by
+  apply linear_certificate p224 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))
+  · norm_num [p224]
+  · intro n; positivity
+  · intro n
+    simp only [p224, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p224_valid : FirstCertificate p224 (1 : ℚ) (fun n x => ((1 : ℚ) * x + (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) / (1 : ℚ)) := p224_base_valid
+theorem p224_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) / (1 : ℚ))) :
+    ∀ n, a n = p224 n := first_unique p224_valid ha
+#print axioms p224_valid
+#print axioms p224_unique
+
+def p170 (n : ℕ) : ℚ := ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-1 : ℚ) / 2) * ((n : ℚ) + 1)) + (1 : ℚ))
+theorem p170_base_valid : FirstCertificate p170 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((n : ℚ) + 1)) / (1 : ℚ)) := by
+  apply linear_certificate p170 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((n : ℚ) + 1))
+  · norm_num [p170]
+  · intro n; positivity
+  · intro n
+    simp only [p170, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p170_valid : FirstCertificate p170 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((n : ℚ) + 1)) / (1 : ℚ)) := p170_base_valid
+theorem p170_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((n : ℚ) + 1)) / (1 : ℚ))) :
+    ∀ n, a n = p170 n := first_unique p170_valid ha
+#print axioms p170_valid
+#print axioms p170_unique
+
+def p175 (n : ℕ) : ℚ := ((((n : ℚ) + 1) ^ 3) + ((-1 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))
+theorem p175_base_valid : FirstCertificate p175 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ)) := by
+  apply linear_certificate p175 (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  · norm_num [p175]
+  · intro n; positivity
+  · intro n
+    simp only [p175, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p175_valid : FirstCertificate p175 (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ)) := p175_base_valid
+theorem p175_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((1 : ℚ) * x + ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) / (1 : ℚ))) :
+    ∀ n, a n = p175 n := first_unique p175_valid ha
+#print axioms p175_valid
+#print axioms p175_unique
+
+def p242 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+def p242_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p242_valid : SystemCertificate p242 p242_b (1 : ℚ) (0 : ℚ) (fun n x y => (((2 : ℚ) * x) + y) / (1 : ℚ)) (fun n x y => (x + ((2 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p242]
+  · norm_num [p242_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p242, p242_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p242, p242_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p242_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => (((2 : ℚ) * x) + y) / (1 : ℚ)) (fun n x y => (x + ((2 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p242 n ∧ b n = p242_b n := system_unique p242_valid ha
+#print axioms p242_valid
+#print axioms p242_unique
+
+def p230 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+def p230_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p230_valid : SystemCertificate p230 p230_b (1 : ℚ) (0 : ℚ) (fun n x y => ((2 : ℚ) * y) / (1 : ℚ)) (fun n x y => ((2 : ℚ) * x) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p230]
+  · norm_num [p230_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p230, p230_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p230, p230_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p230_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((2 : ℚ) * y) / (1 : ℚ)) (fun n x y => ((2 : ℚ) * x) / (1 : ℚ))) :
+    ∀ n, a n = p230 n ∧ b n = p230_b n := system_unique p230_valid ha
+#print axioms p230_valid
+#print axioms p230_unique
+
+def p196 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((4 : ℚ) ^ n)))
+def p196_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((4 : ℚ) ^ n))))
+theorem p196_valid : SystemCertificate p196 p196_b (1 : ℚ) (0 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-1 : ℚ) * y)) / (1 : ℚ)) (fun n x y => (((-1 : ℚ) * x) + ((3 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p196]
+  · norm_num [p196_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p196, p196_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p196, p196_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p196_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-1 : ℚ) * y)) / (1 : ℚ)) (fun n x y => (((-1 : ℚ) * x) + ((3 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p196 n ∧ b n = p196_b n := system_unique p196_valid ha
+#print axioms p196_valid
+#print axioms p196_unique
+
+def p214 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) ^ n)))
+def p214_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p214_valid : SystemCertificate p214 p214_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p214]
+  · norm_num [p214_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p214, p214_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p214, p214_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p214_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p214 n ∧ b n = p214_b n := system_unique p214_valid ha
+#print axioms p214_valid
+#print axioms p214_unique
+
+def p203 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+def p203_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p203_valid : SystemCertificate p203 p203_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p203]
+  · norm_num [p203_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p203, p203_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p203, p203_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p203_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p203 n ∧ b n = p203_b n := system_unique p203_valid ha
+#print axioms p203_valid
+#print axioms p203_unique
+
+def p187 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+def p187_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p187_valid : SystemCertificate p187 p187_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p187]
+  · norm_num [p187_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p187, p187_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p187, p187_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p187_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p187 n ∧ b n = p187_b n := system_unique p187_valid ha
+#print axioms p187_valid
+#print axioms p187_unique
+
+def p206 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((2 : ℚ) ^ n)))
+def p206_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((2 : ℚ) ^ n))))
+theorem p206_valid : SystemCertificate p206 p206_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p206]
+  · norm_num [p206_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p206, p206_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p206, p206_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p206_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p206 n ∧ b n = p206_b n := system_unique p206_valid ha
+#print axioms p206_valid
+#print axioms p206_unique
+
+def p213 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((3 : ℚ) ^ n)))
+def p213_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((3 : ℚ) ^ n))))
+theorem p213_valid : SystemCertificate p213 p213_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((-1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p213]
+  · norm_num [p213_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p213, p213_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p213, p213_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p213_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((-1 : ℚ) / 2) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p213 n ∧ b n = p213_b n := system_unique p213_valid ha
+#print axioms p213_valid
+#print axioms p213_unique
+
+def p192 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((2 : ℚ) * ((1 : ℚ) ^ n))))
+def p192_b (n : ℕ) : ℚ := (((1 : ℚ) / 4) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((-2 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p192_valid : SystemCertificate p192 p192_b (2 : ℚ) (0 : ℚ) (fun n x y => (((2 : ℚ) * x) + ((2 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + ((2 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p192]
+  · norm_num [p192_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p192, p192_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p192, p192_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p192_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => (((2 : ℚ) * x) + ((2 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + ((2 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p192 n ∧ b n = p192_b n := system_unique p192_valid ha
+#print axioms p192_valid
+#print axioms p192_unique
+
+def p169 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((3 : ℚ) ^ n) + ((3 : ℚ) * ((1 : ℚ) ^ n))))
+def p169_b (n : ℕ) : ℚ := (((1 : ℚ) / 6) * (((3 : ℚ) ^ n) + ((-3 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p169_valid : SystemCertificate p169 p169_b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => (((2 : ℚ) * x) + ((3 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 3) * x) + ((2 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p169]
+  · norm_num [p169_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p169, p169_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p169, p169_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p169_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => (((2 : ℚ) * x) + ((3 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 3) * x) + ((2 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p169 n ∧ b n = p169_b n := system_unique p169_valid ha
+#print axioms p169_valid
+#print axioms p169_unique
+
+def p225 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((4 : ℚ) ^ n))))
+def p225_b (n : ℕ) : ℚ := (((1 : ℚ) / 4) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((-2 : ℚ) * ((4 : ℚ) ^ n))))
+theorem p225_valid : SystemCertificate p225 p225_b (2 : ℚ) (0 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-2 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + ((3 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p225]
+  · norm_num [p225_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p225, p225_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p225, p225_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p225_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-2 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + ((3 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p225 n ∧ b n = p225_b n := system_unique p225_valid ha
+#print axioms p225_valid
+#print axioms p225_unique
+
+def p197 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((3 : ℚ) * ((4 : ℚ) ^ n))))
+def p197_b (n : ℕ) : ℚ := (((1 : ℚ) / 6) * (((2 : ℚ) ^ n) + ((-3 : ℚ) * ((4 : ℚ) ^ n))))
+theorem p197_valid : SystemCertificate p197 p197_b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => (((3 : ℚ) * x) + ((-3 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 3) * x) + ((3 : ℚ) * y)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p197]
+  · norm_num [p197_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p197, p197_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p197, p197_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p197_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => (((3 : ℚ) * x) + ((-3 : ℚ) * y)) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 3) * x) + ((3 : ℚ) * y)) / (1 : ℚ))) :
+    ∀ n, a n = p197 n ∧ b n = p197_b n := system_unique p197_valid ha
+#print axioms p197_valid
+#print axioms p197_unique
+
+def p229 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((-2 : ℚ) ^ n))))
+def p229_b (n : ℕ) : ℚ := (((1 : ℚ) / 4) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((-2 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p229_valid : SystemCertificate p229 p229_b (2 : ℚ) (0 : ℚ) (fun n x y => ((4 : ℚ) * y) / (1 : ℚ)) (fun n x y => x / (1 : ℚ)) := by
+  constructor
+  · norm_num [p229]
+  · norm_num [p229_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p229, p229_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p229, p229_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p229_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => ((4 : ℚ) * y) / (1 : ℚ)) (fun n x y => x / (1 : ℚ))) :
+    ∀ n, a n = p229 n ∧ b n = p229_b n := system_unique p229_valid ha
+#print axioms p229_valid
+#print axioms p229_unique
+
+def p202 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((3 : ℚ) * ((-2 : ℚ) ^ n))))
+def p202_b (n : ℕ) : ℚ := (((1 : ℚ) / 6) * (((2 : ℚ) ^ n) + ((-3 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p202_valid : SystemCertificate p202 p202_b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => ((6 : ℚ) * y) / (1 : ℚ)) (fun n x y => (((2 : ℚ) / 3) * x) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p202]
+  · norm_num [p202_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p202, p202_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p202, p202_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p202_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) ((-1 : ℚ) / 3) (fun n x y => ((6 : ℚ) * y) / (1 : ℚ)) (fun n x y => (((2 : ℚ) / 3) * x) / (1 : ℚ))) :
+    ∀ n, a n = p202 n ∧ b n = p202_b n := system_unique p202_valid ha
+#print axioms p202_valid
+#print axioms p202_unique
+
+def p190 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+def p190_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p190_valid : SystemCertificate p190 p190_b (3 : ℚ) (0 : ℚ) (fun n x y => ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * y) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p190]
+  · norm_num [p190_b]
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p190, p190_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p190, p190_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p190_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (3 : ℚ) (0 : ℚ) (fun n x y => ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * y) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((2 : ℚ) * (((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * x) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) :
+    ∀ n, a n = p190 n ∧ b n = p190_b n := system_unique p190_valid ha
+#print axioms p190_valid
+#print axioms p190_unique
+
+def p246 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+def p246_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p246_valid : SystemCertificate p246 p246_b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * (((2 : ℚ) * x) + y)) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * (x + ((2 : ℚ) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p246]
+  · norm_num [p246_b]
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p246, p246_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p246, p246_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p246_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * (((2 : ℚ) * x) + y)) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * (x + ((2 : ℚ) * y))) / (((n : ℚ) + 1) + (1 : ℚ)))) :
+    ∀ n, a n = p246 n ∧ b n = p246_b n := system_unique p246_valid ha
+#print axioms p246_valid
+#print axioms p246_unique
+
+def p184 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * ((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((4 : ℚ) ^ n)))
+def p184_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * ((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((4 : ℚ) ^ n))))
+theorem p184_valid : SystemCertificate p184 p184_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) * x) + ((-1 : ℚ) * y))) / ((n : ℚ) + 1)) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * (((-1 : ℚ) * x) + ((3 : ℚ) * y))) / ((n : ℚ) + 1)) := by
+  constructor
+  · norm_num [p184]
+  · norm_num [p184_b]
+  · intro n
+    apply (eq_div_iff (show ((n : ℚ) + 1) ≠ 0 by positivity)).2
+    simp only [p184, p184_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show ((n : ℚ) + 1) ≠ 0 by positivity)).2
+    simp only [p184, p184_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p184_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) * x) + ((-1 : ℚ) * y))) / ((n : ℚ) + 1)) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * (((-1 : ℚ) * x) + ((3 : ℚ) * y))) / ((n : ℚ) + 1))) :
+    ∀ n, a n = p184 n ∧ b n = p184_b n := system_unique p184_valid ha
+#print axioms p184_valid
+#print axioms p184_unique
+
+def p231 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-1 : ℚ) ^ n)))
+def p231_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p231_valid : SystemCertificate p231 p231_b (3 : ℚ) (0 : ℚ) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (x + ((2 : ℚ) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * x) + y)) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p231]
+  · norm_num [p231_b]
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p231, p231_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p231, p231_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p231_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (3 : ℚ) (0 : ℚ) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (x + ((2 : ℚ) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * (((2 : ℚ) * x) + y)) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) :
+    ∀ n, a n = p231 n ∧ b n = p231_b n := system_unique p231_valid ha
+#print axioms p231_valid
+#print axioms p231_unique
+
+def p209 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((-1 : ℚ) ^ n)))
+def p209_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p209_valid : SystemCertificate p209 p209_b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p209]
+  · norm_num [p209_b]
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p209, p209_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p209, p209_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p209_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ)))) :
+    ∀ n, a n = p209 n ∧ b n = p209_b n := system_unique p209_valid ha
+#print axioms p209_valid
+#print axioms p209_unique
+
+def p208 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * ((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+def p208_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * ((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p208_valid : SystemCertificate p208 p208_b (1 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y))) / ((n : ℚ) + 1)) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / ((n : ℚ) + 1)) := by
+  constructor
+  · norm_num [p208]
+  · norm_num [p208_b]
+  · intro n
+    apply (eq_div_iff (show ((n : ℚ) + 1) ≠ 0 by positivity)).2
+    simp only [p208, p208_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show ((n : ℚ) + 1) ≠ 0 by positivity)).2
+    simp only [p208, p208_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p208_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (1 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y))) / ((n : ℚ) + 1)) (fun n x y => ((((n : ℚ) + 1) + (1 : ℚ)) * ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / ((n : ℚ) + 1))) :
+    ∀ n, a n = p208 n ∧ b n = p208_b n := system_unique p208_valid ha
+#print axioms p208_valid
+#print axioms p208_unique
+
+def p244 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+def p244_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((1 : ℚ) ^ n))))
+theorem p244_valid : SystemCertificate p244 p244_b (3 : ℚ) (0 : ℚ) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p244]
+  · norm_num [p244_b]
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p244, p244_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p244, p244_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p244_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (3 : ℚ) (0 : ℚ) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ))) (fun n x y => ((((2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y))) / (((2 : ℚ) * ((n : ℚ) + 1)) + (1 : ℚ)))) :
+    ∀ n, a n = p244 n ∧ b n = p244_b n := system_unique p244_valid ha
+#print axioms p244_valid
+#print axioms p244_unique
+
+def p178 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((2 : ℚ) ^ n)))
+def p178_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-1 : ℚ) * ((2 : ℚ) ^ n))))
+theorem p178_valid : SystemCertificate p178 p178_b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) := by
+  constructor
+  · norm_num [p178]
+  · norm_num [p178_b]
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p178, p178_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (((n : ℚ) + 1) + (1 : ℚ)) ≠ 0 by positivity)).2
+    simp only [p178, p178_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p178_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (0 : ℚ) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ))) (fun n x y => ((((n : ℚ) + 1) + (2 : ℚ)) * ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y))) / (((n : ℚ) + 1) + (1 : ℚ)))) :
+    ∀ n, a n = p178 n ∧ b n = p178_b n := system_unique p178_valid ha
+#print axioms p178_valid
+#print axioms p178_unique
+
+def p235 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((1 : ℚ) ^ n) + (1 : ℚ)))
+def p235_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((-1 : ℚ) * ((1 : ℚ) ^ n)) + (1 : ℚ)))
+theorem p235_valid : SystemCertificate p235 p235_b (2 : ℚ) (1 : ℚ) (fun n x y => (((2 : ℚ) * x) + y + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => (x + ((2 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p235]
+  · norm_num [p235_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p235, p235_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p235, p235_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p235_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (1 : ℚ) (fun n x y => (((2 : ℚ) * x) + y + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => (x + ((2 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p235 n ∧ b n = p235_b n := system_unique p235_valid ha
+#print axioms p235_valid
+#print axioms p235_unique
+
+def p236 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-2 : ℚ) ^ n) + (-1 : ℚ)))
+def p236_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) * ((-2 : ℚ) ^ n)) + (-1 : ℚ)))
+theorem p236_valid : SystemCertificate p236 p236_b (0 : ℚ) (-1 : ℚ) (fun n x y => (((2 : ℚ) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => (((2 : ℚ) * x) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p236]
+  · norm_num [p236_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p236, p236_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p236, p236_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p236_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (0 : ℚ) (-1 : ℚ) (fun n x y => (((2 : ℚ) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => (((2 : ℚ) * x) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ))) :
+    ∀ n, a n = p236 n ∧ b n = p236_b n := system_unique p236_valid ha
+#print axioms p236_valid
+#print axioms p236_unique
+
+def p182 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((4 : ℚ) ^ n)) + (2 : ℚ)))
+def p182_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((-2 : ℚ) * ((4 : ℚ) ^ n)) + (2 : ℚ)))
+theorem p182_valid : SystemCertificate p182 p182_b (3 : ℚ) (1 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-1 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => (((-1 : ℚ) * x) + ((3 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p182]
+  · norm_num [p182_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p182, p182_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p182, p182_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p182_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (3 : ℚ) (1 : ℚ) (fun n x y => (((3 : ℚ) * x) + ((-1 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => (((-1 : ℚ) * x) + ((3 : ℚ) * y) + (-1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p182 n ∧ b n = p182_b n := system_unique p182_valid ha
+#print axioms p182_valid
+#print axioms p182_unique
+
+def p172 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) ^ n) + (-1 : ℚ)))
+def p172_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) * ((-1 : ℚ) ^ n)) + (-1 : ℚ)))
+theorem p172_valid : SystemCertificate p172 p172_b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p172]
+  · norm_num [p172_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p172, p172_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p172, p172_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p172_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ))) :
+    ∀ n, a n = p172 n ∧ b n = p172_b n := system_unique p172_valid ha
+#print axioms p172_valid
+#print axioms p172_unique
+
+def p198 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((-2 : ℚ) ^ n) + (1 : ℚ)))
+def p198_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((-1 : ℚ) * ((-2 : ℚ) ^ n)) + (1 : ℚ)))
+theorem p198_valid : SystemCertificate p198 p198_b (2 : ℚ) (1 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p198]
+  · norm_num [p198_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p198, p198_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p198, p198_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p198_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (1 : ℚ) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p198 n ∧ b n = p198_b n := system_unique p198_valid ha
+#print axioms p198_valid
+#print axioms p198_unique
+
+def p223 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((1 : ℚ) ^ n) + (-1 : ℚ)))
+def p223_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) * ((1 : ℚ) ^ n)) + (-1 : ℚ)))
+theorem p223_valid : SystemCertificate p223 p223_b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p223]
+  · norm_num [p223_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p223, p223_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p223, p223_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p223_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((3 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((3 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ))) :
+    ∀ n, a n = p223 n ∧ b n = p223_b n := system_unique p223_valid ha
+#print axioms p223_valid
+#print axioms p223_unique
+
+def p219 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((2 : ℚ) ^ n) + (1 : ℚ)))
+def p219_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) * ((3 : ℚ) ^ n)) + ((-1 : ℚ) * ((2 : ℚ) ^ n)) + (1 : ℚ)))
+theorem p219_valid : SystemCertificate p219 p219_b (2 : ℚ) (1 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p219]
+  · norm_num [p219_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p219, p219_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p219, p219_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p219_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (2 : ℚ) (1 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((1 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ)) (fun n x y => ((((1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (-1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p219 n ∧ b n = p219_b n := system_unique p219_valid ha
+#print axioms p219_valid
+#print axioms p219_unique
+
+def p226 (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) ^ n) + (-1 : ℚ)))
+def p226_b (n : ℕ) : ℚ := (((1 : ℚ) / 2) * (((2 : ℚ) ^ n) + ((-1 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) * ((3 : ℚ) ^ n)) + (-1 : ℚ)))
+theorem p226_valid : SystemCertificate p226 p226_b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((-1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) := by
+  constructor
+  · norm_num [p226]
+  · norm_num [p226_b]
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p226, p226_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+  · intro n
+    apply (eq_div_iff (show (1 : ℚ) ≠ 0 by positivity)).2
+    simp only [p226, p226_b, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p226_unique (a b : ℕ → ℚ) (ha : SystemCertificate a b (0 : ℚ) (-1 : ℚ) (fun n x y => ((((5 : ℚ) / 2) * x) + (((-1 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ)) (fun n x y => ((((-1 : ℚ) / 2) * x) + (((5 : ℚ) / 2) * y) + (((1 : ℚ) / 2) * ((n : ℚ) + 1))) / (1 : ℚ))) :
+    ∀ n, a n = p226 n ∧ b n = p226_b n := system_unique p226_valid ha
+#print axioms p226_valid
+#print axioms p226_unique
+
+def p194_sum (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + (-1 : ℚ))
+theorem p194_sum_base_valid : FirstCertificate p194_sum (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p194_sum (1 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (1 : ℚ))
+  · norm_num [p194_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p194_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p194_sum_valid : FirstCertificate p194_sum (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ)) := p194_sum_base_valid
+theorem p194_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p194_sum n := first_unique p194_sum_valid ha
+#print axioms p194_sum_valid
+#print axioms p194_sum_unique
+
+def p194 (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((-1 : ℚ) * ((((2 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + (-1 : ℚ))) + (-1 : ℚ))
+theorem p194_prefix : ∀ n, prefix p194 n = p194_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p194, p194_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p194, p194_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p194_valid : PureSumCertificate p194 (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ)) := by
+  have heq : prefix p194 = p194_sum := funext p194_prefix
+  change FirstCertificate (prefix p194) (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ))
+  rw [heq]
+  exact p194_sum_valid
+theorem p194_unique (a : ℕ → ℚ) (ha : PureSumCertificate a (1 : ℚ) (fun n x => ((2 : ℚ) * x + (1 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p194 n := pure_sum_unique p194_valid ha
+#print axioms p194_valid
+#print axioms p194_unique
+
+def p183_sum (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((n : ℚ) + 1)) + (-1 : ℚ))
+theorem p183_sum_base_valid : FirstCertificate p183_sum (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ)) := by
+  apply linear_certificate p183_sum (3 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ)))
+  · norm_num [p183_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p183_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p183_sum_valid : FirstCertificate p183_sum (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ)) := p183_sum_base_valid
+theorem p183_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ))) :
+    ∀ n, a n = p183_sum n := first_unique p183_sum_valid ha
+#print axioms p183_sum_valid
+#print axioms p183_sum_unique
+
+def p183 (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((2 : ℚ) * ((n : ℚ) + 1)) + ((-1 : ℚ) * ((((2 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + ((2 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ))) + (-1 : ℚ))) + (-1 : ℚ))
+theorem p183_prefix : ∀ n, prefix p183 n = p183_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p183, p183_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p183, p183_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p183_valid : PureSumCertificate p183 (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ)) := by
+  have heq : prefix p183 = p183_sum := funext p183_prefix
+  change FirstCertificate (prefix p183) (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ))
+  rw [heq]
+  exact p183_sum_valid
+theorem p183_unique (a : ℕ → ℚ) (ha : PureSumCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + (3 : ℚ))) / (1 : ℚ))) :
+    ∀ n, a n = p183 n := pure_sum_unique p183_valid ha
+#print axioms p183_valid
+#print axioms p183_unique
+
+def p179_sum (n : ℕ) : ℚ := (((4 : ℚ) * ((2 : ℚ) ^ n)) + (-2 : ℚ))
+theorem p179_sum_base_valid : FirstCertificate p179_sum (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p179_sum (2 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (2 : ℚ))
+  · norm_num [p179_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p179_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p179_sum_valid : FirstCertificate p179_sum (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ)) := p179_sum_base_valid
+theorem p179_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p179_sum n := first_unique p179_sum_valid ha
+#print axioms p179_sum_valid
+#print axioms p179_sum_unique
+
+def p179 (n : ℕ) : ℚ := (((4 : ℚ) * ((2 : ℚ) ^ n)) + ((-1 : ℚ) * ((((4 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + (-2 : ℚ))) + (-2 : ℚ))
+theorem p179_prefix : ∀ n, prefix p179 n = p179_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p179, p179_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p179, p179_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p179_valid : PureSumCertificate p179 (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ)) := by
+  have heq : prefix p179 = p179_sum := funext p179_prefix
+  change FirstCertificate (prefix p179) (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ))
+  rw [heq]
+  exact p179_sum_valid
+theorem p179_unique (a : ℕ → ℚ) (ha : PureSumCertificate a (2 : ℚ) (fun n x => ((2 : ℚ) * x + (2 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p179 n := pure_sum_unique p179_valid ha
+#print axioms p179_valid
+#print axioms p179_unique
+
+def p211_sum (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((n : ℚ) + 1) + ((-1 : ℚ) / 2))
+theorem p211_sum_base_valid : FirstCertificate p211_sum ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ)) := by
+  apply linear_certificate p211_sum ((3 : ℚ) / 2) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2)))
+  · norm_num [p211_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p211_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p211_sum_valid : FirstCertificate p211_sum ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ)) := p211_sum_base_valid
+theorem p211_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ))) :
+    ∀ n, a n = p211_sum n := first_unique p211_sum_valid ha
+#print axioms p211_sum_valid
+#print axioms p211_sum_unique
+
+def p211 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((n : ℚ) + 1) + ((-1 : ℚ) * ((((2 : ℚ) ^ n) / (2 : ℚ)) + ((n : ℚ) + 1) + ((-3 : ℚ) / 2))) + ((-1 : ℚ) / 2))
+theorem p211_prefix : ∀ n, prefix p211 n = p211_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p211, p211_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p211, p211_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p211_valid : PureSumCertificate p211 ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ)) := by
+  have heq : prefix p211 = p211_sum := funext p211_prefix
+  change FirstCertificate (prefix p211) ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ))
+  rw [heq]
+  exact p211_sum_valid
+theorem p211_unique (a : ℕ → ℚ) (ha : PureSumCertificate a ((3 : ℚ) / 2) (fun n x => ((2 : ℚ) * x + (((-1 : ℚ) * ((n : ℚ) + 1)) + ((3 : ℚ) / 2))) / (1 : ℚ))) :
+    ∀ n, a n = p211 n := pure_sum_unique p211_valid ha
+#print axioms p211_valid
+#print axioms p211_unique
+
+def p221_sum (n : ℕ) : ℚ := (((6 : ℚ) * ((2 : ℚ) ^ n)) + (-3 : ℚ))
+theorem p221_sum_base_valid : FirstCertificate p221_sum (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ)) := by
+  apply linear_certificate p221_sum (3 : ℚ) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (2 : ℚ)) (fun n : ℕ => (3 : ℚ))
+  · norm_num [p221_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p221_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p221_sum_valid : FirstCertificate p221_sum (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ)) := p221_sum_base_valid
+theorem p221_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p221_sum n := first_unique p221_sum_valid ha
+#print axioms p221_sum_valid
+#print axioms p221_sum_unique
+
+def p221 (n : ℕ) : ℚ := (((6 : ℚ) * ((2 : ℚ) ^ n)) + ((-1 : ℚ) * ((((6 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + (-3 : ℚ))) + (-3 : ℚ))
+theorem p221_prefix : ∀ n, prefix p221 n = p221_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p221, p221_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p221, p221_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p221_valid : PureSumCertificate p221 (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ)) := by
+  have heq : prefix p221 = p221_sum := funext p221_prefix
+  change FirstCertificate (prefix p221) (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ))
+  rw [heq]
+  exact p221_sum_valid
+theorem p221_unique (a : ℕ → ℚ) (ha : PureSumCertificate a (3 : ℚ) (fun n x => ((2 : ℚ) * x + (3 : ℚ)) / (1 : ℚ))) :
+    ∀ n, a n = p221 n := pure_sum_unique p221_valid ha
+#print axioms p221_valid
+#print axioms p221_unique
+
+def p188_sum (n : ℕ) : ℚ := (((3 : ℚ) ^ n) + ((n : ℚ) + 1) + ((-1 : ℚ) / 3))
+theorem p188_sum_base_valid : FirstCertificate p188_sum ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ)) := by
+  apply linear_certificate p188_sum ((5 : ℚ) / 3) (fun n : ℕ => (1 : ℚ)) (fun n : ℕ => (3 : ℚ)) (fun n : ℕ => (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3)))
+  · norm_num [p188_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p188_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p188_sum_valid : FirstCertificate p188_sum ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ)) := p188_sum_base_valid
+theorem p188_sum_unique (a : ℕ → ℚ) (ha : FirstCertificate a ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ))) :
+    ∀ n, a n = p188_sum n := first_unique p188_sum_valid ha
+#print axioms p188_sum_valid
+#print axioms p188_sum_unique
+
+def p188 (n : ℕ) : ℚ := (((3 : ℚ) ^ n) + ((n : ℚ) + 1) + ((-1 : ℚ) * ((((3 : ℚ) ^ n) / (3 : ℚ)) + ((n : ℚ) + 1) + ((-4 : ℚ) / 3))) + ((-1 : ℚ) / 3))
+theorem p188_prefix : ∀ n, prefix p188 n = p188_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p188, p188_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p188, p188_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p188_valid : PureSumCertificate p188 ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ)) := by
+  have heq : prefix p188 = p188_sum := funext p188_prefix
+  change FirstCertificate (prefix p188) ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ))
+  rw [heq]
+  exact p188_sum_valid
+theorem p188_unique (a : ℕ → ℚ) (ha : PureSumCertificate a ((5 : ℚ) / 3) (fun n x => ((3 : ℚ) * x + (((-2 : ℚ) * ((n : ℚ) + 1)) + ((5 : ℚ) / 3))) / (1 : ℚ))) :
+    ∀ n, a n = p188 n := pure_sum_unique p188_valid ha
+#print axioms p188_valid
+#print axioms p188_unique
+
+def p222_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+theorem p222_sum_valid : GeneralSecondCertificate p222_sum (2 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)) * x) / ((n : ℚ) + 1)) := by
+  apply linear_second_certificate p222_sum (2 : ℚ) (0 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)))
+  · norm_num [p222_sum]
+  · norm_num [p222_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p222_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p222_sum_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (0 : ℚ))
+    (ha : ∀ n : ℕ, ((n : ℚ) + 1) * a (n + 2) = (0 : ℚ) * a (n + 1) + (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)) * a n) :
+    ∀ n, a n = p222_sum n := by
+  apply general_second_unique p222_sum_valid
+  exact linear_second_certificate a (2 : ℚ) (0 : ℚ) (fun n => ((n : ℚ) + 1)) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p222_sum_valid
+#print axioms p222_sum_unique
+
+def p222 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((-2 : ℚ) ^ n))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((((2 : ℚ) ^ n) / (2 : ℚ)) + (((-2 : ℚ) ^ n) / (-2 : ℚ)))))
+theorem p222_prefix : ∀ n, prefix p222 n = p222_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p222, p222_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p222, p222_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p222_valid : PureSecondSumCertificate p222 (2 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)) * x) / ((n : ℚ) + 1)) := by
+  have heq : prefix p222 = p222_sum := funext p222_prefix
+  change GeneralSecondCertificate (prefix p222) (2 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)) * x) / ((n : ℚ) + 1))
+  rw [heq]
+  exact p222_sum_valid
+theorem p222_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (2 : ℚ) (0 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * ((n : ℚ) + 1)) + (8 : ℚ)) * x) / ((n : ℚ) + 1))) :
+    ∀ n, a n = p222 n := pure_second_sum_unique p222_valid ha
+#print axioms p222_valid
+#print axioms p222_unique
+
+def p220_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p220_sum_valid : GeneralSecondCertificate p220_sum (10 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  apply linear_second_certificate p220_sum (10 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)))
+  · norm_num [p220_sum]
+  · norm_num [p220_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p220_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p220_sum_unique (a : ℕ → ℚ) (hi : a 0 = (10 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)) * a (n + 2) = ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * a (n + 1) + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * a n) :
+    ∀ n, a n = p220_sum n := by
+  apply general_second_unique p220_sum_valid
+  exact linear_second_certificate a (10 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p220_sum_valid
+#print axioms p220_sum_unique
+
+def p220 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) * ((-1 : ℚ) ^ n)))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((n : ℚ) + 1) * ((((2 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + (((3 : ℚ) * ((-1 : ℚ) ^ n)) / (-1 : ℚ)))))
+theorem p220_prefix : ∀ n, prefix p220 n = p220_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p220, p220_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p220, p220_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p220_valid : PureSecondSumCertificate p220 (10 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  have heq : prefix p220 = p220_sum := funext p220_prefix
+  change GeneralSecondCertificate (prefix p220) (10 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))
+  rw [heq]
+  exact p220_sum_valid
+theorem p220_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (10 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((10 : ℚ) * ((n : ℚ) + 1)) + (12 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))) :
+    ∀ n, a n = p220 n := pure_second_sum_unique p220_valid ha
+#print axioms p220_valid
+#print axioms p220_unique
+
+def p177_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((-1 : ℚ) ^ n)))
+theorem p177_sum_valid : GeneralSecondCertificate p177_sum (2 : ℚ) (4 : ℚ) (fun n x y => (((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  apply linear_second_certificate p177_sum (2 : ℚ) (4 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p177_sum]
+  · norm_num [p177_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p177_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p177_sum_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (4 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p177_sum n := by
+  apply general_second_unique p177_sum_valid
+  exact linear_second_certificate a (2 : ℚ) (4 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p177_sum_valid
+#print axioms p177_sum_unique
+
+def p177 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((-1 : ℚ) ^ n))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((((3 : ℚ) ^ n) / (3 : ℚ)) + (((-1 : ℚ) ^ n) / (-1 : ℚ)))))
+theorem p177_prefix : ∀ n, prefix p177 n = p177_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p177, p177_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p177, p177_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p177_valid : PureSecondSumCertificate p177 (2 : ℚ) (4 : ℚ) (fun n x y => (((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  have heq : prefix p177 = p177_sum := funext p177_prefix
+  change GeneralSecondCertificate (prefix p177) (2 : ℚ) (4 : ℚ) (fun n x y => (((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  rw [heq]
+  exact p177_sum_valid
+theorem p177_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (2 : ℚ) (4 : ℚ) (fun n x y => (((2 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))) :
+    ∀ n, a n = p177 n := pure_second_sum_unique p177_valid ha
+#print axioms p177_valid
+#print axioms p177_unique
+
+def p181_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((5 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) * ((-2 : ℚ) ^ n))))
+theorem p181_sum_valid : GeneralSecondCertificate p181_sum (16 : ℚ) (24 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  apply linear_second_certificate p181_sum (16 : ℚ) (24 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)))
+  · norm_num [p181_sum]
+  · norm_num [p181_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p181_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p181_sum_unique (a : ℕ → ℚ) (hi : a 0 = (16 : ℚ)) (hj : a 1 = (24 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)) * a (n + 2) = (0 : ℚ) * a (n + 1) + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)) * a n) :
+    ∀ n, a n = p181_sum n := by
+  apply general_second_unique p181_sum_valid
+  exact linear_second_certificate a (16 : ℚ) (24 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => (0 : ℚ)) (fun n => (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p181_sum_valid
+#print axioms p181_sum_unique
+
+def p181 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((5 : ℚ) * ((2 : ℚ) ^ n)) + ((3 : ℚ) * ((-2 : ℚ) ^ n)))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((n : ℚ) + 1) * ((((5 : ℚ) * ((2 : ℚ) ^ n)) / (2 : ℚ)) + (((3 : ℚ) * ((-2 : ℚ) ^ n)) / (-2 : ℚ)))))
+theorem p181_prefix : ∀ n, prefix p181 n = p181_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p181, p181_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p181, p181_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p181_valid : PureSecondSumCertificate p181 (16 : ℚ) (24 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  have heq : prefix p181 = p181_sum := funext p181_prefix
+  change GeneralSecondCertificate (prefix p181) (16 : ℚ) (24 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))
+  rw [heq]
+  exact p181_sum_valid
+theorem p181_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (16 : ℚ) (24 : ℚ) (fun n x y => ((0 : ℚ) * y + (((4 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((20 : ℚ) * ((n : ℚ) + 1)) + (24 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))) :
+    ∀ n, a n = p181 n := pure_second_sum_unique p181_valid ha
+#print axioms p181_valid
+#print axioms p181_unique
+
+def p218_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+theorem p218_sum_valid : GeneralSecondCertificate p218_sum (2 : ℚ) (6 : ℚ) (fun n x y => (((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  apply linear_second_certificate p218_sum (2 : ℚ) (6 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p218_sum]
+  · norm_num [p218_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p218_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p218_sum_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p218_sum n := by
+  apply general_second_unique p218_sum_valid
+  exact linear_second_certificate a (2 : ℚ) (6 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p218_sum_valid
+#print axioms p218_sum_unique
+
+def p218 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((2 : ℚ) ^ n) + ((1 : ℚ) ^ n))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((((2 : ℚ) ^ n) / (2 : ℚ)) + (((1 : ℚ) ^ n) / (1 : ℚ)))))
+theorem p218_prefix : ∀ n, prefix p218 n = p218_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p218, p218_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p218, p218_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p218_valid : PureSecondSumCertificate p218 (2 : ℚ) (6 : ℚ) (fun n x y => (((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  have heq : prefix p218 = p218_sum := funext p218_prefix
+  change GeneralSecondCertificate (prefix p218) (2 : ℚ) (6 : ℚ) (fun n x y => (((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  rw [heq]
+  exact p218_sum_valid
+theorem p218_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (2 : ℚ) (6 : ℚ) (fun n x y => (((3 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-2 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))) :
+    ∀ n, a n = p218 n := pure_second_sum_unique p218_valid ha
+#print axioms p218_valid
+#print axioms p218_unique
+
+def p237_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((2 : ℚ) * ((-1 : ℚ) ^ n))))
+theorem p237_sum_valid : GeneralSecondCertificate p237_sum (6 : ℚ) (6 : ℚ) (fun n x y => ((((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1))) * y + (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  apply linear_second_certificate p237_sum (6 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)))
+  · norm_num [p237_sum]
+  · norm_num [p237_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p237_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p237_sum_unique (a : ℕ → ℚ) (hi : a 0 = (6 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)) * a (n + 2) = (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1))) * a (n + 1) + (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)) * a n) :
+    ∀ n, a n = p237_sum n := by
+  apply general_second_unique p237_sum_valid
+  exact linear_second_certificate a (6 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => (((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p237_sum_valid
+#print axioms p237_sum_unique
+
+def p237 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((2 : ℚ) * ((-1 : ℚ) ^ n)))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((n : ℚ) + 1) * ((((3 : ℚ) ^ n) / (3 : ℚ)) + (((2 : ℚ) * ((-1 : ℚ) ^ n)) / (-1 : ℚ)))))
+theorem p237_prefix : ∀ n, prefix p237 n = p237_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p237, p237_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p237, p237_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p237_valid : PureSecondSumCertificate p237 (6 : ℚ) (6 : ℚ) (fun n x y => ((((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1))) * y + (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  have heq : prefix p237 = p237_sum := funext p237_prefix
+  change GeneralSecondCertificate (prefix p237) (6 : ℚ) (6 : ℚ) (fun n x y => ((((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1))) * y + (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))
+  rw [heq]
+  exact p237_sum_valid
+theorem p237_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (6 : ℚ) (6 : ℚ) (fun n x y => ((((2 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((6 : ℚ) * ((n : ℚ) + 1))) * y + (((3 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((15 : ℚ) * ((n : ℚ) + 1)) + (18 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))) :
+    ∀ n, a n = p237 n := pure_second_sum_unique p237_valid ha
+#print axioms p237_valid
+#print axioms p237_unique
+
+def p168_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((1 : ℚ) ^ n)))
+theorem p168_sum_valid : GeneralSecondCertificate p168_sum (2 : ℚ) (8 : ℚ) (fun n x y => (((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  apply linear_second_certificate p168_sum (2 : ℚ) (8 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))))
+  · norm_num [p168_sum]
+  · norm_num [p168_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p168_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p168_sum_unique (a : ℕ → ℚ) (hi : a 0 = (2 : ℚ)) (hj : a 1 = (8 : ℚ))
+    (ha : ∀ n : ℕ, (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))) * a (n + 2) = ((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * a (n + 1) + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * a n) :
+    ∀ n, a n = p168_sum n := by
+  apply general_second_unique p168_sum_valid
+  exact linear_second_certificate a (2 : ℚ) (8 : ℚ) (fun n => (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) (fun n => ((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ)))) (fun n => ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ)))) hi hj (by intro n; positivity) ha
+#print axioms p168_sum_valid
+#print axioms p168_sum_unique
+
+def p168 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((3 : ℚ) ^ n) + ((1 : ℚ) ^ n))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((((3 : ℚ) ^ n) / (3 : ℚ)) + (((1 : ℚ) ^ n) / (1 : ℚ)))))
+theorem p168_prefix : ∀ n, prefix p168 n = p168_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p168, p168_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p168, p168_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p168_valid : PureSecondSumCertificate p168 (2 : ℚ) (8 : ℚ) (fun n x y => (((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)))) := by
+  have heq : prefix p168 = p168_sum := funext p168_prefix
+  change GeneralSecondCertificate (prefix p168) (2 : ℚ) (8 : ℚ) (fun n x y => (((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))
+  rw [heq]
+  exact p168_sum_valid
+theorem p168_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (2 : ℚ) (8 : ℚ) (fun n x y => (((4 : ℚ) * ((n : ℚ) + 1) * (((n : ℚ) + 1) + (2 : ℚ))) * y + ((-3 : ℚ) * (((n : ℚ) + 1) + (1 : ℚ)) * (((n : ℚ) + 1) + (2 : ℚ))) * x) / (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ))))) :
+    ∀ n, a n = p168 n := pure_second_sum_unique p168_valid ha
+#print axioms p168_valid
+#print axioms p168_unique
+
+def p227_sum (n : ℕ) : ℚ := (((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-2 : ℚ) ^ n)))
+theorem p227_sum_valid : GeneralSecondCertificate p227_sum (4 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  apply linear_second_certificate p227_sum (4 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)))
+  · norm_num [p227_sum]
+  · norm_num [p227_sum]
+  · intro n; positivity
+  · intro n
+    simp only [p227_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add] at *
+    ring
+theorem p227_sum_unique (a : ℕ → ℚ) (hi : a 0 = (4 : ℚ)) (hj : a 1 = (6 : ℚ))
+    (ha : ∀ n : ℕ, ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)) * a (n + 2) = ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * a (n + 1) + (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)) * a n) :
+    ∀ n, a n = p227_sum n := by
+  apply general_second_unique p227_sum_valid
+  exact linear_second_certificate a (4 : ℚ) (6 : ℚ) (fun n => ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) (fun n => ((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1)))) (fun n => (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ))) hi hj (by intro n; positivity) ha
+#print axioms p227_sum_valid
+#print axioms p227_sum_unique
+
+def p227 (n : ℕ) : ℚ := ((((n : ℚ) + 1) * (((n : ℚ) + 1) + (1 : ℚ)) * (((3 : ℚ) ^ n) + ((-2 : ℚ) ^ n))) + ((-1 : ℚ) * (((n : ℚ) + 1) + (-1 : ℚ)) * ((n : ℚ) + 1) * ((((3 : ℚ) ^ n) / (3 : ℚ)) + (((-2 : ℚ) ^ n) / (-2 : ℚ)))))
+theorem p227_prefix : ∀ n, prefix p227 n = p227_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p227, p227_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p227, p227_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p227_valid : PureSecondSumCertificate p227 (4 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1))) := by
+  have heq : prefix p227 = p227_sum := funext p227_prefix
+  change GeneralSecondCertificate (prefix p227) (4 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))
+  rw [heq]
+  exact p227_sum_valid
+theorem p227_unique (a : ℕ → ℚ) (ha : PureSecondSumCertificate a (4 : ℚ) (6 : ℚ) (fun n x y => (((((n : ℚ) + 1) ^ 2) + ((3 : ℚ) * ((n : ℚ) + 1))) * y + (((6 : ℚ) * (((n : ℚ) + 1) ^ 2)) + ((30 : ℚ) * ((n : ℚ) + 1)) + (36 : ℚ)) * x) / ((((n : ℚ) + 1) ^ 2) + ((n : ℚ) + 1)))) :
+    ∀ n, a n = p227 n := pure_second_sum_unique p227_valid ha
+#print axioms p227_valid
+#print axioms p227_unique
+
+def p166 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + (2 : ℚ))
+def p166_sum (n : ℕ) : ℚ := (((2 : ℚ) ^ (n + 1)) + ((2 : ℚ) * ((n : ℚ) + 1)) + (-1 : ℚ))
+theorem p166_prefix : ∀ n, prefix p166 n = p166_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p166, p166_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p166, p166_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p166_valid : SumRelationCertificate p166 (3 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-5 : ℚ))) := by
+  constructor
+  · norm_num [p166]
+  · intro n
+    rw [p166_prefix]
+    simp only [p166, p166_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p166_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (3 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-5 : ℚ)))) :
+    ∀ n, a n = p166 n := sum_relation_unique p166_valid ha (by norm_num)
+#print axioms p166_valid
+#print axioms p166_unique
+
+def p245 (n : ℕ) : ℚ := (((2 : ℚ) ^ n) + ((n : ℚ) + 1))
+def p245_sum (n : ℕ) : ℚ := (((2 : ℚ) ^ (n + 1)) + (((1 : ℚ) / 2) * ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) + (((-1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-3 : ℚ) / 2))
+theorem p245_prefix : ∀ n, prefix p245 n = p245_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p245, p245_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p245, p245_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p245_valid : SumRelationCertificate p245 (2 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-1 : ℚ))) := by
+  constructor
+  · norm_num [p245]
+  · intro n
+    rw [p245_prefix]
+    simp only [p245, p245_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p245_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (2 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-1 : ℚ)))) :
+    ∀ n, a n = p245 n := sum_relation_unique p245_valid ha (by norm_num)
+#print axioms p245_valid
+#print axioms p245_unique
+
+def p204 (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + (2 : ℚ))
+def p204_sum (n : ℕ) : ℚ := (((2 : ℚ) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + ((2 : ℚ) * ((n : ℚ) + 1)))
+theorem p204_prefix : ∀ n, prefix p204 n = p204_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p204, p204_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p204, p204_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p204_valid : SumRelationCertificate p204 (4 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ))) := by
+  constructor
+  · norm_num [p204]
+  · intro n
+    rw [p204_prefix]
+    simp only [p204, p204_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p204_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (4 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-6 : ℚ)))) :
+    ∀ n, a n = p204 n := sum_relation_unique p204_valid ha (by norm_num)
+#print axioms p204_valid
+#print axioms p204_unique
+
+def p207 (n : ℕ) : ℚ := (((2 : ℚ) * ((2 : ℚ) ^ n)) + ((n : ℚ) + 1))
+def p207_sum (n : ℕ) : ℚ := (((2 : ℚ) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + (((1 : ℚ) / 2) * ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) + (((-1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-1 : ℚ) / 2))
+theorem p207_prefix : ∀ n, prefix p207 n = p207_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p207, p207_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p207, p207_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p207_valid : SumRelationCertificate p207 (3 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-2 : ℚ))) := by
+  constructor
+  · norm_num [p207]
+  · intro n
+    rw [p207_prefix]
+    simp only [p207, p207_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p207_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (3 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-2 : ℚ)))) :
+    ∀ n, a n = p207 n := sum_relation_unique p207_valid ha (by norm_num)
+#print axioms p207_valid
+#print axioms p207_unique
+
+def p228 (n : ℕ) : ℚ := (((4 : ℚ) * ((2 : ℚ) ^ n)) + (2 : ℚ))
+def p228_sum (n : ℕ) : ℚ := (((4 : ℚ) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + ((2 : ℚ) * ((n : ℚ) + 1)))
+theorem p228_prefix : ∀ n, prefix p228 n = p228_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p228, p228_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p228, p228_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p228_valid : SumRelationCertificate p228 (6 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-8 : ℚ))) := by
+  constructor
+  · norm_num [p228]
+  · intro n
+    rw [p228_prefix]
+    simp only [p228, p228_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p228_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (6 : ℚ) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + (-8 : ℚ)))) :
+    ∀ n, a n = p228 n := sum_relation_unique p228_valid ha (by norm_num)
+#print axioms p228_valid
+#print axioms p228_unique
+
+def p189 (n : ℕ) : ℚ := (((3 : ℚ) * ((2 : ℚ) ^ n)) + ((n : ℚ) + 1))
+def p189_sum (n : ℕ) : ℚ := (((3 : ℚ) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + (((1 : ℚ) / 2) * ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) + (((-1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-1 : ℚ) / 2))
+theorem p189_prefix : ∀ n, prefix p189 n = p189_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p189, p189_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p189, p189_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p189_valid : SumRelationCertificate p189 (4 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-3 : ℚ))) := by
+  constructor
+  · norm_num [p189]
+  · intro n
+    rw [p189_prefix]
+    simp only [p189, p189_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p189_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (4 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-3 : ℚ)))) :
+    ∀ n, a n = p189 n := sum_relation_unique p189_valid ha (by norm_num)
+#print axioms p189_valid
+#print axioms p189_unique
+
+def p195 (n : ℕ) : ℚ := ((((1 : ℚ) / 2) * ((2 : ℚ) ^ n)) + (2 : ℚ))
+def p195_sum (n : ℕ) : ℚ := ((((1 : ℚ) / 2) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + ((2 : ℚ) * ((n : ℚ) + 1)))
+theorem p195_prefix : ∀ n, prefix p195 n = p195_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p195, p195_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p195, p195_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p195_valid : SumRelationCertificate p195 ((5 : ℚ) / 2) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + ((-9 : ℚ) / 2))) := by
+  constructor
+  · norm_num [p195]
+  · intro n
+    rw [p195_prefix]
+    simp only [p195, p195_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p195_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a ((5 : ℚ) / 2) (2 : ℚ) (fun n => (((2 : ℚ) * ((n : ℚ) + 1)) + ((-9 : ℚ) / 2)))) :
+    ∀ n, a n = p195 n := sum_relation_unique p195_valid ha (by norm_num)
+#print axioms p195_valid
+#print axioms p195_unique
+
+def p171 (n : ℕ) : ℚ := (((4 : ℚ) * ((2 : ℚ) ^ n)) + ((n : ℚ) + 1))
+def p171_sum (n : ℕ) : ℚ := (((4 : ℚ) * (((2 : ℚ) ^ (n + 1)) + (-1 : ℚ))) + (((1 : ℚ) / 2) * ((((n : ℚ) + 1) + (1 : ℚ)) ^ 2)) + (((-1 : ℚ) / 2) * ((n : ℚ) + 1)) + ((-1 : ℚ) / 2))
+theorem p171_prefix : ∀ n, prefix p171 n = p171_sum n := by
+  intro n
+  induction n with
+  | zero => norm_num [prefix, p171, p171_sum]
+  | succ n ih =>
+    rw [prefix_succ, ih]
+    simp only [p171, p171_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p171_valid : SumRelationCertificate p171 (5 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-4 : ℚ))) := by
+  constructor
+  · norm_num [p171]
+  · intro n
+    rw [p171_prefix]
+    simp only [p171, p171_sum, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]
+    norm_num <;> ring
+theorem p171_unique (a : ℕ → ℚ) (ha : SumRelationCertificate a (5 : ℚ) (2 : ℚ) (fun n => ((((1 : ℚ) / 2) * (((n : ℚ) + 1) ^ 2)) + (((-3 : ℚ) / 2) * ((n : ℚ) + 1)) + (-4 : ℚ)))) :
+    ∀ n, a n = p171 n := sum_relation_unique p171_valid ha (by norm_num)
+#print axioms p171_valid
+#print axioms p171_unique
 
 end Recurrence

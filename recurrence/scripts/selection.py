@@ -7,6 +7,9 @@ from identity import fingerprint, identity_key
 
 def parameter_key(problem):
     ir,certificate = problem['ir'],problem['routes'][0]['certificate']
+    if ir.get('shape')=='system': return 'modes:'+','.join(str(evaluate(x,0)) for x in ir['matrix'])
+    if ir.get('shape') in {'pure_sum','sum_relation'}: return 'sum:'+problem['generation']['profile']
+    if ir.get('difference_polynomial'): return 'forcing:'+str(evaluate(ir['R'],0))
     if 'roots' in certificate:
         return 'roots:' + ','.join(sorted(str(evaluate(x,0)) for x in certificate['roots']))
     if ir.get('shape')=='power_second': return 'base:'+str(evaluate(ir['power_base'],0))
@@ -33,8 +36,8 @@ def choose_diverse(candidates, quota, config, registry):
                 orientation = int(profile.startswith('inverse:')!=preferred_inverse) if preferred_inverse is not None and profile else 0
                 balance = parameters[parameter_key(p)] if config['selection']['balance_parameters'] else 0
                 existing = int(fingerprint(p['ir']) not in known) if config['selection']['prefer_existing_ids'] else 0
-                return (p['scores']['cleanliness'],orientation,coefficients[identity_key(p['ir'],False)],
-                        balance,p['routes'][0]['parts']['P'],p['scores']['difficulty'],existing,
+                return (coefficients[identity_key(p['ir'],False)],orientation,balance,
+                        p['scores']['cleanliness'],p['routes'][0]['parts']['P'],p['scores']['difficulty'],existing,
                         p['statement']['recurrence_tex'],p['statement']['initials_tex'])
             p=min(groups[key],key=rank)
             groups[key].remove(p)

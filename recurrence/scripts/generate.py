@@ -31,11 +31,19 @@ FAMILIES={
     'scaled_second_order':'正規化＋3項間', 'difference_scaled':'階差＋階比＋総和',
     'weighted_sum':'総和消去＋3項間', 'multiplicative_second':'対数＋二重の階差',
 }
+FAMILIES.update(arithmetic='等差数列',polynomial_difference='多項式の階差',
+    coupled_symmetric='対称な連立',coupled_weighted='一次結合で分離する連立',
+    coupled_scaled='正規化する連立',coupled_forced='付加項のある連立',
+    pure_sum='純総和',pure_sum_scaled='正規化する純総和',sum_relation='総和と一般項の関係')
 SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 
 
 def compile_recipe(family, parameters, profile='gap_2', config=None):
     config=config or load_config()
+    from variety import VARIETY_FAMILIES, variety_recipe
+    if family in VARIETY_FAMILIES:
+        recipe=variety_recipe(family,parameters,profile,config)
+        return problem_from_recipe(family,recipe,profile,config)
     r,c,d,s=(Fraction(parameters[x]) for x in ('r','c','d','s'))
     core='constant' if family in {'constant','scaled_constant','shifted_scaled','ratio_power','multiplicative_second'} else 'geometric' if family in {'geometric','second_order','polynomial_forcing','reciprocal_forcing','scaled_second_order','difference_scaled','weighted_sum'} else 'affine_fixed_point'
     params={'initial':num(d)} if core=='constant' else {'ratio':num(r),'amplitude':num(d)}
@@ -91,25 +99,46 @@ def compile_recipe(family, parameters, profile='gap_2', config=None):
             'core':{'id':'core','kind':core,'parameters':params},
             'blocks':blocks,'output':previous}
     recipe=normalize_recipe(recipe,config)
+    return problem_from_recipe(family,recipe,profile,config)
+
+
+def problem_from_recipe(family,recipe,profile,config):
+    from variety import VARIETY_FAMILIES
     ir=compile_blocks(recipe,config)
     routes=score_routes(ir,find_routes(ir,config))
     quality=assess(ir,routes,config)
     main=routes[0] if routes else None
-    scores={'difficulty':main['cost'] if main else None,
-            'level':level(main['cost']) if main else None,
+    scores={
+            'level':level(main['difficulty_cost']) if main else None,
+            'difficulty':main['difficulty_cost'] if main else None,
+            'route_cost':main['cost'] if main else None,
             'cleanliness':main['numeric_cost'] if main else None,
             'quality_proposal':max(0,30-2*main['parts']['P']-main['parts']['R']-main['parts']['A']) if main else 0,
             'quality_status':'structural-heuristic','version':config['version']}
+    from exposition import explain_route
+    for route in routes: route['steps']=[s.replace('+-','-').replace('--','+') for s in explain_route(ir,route)]
+    initials=[f'a_{{{i+1}}}={latex(v)}' for i,v in enumerate(ir['initials'])]
+    recurrence=latex(ir['lhs'])+'='+latex(ir['rhs'])
+    answer='a_n='+latex(ir['formula'])
+    if ir.get('shape')=='system':
+        initials=[f'a_1={latex(ir["initials"][0])}',f'b_1={latex(ir["b_initial"])}']
+        recurrence=r'\begin{cases}'+recurrence+r'\\'+latex(ir['b_lhs'])+'='+latex(ir['b_rhs'])+r'\end{cases}'
+        answer=r'\begin{aligned}'+answer+r'\\b_n='+latex(ir['b_formula'])+r'\end{aligned}'
+    if ir.get('shape')=='pure_sum': initials=[f'S_{{{i+1}}}='+latex(v) for i,v in enumerate(ir['initials'])]
     return {'family':family,'family_label':FAMILIES[family],'recipe':recipe,'ir':ir,
-            'statement':{'initials_tex':[f'a_{{{i+1}}}={latex(v)}' for i,v in enumerate(ir['initials'])],
-                         'recurrence_tex':latex(ir['lhs'])+'='+latex(ir['rhs']),
+            'statement':{'initials_tex':initials,
+                         'recurrence_tex':recurrence,
+                         'definitions_tex':r'S_n=\sum_{k=1}^{n}a_k' if ir.get('shape') in {'pure_sum','sum_relation'} else None,
                          'condition':'n は 1 以上の整数とする。数列の一般項 a_n を求めよ。'},
-            'answer_tex':'a_n='+latex(ir['formula']),'routes':routes,'scores':scores,'quality':quality,
-            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'} else None,
+            'answer_tex':answer,'routes':routes,'scores':scores,'quality':quality,
+            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'}|VARIETY_FAMILIES else None,
                           'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
 def proofs(problem):
+    if problem['ir'].get('shape') in {'system','pure_sum','sum_relation'}:
+        from variety_proofs import variety_proofs
+        return variety_proofs(problem)
     if problem['ir'].get('shape'):
         from advanced_proofs import advanced_proofs
         return advanced_proofs(problem)
@@ -181,10 +210,18 @@ def validate(problem):
     assert problem['scores']['level'] in range(1,5)
     for n in range(24):
         xs={i:evaluate(ir['formula'],n+i) for i in range(-n,3)}
+        if ir.get('shape')=='system':
+            xs.update({('b',i):evaluate(ir['b_formula'],n+i) for i in range(3)})
+            assert evaluate(ir['b_lhs'],n,xs)==evaluate(ir['b_rhs'],n,xs)
+        if ir.get('shape') in {'pure_sum','sum_relation'}:
+            xs.update({('S',i):sum((evaluate(ir['formula'],k) for k in range(n+i+1)),Fraction(0)) for i in (0,1,2)})
         assert evaluate(ir['lhs'],n,xs)==evaluate(ir['rhs'],n,xs),(problem.get('id'),n)
         for route in problem['routes']:
             assert evaluate(route['formula'],n)==xs[0],('forward route',route['title'],n)
-            check_derivation(ir,route,n)
+            if ir.get('shape') in {'system','pure_sum','sum_relation'}:
+                from variety import check_variety_route
+                check_variety_route(ir,route,n,xs)
+            else: check_derivation(ir,route,n)
         if ir['reciprocal']:
             assert xs[0]>0
             assert evaluate(add(ir['Q'],mul(ir['R'],{'op':'term','offset':0})),n,xs)!=0
@@ -239,6 +276,20 @@ def comparison_report(problems,config,counters,rejections):
             'note':'式の構造と対応済み解法の比較です。学習者による難易度・良問性の実測は未実施です。'}
 
 
+def family_profiles(family,config):
+    if family in SCALED or family=='scaled_second_order': return [name for name,_ in scale_options(config)]
+    if family=='ratio_power': return config['exponent_profiles']
+    if family=='difference_scaled': return ['n','n_plus_1','odd']
+    if family=='weighted_sum': return [mode+':'+g for mode in ('distinct','repeated') for g in ('identity','n','n_plus_1','odd')]
+    if family=='multiplicative_second': return ['constant','n','odd']
+    if family=='polynomial_difference': return ['n','odd','consecutive']
+    if family=='coupled_scaled': return ['n','n_plus_1','odd']
+    if family=='coupled_forced': return ['constant','n']
+    if family in {'pure_sum','sum_relation'}: return ['constant','linear']
+    if family=='pure_sum_scaled': return ['n','consecutive']
+    return ['none']
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--config',type=Path,default=CONFIG_PATH)
@@ -254,16 +305,17 @@ def main():
     for family in FAMILIES:
         quota=config['quotas'].get(family,0)
         if not quota: continue
-        if family in SCALED: profiles=[name for name,_ in scale_options(config)]
-        elif family=='ratio_power': profiles=config['exponent_profiles']
-        elif family=='scaled_second_order': profiles=[name for name,_ in scale_options(config) if name.removeprefix('inverse:') in {'n','n_plus_1','odd'}]
-        elif family=='difference_scaled': profiles=['n','n_plus_1','odd']
-        elif family=='weighted_sum': profiles=[mode+':'+g for mode in ('distinct','repeated') for g in ('identity','n','n_plus_1','odd')]
-        elif family=='multiplicative_second': profiles=['constant','n','odd']
-        else: profiles=['none']
+        profiles=family_profiles(family,config)
         candidates=[]
+        family_parameters=parameters
+        if family=='geometric':
+            family_parameters=list(itertools.product((-2,-1,Fraction(1,2),Fraction(2,3),2,3),(1,),(1,2,3,4,5,6,8,9),(3,)))
+        if family=='arithmetic':
+            family_parameters=list(itertools.product((2,),(-3,-2,-1,Fraction(1,2),1,2,3,4),(1,2,3,4,5,6,8,9),(3,)))
+        if family.startswith('coupled_') or family in {'second_order','scaled_second_order','pure_sum_scaled'}:
+            family_parameters=list(itertools.product((2,3),(1,2,3),(1,2,3,4,5,6,8,9),(-2,-1,1,2,3,4)))
         for profile in profiles:
-            for r,c,d,s in parameters:
+            for r,c,d,s in family_parameters:
                 counters['attempted']+=1
                 try: p=compile_recipe(family,{'r':r,'c':c,'d':d,'s':s},profile,config)
                 except RuleViolation as e:
@@ -303,7 +355,7 @@ def main():
     (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
     report=comparison_report(problems,config,counters,rejections)
     (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.4.0',
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.6.0',
              'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
              'generation_config':config,'function_catalog':profile_catalog(config),
              'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity','level_diversity')},

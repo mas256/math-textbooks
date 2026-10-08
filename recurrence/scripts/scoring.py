@@ -11,7 +11,7 @@ OPERATIONS = {"constant": 1, "geometric": 2, "fixed_point": 2,
               "ratio_product": 2, "evaluate_product": 1,
               "logarithm": 3, "difference_sum": 2, "evaluate_sum": 1,
               "polynomial_shift": 4}
-OPERATIONS.update(difference=2,eliminate_sum=3,geometric_sum=4,evaluate_quadratic_sum=2)
+OPERATIONS.update(difference=2,eliminate_sum=3,geometric_sum=4,evaluate_quadratic_sum=2,split_pair=2,recover_pair=2,recover_sum=2)
 
 
 def component_cost(n, preferred):
@@ -74,8 +74,11 @@ def expression_metrics(expressions):
 
 def statement_metrics(ir):
     result=expression_metrics([ir['lhs'],ir['rhs']])
+    if ir.get('shape')=='system':
+        other=expression_metrics([ir['b_lhs'],ir['b_rhs']])
+        result={key:max(value,other[key]) for key,value in result.items()}
     degrees=[]
-    keys=('P2','Q2','R2') if ir.get('shape')=='linear_second' else ('P','Q','R')
+    keys=('P2','Q2','R2') if ir.get('shape')=='linear_second' or ir.get('shape')=='pure_sum' and ir['second_order'] else ('P','Q','R')
     for key in keys:
         try: degrees.append(max(polynomial(ir[key]),default=0))
         except ValueError: pass
@@ -102,15 +105,18 @@ def score_routes(ir, routes):
         expression=max(expression_cost(metrics),expression_cost(expression_metrics([route['formula']])))
         route.update(route_score(route['operations'],route['discovery'],arithmetic,
                                  route['domain'],expression))
+        route['difficulty_cost']=route['parts']['B']+route['parts']['R']+route['parts']['T']
         route['numeric_cost']=arithmetic
         route['observed_metrics']=metrics
-    return sorted(routes,key=lambda r:(r['cost'],r['numeric_cost'],r['title']))
+    return sorted(routes,key=lambda r:(r['difficulty_cost'],r['cost'],r['numeric_cost'],r['title']))
 
 
 def assess(ir, routes, config):
     metrics=statement_metrics(ir)
     limits=config['quality_limits']
     reasons=[]
+    if all(evaluate(ir['formula'],k)==evaluate(ir['formula'],0) for k in range(8)):
+        reasons.append('constant_output_sequence')
     for metric,key in [('coefficient_degree','max_coefficient_degree'),('nodes','max_statement_nodes'),
                        ('fraction_depth','max_fraction_depth'),('display_terms','max_display_terms')]:
         if metrics[metric]>limits[key]: reasons.append(key)
@@ -120,7 +126,7 @@ def assess(ir, routes, config):
         main=routes[0]
         if main['discovery']>limits['max_discovery']: reasons.append('max_discovery')
         if main['numeric_cost']>limits['max_numeric_cost']: reasons.append('max_numeric_cost')
-        if level(main['cost']) not in range(1,5): reasons.append('unsupported_level')
+        if level(main['difficulty_cost']) not in range(1,5): reasons.append('unsupported_level')
         if not main['complete'] or main['parts']['U']: reasons.append('unfinished_route')
         cert=main['certificate']
         if ir['reciprocal'] and cert['kind']=='polynomial-normalization' and cert['profile']!='identity':

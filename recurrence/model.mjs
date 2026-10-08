@@ -77,6 +77,7 @@ export function texDocument(p, includeAnswer = false) {
   let text = '% UTF-8 / LuaLaTeX\n\\documentclass{ltjsarticle}\n\\usepackage{amsmath}\n\\begin{document}\n';
   text += '\\section*{問題 ' + p.id + '}\n数列の一般項 $a_n$ を求めよ。$n\\geq 1$ とする。\n';
   text += math(p.statement.initials_tex.join(',\\quad '));
+  if (p.statement.definitions_tex) text += math(p.statement.definitions_tex);
   text += math(p.statement.recurrence_tex);
   if (includeAnswer) {
     text += '\\section*{解答}\n' + p.routes[0].title + '\n';

@@ -12,8 +12,8 @@ def index():
     return {"op": "index"}  # school index n; Lean index k = n - 1
 
 
-def term(offset=0):
-    return {"op": "term", "offset": offset}
+def term(offset=0, variable=None):
+    return {"op": "term", "offset": offset, **({'variable':variable} if variable else {})}
 
 
 def add(*args):
@@ -107,7 +107,8 @@ def evaluate(expr, k, terms=None):
     if op == "nat_index": return k + expr["offset"]
     if op == "nat_constant": return expr["value"]
     if op == "triangular": return k * (k + 1) // 2
-    if op == "term": return terms[expr["offset"]]
+    if op == "term": return terms[(expr['variable'],expr['offset'])] if 'variable' in expr else terms[expr["offset"]]
+    if op == 'sum_term': return terms[('S',expr['offset'])]
     if op == 'prefix_sum':
         return sum((evaluate(expr['args'][0],j,{0:terms[j-k]}) for j in range(k+1)),Fraction(0))
     if op == 'log':
@@ -138,7 +139,9 @@ def latex(expr):
     if op == "triangular": return r"\frac{n(n-1)}{2}"
     if op == "term":
         o = expr["offset"]
-        return "a_{n}" if not o else "a_{n+" + str(o) + "}"
+        variable=expr.get('variable','a')
+        return variable+"_{n}" if not o else variable+"_{n+" + str(o) + "}"
+    if op == 'sum_term': return 'S_{n}' if not expr['offset'] else 'S_{n+'+str(expr['offset'])+'}'
     if op == 'prefix_sum':
         import re
         body=re.sub(r'(?<![a-zA-Z\\])n(?![a-zA-Z])','k',latex(expr['args'][0]))
@@ -200,7 +203,9 @@ def lean(expr, sequence="f"):
     if op == "nat_constant": return str(expr["value"])
     if op == "nat_index": return "n" if expr["offset"] == 0 else f"(n + {expr['offset']})"
     if op == "triangular": return "((n + 1).choose 2)"
-    if op == "term": return f"({sequence} n)" if expr["offset"] == 0 else f"({sequence} (n + {expr['offset']}))"
+    if op == "term":
+        name=sequence+"_b" if expr.get("variable")=="b" else sequence
+        return f"({name} n)" if expr["offset"] == 0 else f"({name} (n + {expr['offset']}))"
     if op == 'prefix_sum':
         import re
         body=re.sub(r'\bn\b','k',lean(expr['args'][0],sequence))

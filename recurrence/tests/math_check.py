@@ -22,7 +22,7 @@ config=load_config()
 for p in bank['problems']:
     assert compile_blocks(p['recipe']) == p['ir']
     validate(p)
-    assert p['routes'][0]['cost'] == min(r['cost'] for r in p['routes'])
+    assert p['routes'][0]['difficulty_cost'] == min(r['difficulty_cost'] for r in p['routes'])
     assert p['routes'][0]['parts']['U'] == 0
     assert p['scores']['level'] == level(p['scores']['difficulty'])
     assert all('+-' not in step for route in p['routes'] for step in route['steps'])
@@ -31,7 +31,7 @@ for p in bank['problems']:
     assert p['quality']['metrics']['coefficient_degree']<=2
     assert all(count<=config['max_transforms'][kind] for kind,count in p['generation']['transform_counts'].items())
     # The forward solver still succeeds after removing construction/formula data.
-    hidden={'formula','underlying','exponent_profile','sum_base','power_exponent'}
+    hidden={'formula','b_formula','sum_formula','underlying','exponent_profile','sum_base','power_exponent'}
     if p['ir'].get('shape')=='weighted_sum': hidden.update({'p','q'})
     stripped={k:v for k,v in p['ir'].items() if k not in hidden}
     routes=score_routes(stripped,find_routes(stripped,config))
@@ -197,9 +197,22 @@ try: compile_recipe('multiplicative_second',{'r':2,'c':1,'d':Fraction(1,2),'s':3
 except RuleViolation as e: assert str(e)=='unregistered_natural_exponent'
 else: raise AssertionError('nonintegral registered exponent accepted')
 scaled_three=compile_recipe('scaled_second_order',{'r':2,'c':1,'d':1,'s':3},'inverse:n')
-assert r'b_n=n\,a_{n}' in scaled_three['routes'][0]['steps'][0]
+assert r'n\,a_{n}' in ' '.join(scaled_three['routes'][0]['steps'])
 validate(scaled_three)
 assert square['routes'][0]['operations'][-1]=='evaluate_sum'
 cube=compile_recipe('ratio_power',{'r':2,'c':1,'d':1,'s':3},'tetrahedral')
 assert cube['routes'][0]['operations'][-1]=='evaluate_quadratic_sum'
 print('Checks passed: recipe replay, forward routes, intermediate relations, notation, domain guards, balanced selection and all historical public IDs.')
+
+# Educational levels are independent of initial-value arithmetic and TeX length.
+for family,profile in [('scaled_second_order','inverse:n'),('scaled_second_order','inverse:consecutive')]:
+    variants=[compile_recipe(family,{'r':2,'c':c,'d':d,'s':3},profile) for c,d in [(1,1),(3,9),(6,8)]]
+    assert {p['scores']['level'] for p in variants}=={3}
+assert not any(p['family']=='constant' for p in bank['problems'])
+assert all(any(evaluate(p['ir']['formula'],k)!=evaluate(p['ir']['formula'],0) for k in range(1,8)) for p in bank['problems'])
+for shape in ['system','pure_sum','sum_relation']:
+    assert any(p['ir'].get('shape')==shape for p in bank['problems']),shape
+for level in [3,4]:
+    assert any(p['ir'].get('shape')=='system' and p['scores']['level']==level for p in bank['problems'])
+    assert any(p['ir'].get('shape') in {'pure_sum','sum_relation','weighted_sum'} and p['scores']['level']==level for p in bank['problems'])
+print('New checks passed: nonconstant outputs, stable educational levels, paired modes and distinct summation shapes.')

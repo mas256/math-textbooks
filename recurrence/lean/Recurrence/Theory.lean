@@ -192,4 +192,78 @@ theorem weighted_sum_from_second (f b g : ℕ → ℚ) (initial first second α 
     exact hdiv k
   rw [hf (n + 1), hdiv n, hsum, ← second_to_sum hb hboundary n]
 
+
+def prefix (f : ℕ → ℚ) (n : ℕ) : ℚ := ∑ k ∈ Finset.range (n + 1), f k
+
+theorem prefix_succ (f : ℕ → ℚ) (n : ℕ) : prefix f (n + 1) = prefix f n + f (n + 1) := by
+  simp only [prefix, Finset.sum_range_succ]
+
+theorem prefix_injective {f a : ℕ → ℚ} (h : ∀ n, prefix a n = prefix f n) :
+    ∀ n, a n = f n := by
+  intro n
+  cases n with
+  | zero => simpa [prefix] using h 0
+  | succ n =>
+    have hn := h n
+    have hs := h (n + 1)
+    rw [prefix_succ, prefix_succ] at hs
+    linarith
+
+abbrev PureSumCertificate (f : ℕ → ℚ) (initial : ℚ) (step : ℕ → ℚ → ℚ) :=
+  FirstCertificate (prefix f) initial step
+
+abbrev PureSecondSumCertificate (f : ℕ → ℚ) (initial second : ℚ)
+    (step : ℕ → ℚ → ℚ → ℚ) := GeneralSecondCertificate (prefix f) initial second step
+
+theorem pure_sum_unique {f a : ℕ → ℚ} {initial : ℚ} {step : ℕ → ℚ → ℚ}
+    (hf : PureSumCertificate f initial step) (ha : PureSumCertificate a initial step) :
+    ∀ n, a n = f n := prefix_injective (first_unique hf ha)
+
+theorem pure_second_sum_unique {f a : ℕ → ℚ} {initial second : ℚ}
+    {step : ℕ → ℚ → ℚ → ℚ}
+    (hf : PureSecondSumCertificate f initial second step)
+    (ha : PureSecondSumCertificate a initial second step) :
+    ∀ n, a n = f n := prefix_injective (general_second_unique hf ha)
+
+structure SumRelationCertificate (f : ℕ → ℚ) (initial α : ℚ) (F : ℕ → ℚ) : Prop where
+  init : f 0 = initial
+  recurrence : ∀ n, prefix f n = α * f n + F n
+
+theorem sum_relation_unique {f a : ℕ → ℚ} {initial α : ℚ} {F : ℕ → ℚ}
+    (hf : SumRelationCertificate f initial α F)
+    (ha : SumRelationCertificate a initial α F) (hα : α ≠ 1) : ∀ n, a n = f n := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    have hsum : (∑ k ∈ Finset.range n, a k) = ∑ k ∈ Finset.range n, f k := by
+      apply Finset.sum_congr rfl
+      intro k hk
+      exact ih k (Finset.mem_range.mp hk)
+    have hf' := hf.recurrence n
+    have ha' := ha.recurrence n
+    simp only [prefix, Finset.sum_range_succ] at hf' ha'
+    rw [hsum] at ha'
+    have hz : (1 - α) * (a n - f n) = 0 := by nlinarith
+    have hn : 1 - α ≠ 0 := sub_ne_zero.mpr hα.symm
+    exact sub_eq_zero.mp ((mul_eq_zero.mp hz).resolve_left hn)
+
+structure SystemCertificate (f g : ℕ → ℚ) (first second : ℚ)
+    (A B : ℕ → ℚ → ℚ → ℚ) : Prop where
+  init_a : f 0 = first
+  init_b : g 0 = second
+  recurrence_a : ∀ n, f (n + 1) = A n (f n) (g n)
+  recurrence_b : ∀ n, g (n + 1) = B n (f n) (g n)
+
+theorem system_unique {f g a b : ℕ → ℚ} {first second : ℚ}
+    {A B : ℕ → ℚ → ℚ → ℚ}
+    (hf : SystemCertificate f g first second A B)
+    (ha : SystemCertificate a b first second A B) : ∀ n, a n = f n ∧ b n = g n := by
+  intro n
+  induction n with
+  | zero => exact ⟨ha.init_a.trans hf.init_a.symm, ha.init_b.trans hf.init_b.symm⟩
+  | succ n ih =>
+    constructor
+    · simpa only [ha.recurrence_a, hf.recurrence_a, ih.1, ih.2]
+    · simpa only [ha.recurrence_b, hf.recurrence_b, ih.1, ih.2]
+
 end Recurrence

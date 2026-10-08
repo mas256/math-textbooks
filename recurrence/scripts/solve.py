@@ -284,6 +284,9 @@ def check_derivation(ir, route, n):
 
 
 def find_routes(ir, config):
+    if ir.get('shape') in {'system','pure_sum','sum_relation'} or ir.get('difference_polynomial'):
+        from variety import variety_routes
+        return variety_routes(ir,config)
     if ir.get('shape'):
         from advanced_solve import advanced_routes
         return advanced_routes(ir,config)

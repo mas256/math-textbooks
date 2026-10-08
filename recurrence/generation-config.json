@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "seed": 20261008,
   "max_transforms": {
     "add_constant": 1,
@@ -12,7 +12,11 @@
     "difference_lift": 1,
     "sum_encode": 1,
     "cumulative_sum": 2,
-    "power_sequence": 1
+    "power_sequence": 1,
+    "pair_mix": 1,
+    "partial_sum_encode": 1,
+    "sum_relation_encode": 1,
+    "difference_polynomial": 1
   },
   "max_blocks": 4,
   "selection": {
@@ -42,7 +46,7 @@
     "max_numeric_cost": 8
   },
   "quotas": {
-    "constant": 5,
+    "constant": 0,
     "geometric": 5,
     "affine": 5,
     "scaled_constant": 12,
@@ -57,7 +61,16 @@
     "scaled_second_order": 12,
     "difference_scaled": 12,
     "weighted_sum": 12,
-    "multiplicative_second": 12
+    "multiplicative_second": 12,
+    "arithmetic": 6,
+    "polynomial_difference": 6,
+    "coupled_symmetric": 8,
+    "coupled_weighted": 6,
+    "coupled_scaled": 8,
+    "coupled_forced": 8,
+    "pure_sum": 6,
+    "pure_sum_scaled": 8,
+    "sum_relation": 8
   },
   "difficulty_mix": {
     "3": {
