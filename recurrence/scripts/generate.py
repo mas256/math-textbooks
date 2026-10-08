@@ -6,7 +6,7 @@ import itertools
 import json
 import random
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from fractions import Fraction
 from pathlib import Path
 
@@ -15,7 +15,9 @@ from expr import add, div, evaluate, index, latex, lean, mul, nat, neg, num, pow
 from profiles import EXPONENTS, profile_catalog, scale_options
 from rules import CONFIG_PATH, RuleViolation, load_config, normalize_recipe
 from scoring import assess, level, score_routes, statement_metrics, walk
-from solve import find_routes
+from solve import check_derivation, find_routes
+from identity import REGISTRY_PATH, assign_ids, identity_key, load_registry
+from selection import choose_diverse, diversity_summary
 
 ROOT=Path(__file__).resolve().parents[1]
 BUILD=ROOT/'build'
@@ -155,53 +157,11 @@ def validate(problem):
         assert evaluate(ir['lhs'],n,xs)==evaluate(ir['rhs'],n,xs),(problem.get('id'),n)
         for route in problem['routes']:
             assert evaluate(route['formula'],n)==xs[0],('forward route',route['title'],n)
+            check_derivation(ir,route,n)
         if ir['reciprocal']:
             assert xs[0]>0
             assert evaluate(add(ir['Q'],mul(ir['R'],{'op':'term','offset':0})),n,xs)!=0
     return 24
-
-
-def choose_diverse(candidates, quota, config=None):
-    config=config or load_config()
-    groups=defaultdict(list)
-    ordered=sorted(candidates,key=lambda p:(p['scores']['cleanliness'],p['routes'][0]['parts']['P'],p['scores']['difficulty'],p['statement']['recurrence_tex']))
-    profile_count=len({p['generation']['profile'] for p in candidates})
-    for p in ordered:
-        profile=p['generation']['profile']
-        if profile:
-            key=profile if quota>=profile_count else profile.removeprefix('inverse:')
-        else:
-            key=json.dumps([p['ir'][x] for x in ('P','Q','R')]+([p['ir']['p'],p['ir']['q']] if p['ir']['second_order'] else []),sort_keys=True)
-        groups[key].append(p)
-    if candidates and candidates[0]['generation']['profile'] and quota<profile_count:
-        for key,group in groups.items():
-            preferred_inverse=bool(config['scale_profiles'].index(key)%2) if key in config['scale_profiles'] else False
-            group.sort(key=lambda p:(p['generation']['profile'].startswith('inverse:')!=preferred_inverse,
-                                     p['scores']['cleanliness'],p['routes'][0]['parts']['P'],p['scores']['difficulty']))
-    chosen=[]
-    while len(chosen)<quota and groups:
-        for key in list(groups):
-            chosen.append(groups[key].pop(0))
-            if not groups[key]: del groups[key]
-            if len(chosen)==quota: break
-    return chosen
-
-
-def identity_key(ir):
-    """Keep existing public links only when recurrence and initials agree."""
-    from expr import polynomial, poly_gcd, poly_divmod
-    initial=[evaluate(x,0) for x in ir['initials']]
-    if ir['second_order']:
-        return str(['second',evaluate(ir['p'],0),evaluate(ir['q'],0),initial])
-    try:
-        ps=[polynomial(ir[k]) for k in ('P','Q','R')]
-        common=poly_gcd(poly_gcd(ps[0],ps[1]),ps[2])
-        ps=[poly_divmod(p,common)[0] for p in ps]
-        scale=ps[0][max(ps[0])]
-        coefficients=[sorted((d,str(c/scale)) for d,c in p.items()) for p in ps]
-    except ValueError:
-        coefficients=[ir[k] for k in ('P','Q','R')]
-    return str([ir['reciprocal'],coefficients,initial])
 
 
 def summarize(problems):
@@ -215,6 +175,10 @@ def summarize(problems):
 
 def comparison_report(problems,config,counters,rejections):
     baseline=json.loads((ROOT/'reference/quality-baseline.json').read_text())
+    previous=json.loads((ROOT/'reference/quality-v0.2.json').read_text())
+    # Forward recognition, with no construction history, supplies comparable
+    # parameter information even for the frozen snapshot.
+    for p in previous['problems']: p['routes']=score_routes(p['ir'],find_routes(p['ir'],config))
     rejected=[]
     for i,p in enumerate(baseline['problems'],1):
         routes=score_routes(p['ir'],find_routes(p['ir'],config))
@@ -230,6 +194,8 @@ def comparison_report(problems,config,counters,rejections):
             'before':summarize(baseline['problems']),'after':summarize(problems),
             'candidate_counts':dict(counters),'rejection_reasons':dict(rejections),
             'baseline_rejected_count':len(rejected),'baseline_rejected_examples':rejected,
+            'diversity':{'previous_version':previous['version'],'before':diversity_summary(previous['problems']),
+                         'after':diversity_summary(problems)},
             'examples':examples,'limits':config,'status':'structural-comparison',
             'note':'式の構造と対応済み解法の比較です。学習者による難易度・良問性の実測は未実施です。'}
 
@@ -237,14 +203,13 @@ def comparison_report(problems,config,counters,rejections):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--config',type=Path,default=CONFIG_PATH)
+    parser.add_argument('--update-id-registry',action='store_true')
     args=parser.parse_args()
     config=load_config(args.config)
     BUILD.mkdir(exist_ok=True)
     parameters=list(itertools.product((2,3),(1,2,3),(1,2,3,4,5,6,8,9,Fraction(1,2)),(3,4)))
     random.Random(config['seed']).shuffle(parameters)
-    baseline=json.loads((ROOT/'reference/quality-baseline.json').read_text())
-    previous_ids={identity_key(p['ir']):f'p{i:03}' for i,p in enumerate(baseline['problems'],1)}
-    next_id=len(baseline['problems'])+1
+    registry=load_registry()
     problems, fingerprints=[],set()
     counters,rejections=Counter(),Counter()
     for family in FAMILIES:
@@ -272,32 +237,34 @@ def main():
                     continue
                 counters['accepted_candidates']+=1
                 candidates.append(p)
-        selected=choose_diverse(candidates,quota,config)
+        selected=choose_diverse(candidates,quota,config,registry)
         if len(selected)!=quota:
             raise RuntimeError(f'{family}: only {len(selected)} acceptable problems for quota {quota}; reasons={dict(rejections)}')
-        for p in selected:
-            previous_id=previous_ids.get(identity_key(p['ir']))
-            p['id']=previous_id or f'p{next_id:03}'
-            if previous_id is None: next_id+=1
-            validate(p)
-            p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] else [])
-            p['lean_source']='import Recurrence.Theory\n\nnamespace Recurrence\n'+proofs(p)+'end Recurrence\n'
-            problems.append(p)
+        problems.extend(selected)
     if not problems: raise RuntimeError('No problems were selected')
+    added_ids=assign_ids(problems,registry,args.update_id_registry)
+    for p in problems:
+        validate(p)
+        p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] else [])
+        p['lean_source']='import Recurrence.Theory\n\nnamespace Recurrence\n'+proofs(p)+'end Recurrence\n'
+    if args.update_id_registry:
+        REGISTRY_PATH.write_text(json.dumps(registry,indent=2)+'\n')
     source='import Recurrence.Theory\n\nnamespace Recurrence\n\n'+'\n'.join(proofs(p) for p in problems)+'\nend Recurrence\n'
     (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
     report=comparison_report(problems,config,counters,rejections)
     (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.2.0',
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.3.0',
              'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
              'generation_config':config,'function_catalog':profile_catalog(config),
-             'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count')},
+             'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity')},
              'checks':{'exact_arithmetic_cases':len(problems)*24},
              'proof_source_sha256':hashlib.sha256(source.encode()).hexdigest()}
     (BUILD/'candidates.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
     print(f"Generated {len(problems)} problems / {len(payload['families'])} families; {len(problems)*24} exact term checks passed.")
     print('Comparison:',json.dumps({k:report[k] for k in ('before','after','baseline_rejected_count')},ensure_ascii=False))
     print('Candidate screening:',dict(counters),'reasons:',dict(rejections))
+    print('Distinct coefficient patterns:',report['diversity']['before']['coefficient_patterns'],'->',report['diversity']['after']['coefficient_patterns'])
+    print('New public IDs:',added_ids)
 
 
 if __name__=='__main__': main()

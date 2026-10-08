@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "seed": 20261008,
   "max_transforms": {
     "add_constant": 1,
@@ -10,6 +10,7 @@
     "linear_combination": 1
   },
   "max_blocks": 3,
+  "selection": {"balance_parameters": true, "prefer_existing_ids": true},
   "scale_profiles": ["n", "n_plus_1", "n_squared", "consecutive", "gap_2", "odd"],
   "allow_inverse_scales": true,
   "exponent_profiles": ["triangular", "square_minus_one", "tetrahedral"],

@@ -30,7 +30,7 @@ export function validateBank(bank, manifest) {
   }
   const ids = new Set();
   for (const p of bank.problems) {
-    if (ids.has(p.id) || !/^p\d{3}$/.test(p.id)
+    if (ids.has(p.id) || !/^p\d{3,}$/.test(p.id)
       || p.verification?.status !== 'lean-verified'
       || !p.lean_theorems?.includes(p.id + '_unique')
       || !p.routes?.length || p.routes[0].parts.U !== 0

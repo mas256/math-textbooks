@@ -99,6 +99,25 @@ function renderGenerationSummary() {
     el('p', `多項式係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
     el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
     el('p', 'この比較は式の構造を測った結果です。学習者の正答率や、良問としての評価は今後確認します。'));
+  const diversity = comparison.diversity;
+  const diversitySummary = $('diversity-summary');
+  diversitySummary.replaceChildren();
+  if (diversity) {
+    diversitySummary.append(el('p', `前版の ${diversity.before.count} 問と今回の ${diversity.after.count} 問では、係数パターンは ${diversity.before.coefficient_patterns} → ${diversity.after.coefficient_patterns} 種類です。初期値だけが違う問題は同じパターンとして数えます。数値の扱いやすさを優先し、同程度の候補から公比・指数の底の偏りを減らして選びます。`));
+    const table = el('table', undefined, 'score-table');
+    table.append(el('caption', '公比・指数の底の分布'));
+    const head = el('tr');
+    for (const label of ['型','前版','今回']) head.append(el('th',label));
+    const thead=el('thead'); thead.append(head); table.append(thead);
+    const tbody=el('tbody');
+    const distribution = data => Object.entries(data?.parameters || {}).map(([key,count]) => key.replace('ratio:', '公比 ').replace('base:', '底 ') + `：${count}問`).join('、') || '出題なし';
+    for (const family of ['scaled_affine','reciprocal_scaled','ratio_power']) {
+      const row=el('tr');
+      for (const text of [state.bank.families[family] || family,distribution(diversity.before.families[family]),distribution(diversity.after.families[family])]) row.append(el('td',text));
+      tbody.append(row);
+    }
+    table.append(tbody); diversitySummary.append(table);
+  }
   const functions = $('function-catalog');
   const normalizers = catalog.scales.filter(p => !p.id.startsWith('inverse:')).map(p => '\\(' + p.normalizer_tex + '\\)').join('、');
   const increments = catalog.exponents.map(p => '\\(' + p.increment_tex + '\\)').join('、');

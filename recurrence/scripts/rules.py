@@ -22,6 +22,8 @@ def load_config(path=CONFIG_PATH):
     assert isinstance(config["max_blocks"], int) and config["max_blocks"] >= 0
     assert all(isinstance(v, int) and v >= 0 for v in config["quality_limits"].values())
     assert all(isinstance(v, int) and v >= 0 for v in config["quotas"].values())
+    assert set(config['selection']) == {'balance_parameters','prefer_existing_ids'}
+    assert all(isinstance(v,bool) for v in config['selection'].values())
     return config
 
 

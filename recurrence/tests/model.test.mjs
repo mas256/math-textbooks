@@ -36,6 +36,9 @@ test('structurally rejected or incomplete problems cannot be served', () => {
   problem.quality.accepted=true;
   problem.routes[0].complete=false;
   assert.throws(()=>validateBank(verified,manifest));
+  problem.routes[0].complete=true;
+  problem.id='p1000'; problem.lean_theorems=['p1000_unique'];
+  assert.equal(validateBank(verified,manifest),verified);
 });
 
 test('TeX defaults to problem only and adds solutions on request', () => {

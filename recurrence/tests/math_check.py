@@ -7,12 +7,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from compiler import compile_blocks
-from expr import add, evaluate, latex, mul, num, index, power
+from expr import add, evaluate, latex, mul, num, index, power, nat, nat_const
 from generate import compile_recipe, identity_key, validate
 from profiles import EXPONENTS, SCALES, scale_options
 from rules import RuleViolation, load_config, normalize_recipe
 from scoring import assess, numeric_cost, level, score_routes
-from solve import find_routes
+from solve import check_derivation, find_routes
+from identity import assign_ids, fingerprint, load_registry
 
 assert [level(x) for x in [3,4,7,8,12,13,18,19,25,26]] == [1,2,2,3,3,4,4,5,5,None]
 assert [numeric_cost(x) for x in [Fraction(1,2),Fraction(25,8),Fraction(1,7),Fraction(7,11),Fraction(49,64)]] == [0,0,1,3,4]
@@ -25,6 +26,7 @@ for p in bank['problems']:
     assert p['routes'][0]['parts']['U'] == 0
     assert p['scores']['level'] == level(p['scores']['difficulty'])
     assert all('+-' not in step for route in p['routes'] for step in route['steps'])
+    assert all('--' not in step for route in p['routes'] for step in route['steps'])
     assert p['quality']['accepted']
     assert p['quality']['metrics']['coefficient_degree']<=2
     assert all(count<=config['max_transforms'][kind] for kind,count in p['generation']['transform_counts'].items())
@@ -106,4 +108,53 @@ assert r'\left(n-1\right)' in square['answer_tex'] and r'\left(n+1\right)' in sq
 assert len(bank['problems'])==sum(config['quotas'].values())
 assert len(set(p['id'] for p in bank['problems']))==len(bank['problems'])
 assert {p['generation']['profile'] for p in bank['problems'] if p['family']=='scaled_constant'}=={name for name,_ in scale_options(config)}
-print('Checks passed: recipe replay, forward routes without recipes, policy overrides, profile closure, domain guards, old-example rejection, scoring and stable public IDs.')
+
+# Regression for a published ambiguity: 3 times 2^sum must not read as 32^sum,
+# and the entire additive increment belongs inside the summation.
+power_example=compile_recipe('ratio_power',{'r':2,'c':1,'d':3,'s':3},'square_minus_one')
+step=power_example['routes'][0]['steps'][0]
+assert r'3\cdot 2^{' in step and r'\left(2\,j+1\right)' in step
+assert r'3\cdot 2^{' in power_example['answer_tex']
+assert latex({'op':'choose','args':[nat_const(3),nat_const(2)]})==r'\binom{3}{2}'
+assert r'\frac{' in latex(EXPONENTS['tetrahedral']['increment'])
+unit_base=compile_recipe('ratio_power',{'r':1,'c':1,'d':3,'s':3},'triangular')
+assert all('logarithm' not in route['operations'] for route in unit_base['routes'])
+assert unit_base['routes'][0]['operations']==['constant']
+
+# Intermediate errors must be caught even while the final formula stays correct.
+particular=compile_recipe('polynomial_forcing',{'r':2,'c':1,'d':3,'s':3})
+tampered=copy.deepcopy(particular['routes'][0])
+tampered['derivation'][0]['R']=add(tampered['derivation'][0]['R'],num(1))
+try: check_derivation(particular['ir'],tampered,0)
+except AssertionError: pass
+else: raise AssertionError('incorrect intermediate recurrence accepted')
+# A non-unit leading coefficient must be divided out in the explanation too.
+nonunit={**particular['ir'],'P':num(2),'Q':num(4),'R':mul(num(2),index())}
+routes=find_routes(nonunit,config)
+assert routes and all('2(An+B)+n' in s for r in routes if r['certificate']['kind']=='linear-particular' for s in r['steps'] if 'A(n+1)' in s)
+
+registry=load_registry()
+known={e['fingerprint']:e['id'] for e in registry['entries']}
+previous=json.loads((Path(__file__).resolve().parents[1]/'reference/quality-v0.2.json').read_text())
+for p in previous['problems']: assert known[fingerprint(p['ir'])]==p['id']
+for p in bank['problems']:
+    assert known[fingerprint(p['ir'])]==p['id']
+    assert fingerprint(json.loads(json.dumps(p['ir'],sort_keys=True)))==fingerprint(p['ir'])
+unknown=compile_recipe('constant',{'r':2,'c':1,'d':999,'s':3})
+protected=copy.deepcopy(registry)
+try: assign_ids([unknown],protected)
+except RuntimeError: pass
+else: raise AssertionError('unknown problem silently published with a reused ID')
+assert protected==registry
+assert assign_ids([unknown],protected,True)==1
+assert unknown['id']==f"p{registry['next_id']:03}"
+assert assign_ids([unknown],protected)==0
+
+diversity=bank['comparison']['diversity']
+assert diversity['before']['count']==diversity['after']['count']==70
+assert diversity['after']['coefficient_patterns']>=diversity['before']['coefficient_patterns']
+for family in ['scaled_affine','reciprocal_scaled','ratio_power']:
+    distribution=diversity['after']['families'][family]['parameters']
+    assert len(distribution)==2 and max(distribution.values())-min(distribution.values())<=1
+assert max(p['scores']['cleanliness'] for p in bank['problems'])<=max(p['scores']['cleanliness'] for p in previous['problems'])
+print('Checks passed: recipe replay, forward routes, intermediate relations, notation, domain guards, balanced selection and all historical public IDs.')

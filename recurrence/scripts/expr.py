@@ -1,6 +1,6 @@
 """A small, shared exact expression IR for LaTeX, Lean and arithmetic checks."""
 from fractions import Fraction
-from math import comb
+from math import comb, factorial
 
 
 def num(value):
@@ -139,7 +139,7 @@ def latex(expr):
             out += ("" if not out or text.startswith("-") else "+") + text
         return out
     if op == "mul":
-        out = []
+        out = ""
         negative = False
         for a in args:
             if a == num(-1): negative = not negative; continue
@@ -149,15 +149,22 @@ def latex(expr):
             text = latex(a)
             if a["op"] == "add" or (a["op"] == "nat_index" and a['offset']!=1) or (a["op"] == "rational" and a["num"] < 0):
                 text = r"\left(" + text + r"\right)"
-            out.append(text)
-        return ("-" if negative else "") + (r"\,".join(out) or "1")
+            # Adjacent numerical factors must not look like one integer.
+            numerical = a['op'] == 'rational' or a['op'] == 'pow' and a['args'][0]['op'] == 'rational'
+            out += (r"\cdot " if numerical else r"\,") + text if out else text
+        return ("-" if negative else "") + (out or "1")
     if op == "div": return rf"\frac{{{latex(args[0])}}}{{{latex(args[1])}}}"
     if op == "pow":
         base = latex(args[0])
         if args[0]["op"] not in {"rational", "index"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
             base = r"\left(" + base + r"\right)"
         return base + "^{" + latex(args[1]) + "}"
-    if op == "choose": return rf"\binom{{{latex(args[0])}}}{{{latex(args[1])}}}"
+    if op == "choose":
+        k = args[1].get('value')
+        if k in (2, 3) and args[0]['op'] == 'nat_index':
+            numerator = mul(*(shift(args[0], -i) for i in reversed(range(k))))
+            return latex(div(numerator, num(factorial(k))))
+        return rf"\binom{{{latex(args[0])}}}{{{latex(args[1])}}}"
     raise ValueError(op)
 
 

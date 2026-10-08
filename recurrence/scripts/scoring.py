@@ -121,4 +121,4 @@ def assess(ir, routes, config):
             if evaluate(cert['shift'],0) and evaluate(cert['forcing'],0):
                 reasons.append('hidden_shift_before_normalization')
     return {'accepted':not reasons,'reasons':reasons,'metrics':metrics,
-            'status':'structural-heuristic','version':'0.3.0'}
+            'status':'structural-heuristic','version':config['version']}

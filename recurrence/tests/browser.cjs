@@ -61,6 +61,8 @@ const fs = require('node:fs');
   await page.locator('#generation-details summary').click();
   await page.waitForFunction(()=>document.querySelector('#function-catalog mjx-container'));
   assert.ok((await page.locator('#generation-summary').textContent()).includes(`${bank.problems.length} 問`));
+  assert.ok((await page.locator('#diversity-summary').textContent()).includes(`${bank.comparison.diversity.after.coefficient_patterns} 種類`));
+  assert.equal(await page.locator('#diversity-summary tbody tr').count(),3);
   await page.setViewportSize({width:375,height:900});
   const widest=bank.problems.reduce((a,b)=>a.quality.metrics.nodes>b.quality.metrics.nodes?a:b);
   await page.goto('http://127.0.0.1:8787/recurrence/?problem='+widest.id);
@@ -71,6 +73,19 @@ const fs = require('node:fs');
   await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
   await page.screenshot({path:'recurrence/build/mobile-answer.png',fullPage:true});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+  // Expanded explanations introduce longer equations than the statements.
+  // Exercise the longest main explanation in every family on a phone.
+  for (const family of Object.keys(bank.families)) {
+    const examples=bank.problems.filter(p=>p.family===family);
+    const longest=examples.reduce((a,b)=>a.routes[0].steps.join('').length>b.routes[0].steps.join('').length?a:b);
+    await page.goto('http://127.0.0.1:8787/recurrence/?problem='+longest.id);
+    await page.locator('#answer-button').waitFor({state:'visible'});
+    await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
+    await page.locator('#answer-button').click();
+    await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
+    assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(),0,family);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile '+family);
+  }
   assert.deepEqual(errors,[]);
   console.log(`Browser checks passed: ${formulas.length} formulas, every family, hints, filters, exports, comparison and mobile layout.`);
   await browser.close();

@@ -15,11 +15,16 @@ from compiler import compile_blocks
 from rules import normalize_recipe
 from scoring import assess, score_routes
 from solve import find_routes
+from generate import validate
+from identity import fingerprint, load_registry
 config = bank['generation_config']
+public_ids = {e['fingerprint']:e['id'] for e in load_registry()['entries']}
 for p in bank['problems']:
     assert normalize_recipe(p['recipe'], config) == p['recipe']
     assert compile_blocks(p['recipe'], config) == p['ir']
     assert assess(p['ir'], score_routes(p['ir'], find_routes(p['ir'], config)), config)['accepted']
+    assert public_ids[fingerprint(p['ir'])] == p['id'], 'Public ID does not match its registered problem'
+    validate(p)
 assert (ROOT / "lean/.lake/build/lib/lean/Recurrence/Generated.olean").is_file(), "Lean compilation did not produce Generated.olean"
 log = (BUILD / "lean.log").read_text(encoding="utf-8")
 assert "sorryAx" not in log, "Untrusted proof dependency"
