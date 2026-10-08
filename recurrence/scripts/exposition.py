@@ -3,7 +3,7 @@
 The numerical data come from the independently recognized route certificate.
 """
 from fractions import Fraction
-from expr import add, sub, mul, div, num, term, nat, index, power, evaluate, latex, polynomial
+from expr import add, sub, mul, div, num, term, nat, index, power, evaluate, latex, polynomial, expand_polynomial
 from profiles import SCALES, EXPONENTS
 from solve import signed, coefficient_tex, sequence_tex, relation_tex
 
@@ -46,7 +46,7 @@ def scalar_exposition(ir,route,variable='a'):
         target=source if changed else variable
         steps=[]
         if changed:
-            steps.append('左右の係数と付加項を比較し、同じ数列の隣接する項としてまとめられる形を考える。'+M(source+'_n='+sequence_tex(div(sub(term(),num(h)),g),variable))+' とおく。')
+            steps.append('左右の係数と付加項を比較し、同じ数列の隣接する項としてまとめられる形を考える。'+M(source+'_n='+sequence_tex(mul(sub(term(),num(h)),g['args'][1]) if g['op']=='div' and g['args'][0]==num(1) else div(sub(term(),num(h)),g),variable))+' とおく。')
             steps.append('この置換を与式に代入して整理すると、'+E(relation_tex(num(r),num(q),source)+r'\\'+source+'_1&='+N(b1))+' となる。')
         if r==1:
             if q:
@@ -57,7 +57,7 @@ def scalar_exposition(ir,route,variable='a'):
         else:
             fixed=q/(1-r)
             if q:
-                other='w' if variable in {'u','v'} else 'd' if target in {'b','c'} else 'b'
+                other='z' if target=='w' else 'w' if variable in {'u','v'} else 'd' if target in {'b','c'} else 'b'
                 steps.append('定数項を消すため、'+M('x='+coefficient_tex(r,'x')+signed(q))+' を満たす数を求めると '+M('x='+N(fixed))+' である。'+M(other+'_n='+target+'_n'+signed(-fixed))+' とおけば、')
                 steps.append(E(other+'_{n+1}&='+coefficient_tex(r,target+'_n')+signed(q-fixed)+r'\\&='+N(r)+'('+target+'_n'+signed(-fixed)+')'+r'\\&='+coefficient_tex(r,other+'_n'))+' となり、'+M(other+'_1='+N(b1-fixed))+' である。')
                 steps.append('よって '+M(other+'_n='+L(mul(num(b1-fixed),power(num(r),nat()))))+' を得る。'+M(target+'_n='+other+'_n'+signed(fixed))+' に戻す。')
@@ -67,7 +67,7 @@ def scalar_exposition(ir,route,variable='a'):
         return steps
     if kind=='linear-particular':
         p=cert['particular'];r=evaluate(cert['ratio'],0);A=polynomial(p).get(1,0);B=polynomial(p).get(0,0)
-        forcing=div(ir['R'],ir['P']);first=evaluate(ir['initials'][0],0);amp=first-evaluate(p,0)
+        forcing=expand_polynomial(mul(ir['R'],num(1/evaluate(ir['P'],0)))) if not max(polynomial(ir['P']),default=0) else div(ir['R'],ir['P']);first=evaluate(ir['initials'][0],0);amp=first-evaluate(p,0)
         target='c' if variable=='b' else 'b'
         return ['付加項が '+M('n')+' の一次式なので、それを打ち消す一次式を考える。特解を '+M('u_n=An+B')+' とおく。',
             M('u_{n+1}='+coefficient_tex(r,'u_n')+'+'+L(forcing))+' に代入し、'+M('n')+' の係数と定数項を比較すると '+M('A='+N(A)+r',\quad B='+N(B))+' となる。したがって '+M('u_n='+L(p))+' である。',
@@ -115,7 +115,7 @@ def explain_route(ir,route):
             var='T' if g!=num(1) else 'S'
             first=evaluate(ir['initials'][0],0)/evaluate(g,0)
             tmp={'P':num(1),'Q':scalar['certificate']['ratio'],'R':num(0),'initials':[num(first)]}
-            if scalar['certificate']['kind']=='linear-particular': tmp['R']=sub(shift_expr(scalar['formula']),mul(tmp['Q'],scalar['formula']))
+            if scalar['certificate']['kind']=='linear-particular': tmp['R']=expand_polynomial(sub(shift_expr(scalar['certificate']['particular']),mul(tmp['Q'],scalar['certificate']['particular'])))
             elif scalar['certificate']['kind']=='polynomial-normalization': tmp['R']=scalar['certificate']['forcing']
             steps+=scalar_exposition(tmp,scalar,var)
         steps.append('したがって、部分和は '+M('S_n='+L(S))+' である。'+M(r'n\ge2')+' のとき、'+M('a_n=S_n-S_{n-1}')+' を使う。')
@@ -123,11 +123,11 @@ def explain_route(ir,route):
         return steps
     if kind=='mixed-sum-relation':
         f=cert['forcing'];alpha=evaluate(cert['alpha'],0);scalar=cert['scalar'];r=alpha/(alpha-1)
-        R=mul(num(1/(alpha-1)),sub(f,shift_expr(f)))
+        R=expand_polynomial(mul(num(1/(alpha-1)),sub(f,shift_expr(f))))
         route['title']='隣接する部分和の差で総和を消す';route['hint']='S_nとa_nが混ざっている。添字を1つ進めた式から元の式を引き、S_nを消す。'
         steps=['与式に '+M('n=1')+' を代入すると、'+M('S_1=a_1='+N(alpha)+'a_1+'+N(evaluate(f,0)))+' より '+M('a_1='+N(evaluate(ir['initials'][0],0)))+' である。',
             '添字を1つ進めた式と元の式の差をとる。'+M('S_{n+1}-S_n=a_{n+1}')+' なので、',
-            E('a_{n+1}&='+N(alpha)+'(a_{n+1}-a_n)'+r'\\&\quad{}+('+L(shift_expr(f))+')-('+L(f)+')'),
+            E('a_{n+1}&='+N(alpha)+'(a_{n+1}-a_n)'+r'\\&\quad{}+('+L(shift_expr(f))+')'+r'\\&\quad{}-('+L(f)+')'),
             'これを '+M('a_{n+1}')+' について解くと '+M('a_{n+1}='+coefficient_tex(r,'a_n')+'+'+L(R))+' となる。']
         steps+=scalar_exposition({'P':num(1),'Q':num(r),'R':R,'initials':ir['initials']},scalar)
         return steps
@@ -162,7 +162,7 @@ def explain_route(ir,route):
             '与式の逆数をとると '+M(sequence_tex(mul(ir['P'],term(1)),'v')+'='+sequence_tex(add(mul(ir['Q'],term()),ir['R']),'v'))+' となり、'+M('v_1='+N(evaluate(base['initials'][0],0)))+' である。']
         steps+=scalar_exposition(base,route,'v')
         # Preserve the explicit domain identity computed by the forward solver.
-        steps += route['steps'][-2:]
+        steps += [s for s in route['steps'] if '元の分母は' in s][-1:]
         steps.append(M(r'a_n=\frac1{v_n}')+' に戻せば、元の数列の一般項を得る。')
         return steps
     # Registered product, log and antidifference routes retain their checked data;
