@@ -44,6 +44,34 @@ export function validateBank(bank, manifest) {
   return bank;
 }
 
+const scoreLabels = {B:'操作', R:'発見', A:'計算', T:'条件の確認', P:'式の複雑さ', U:'未評価部分'};
+
+export function routeComparison(routes) {
+  const main = routes[0];
+  const others = routes.slice(1);
+  let reason = '登録済みの候補では、この解法だけを検出しました。';
+  if (others.length) {
+    const tied = others.filter(r => r.cost === main.cost);
+    if (!tied.length) reason = `登録済みの候補で合計スコアが最小（${main.cost}）なので、主解法にしています。`;
+    else if (tied.every(r => r.numeric_cost > main.numeric_cost)) {
+      reason = `合計スコアは同点（${main.cost}）ですが、途中で扱う数値のコストが小さいため、主解法にしています。`;
+    } else {
+      reason = `合計スコアと数値のコストが同点の解法があります。解法名の順で表示しており、優劣を表す順序ではありません。`;
+    }
+  }
+  const alternatives = others.map(route => {
+    const lower = [], higher = [];
+    for (const [key,label] of Object.entries(scoreLabels)) {
+      const difference = route.parts[key] - main.parts[key];
+      if (difference < 0) lower.push(`${label}が${-difference}点低い`);
+      if (difference > 0) higher.push(`${label}が${difference}点高い`);
+    }
+    const differences = [...lower, ...higher];
+    return `主解法との比較：${differences.length ? differences.join('、') : '各項目のスコアも同じ'}。合計は${route.cost}（主解法は${main.cost}）。`;
+  });
+  return {reason, alternatives};
+}
+
 export function texDocument(p, includeAnswer = false) {
   const math = text => '\\[\n' + text + '\n\\]\n';
   let text = '% UTF-8 / LuaLaTeX\n\\documentclass{ltjsarticle}\n\\usepackage{amsmath}\n\\begin{document}\n';
@@ -52,10 +80,14 @@ export function texDocument(p, includeAnswer = false) {
   text += math(p.statement.recurrence_tex);
   if (includeAnswer) {
     text += '\\section*{解答}\n' + p.routes[0].title + '\n';
+    const comparison = routeComparison(p.routes);
+    text += '\n着眼点：' + p.routes[0].hint + '\n';
+    text += '\n' + comparison.reason + ' スコアは暫定値です。\n';
     for (const step of p.routes[0].steps) text += '\n' + step + '\n';
     text += math(p.answer_tex);
-    for (const route of p.routes.slice(1)) {
+    for (const [index, route] of p.routes.slice(1).entries()) {
       text += '\\subsection*{別解：' + route.title + '}\n';
+      text += '\n着眼点：' + route.hint + '\n' + comparison.alternatives[index] + '\n';
       for (const step of route.steps) text += '\n' + step + '\n';
     }
   }

@@ -1,4 +1,4 @@
-import { poolFor, chooseProblem, validateBank, texDocument } from './model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } from './model.mjs';
 
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
@@ -176,13 +176,18 @@ function toggleAnswer() {
   if (!open) return;
   if (window.MathJax?.typesetClear) window.MathJax.typesetClear([$('answer')]);
   $('method-title').textContent = p.routes[0].title;
+  const comparison = routeComparison(p.routes);
+  $('method-observation').textContent = '着眼点：' + p.routes[0].hint;
+  $('method-choice').textContent = comparison.reason + ' スコアは暫定値です。';
   $('solution-steps').replaceChildren(...p.routes[0].steps.map(step => el('li', step)));
   $('answer-formula').replaceChildren(mathBlock(p.answer_tex));
   $('revealed-family').textContent = p.family_label;
   const alternates = $('alternate-container'); alternates.replaceChildren();
-  for (const route of p.routes.slice(1, 3)) {
+  for (const [index, route] of p.routes.slice(1, 3).entries()) {
     const box = el('details', undefined, 'alternate');
     box.append(el('summary', '別解：' + route.title));
+    box.append(el('p', '着眼点：' + route.hint, 'method-observation'),
+      el('p', comparison.alternatives[index], 'details-note'));
     const steps = el('ol', undefined, 'solution-steps');
     steps.append(...route.steps.map(step => el('li', step))); box.append(steps);
     box.addEventListener('toggle', () => { if (box.open) typeset([box]); });

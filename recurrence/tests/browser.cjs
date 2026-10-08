@@ -20,6 +20,13 @@ const fs = require('node:fs');
   await page.locator('#answer-button').click();
   await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
   assert.equal(await page.locator('#answer').isVisible(),true);
+  assert.equal(await page.locator('#method-observation').textContent(), '着眼点：'+first.routes[0].hint);
+  assert.ok((await page.locator('#method-choice').textContent()).includes('登録済みの候補'));
+  for (const alternate of await page.locator('.alternate').all()) {
+    await alternate.locator('summary').click();
+    assert.ok((await alternate.textContent()).includes('主解法との比較：'));
+    assert.ok((await alternate.textContent()).includes('着眼点：'));
+  }
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('#answer').isVisible(),false);
   assert.ok((await page.locator('#bank-status').textContent()).includes(`${bank.problems.length} 問・${Object.keys(bank.families).length}系統`));

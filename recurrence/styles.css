@@ -70,6 +70,7 @@ mjx-container[display=true] { margin:14px 0 !important; max-width:100%; }
 .answer h3 { margin:0 0 22px; font-family:var(--serif); font-size:21px; font-weight:500; }
 .answer-heading .eyebrow { margin-bottom:7px; }
 .method-title { margin:0 0 19px; color:var(--teal); font-size:13px; font-weight:600; }
+.method-observation { margin:12px 0; padding:10px 13px; border-left:3px solid var(--teal); font-size:13px; line-height:1.9; background:#f1f5ec; }
 .solution-steps { padding-left:20px; margin:0; font-size:13px; line-height:2.1; }
 .solution-steps li { padding-left:5px; margin-bottom:14px; overflow-x:auto; }
 .solution-steps li::marker { font-size:11px; color:var(--teal); }

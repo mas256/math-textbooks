@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { poolFor, chooseProblem, validateBank, texDocument } from '../model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } from '../model.mjs';
 
 const p = (id, family, level) => ({id,family,scores:{level}});
 const bank = {problems:[p('p001','a',1),p('p002','a',1),p('p003','b',2)]};
@@ -43,7 +43,23 @@ test('structurally rejected or incomplete problems cannot be served', () => {
 
 test('TeX defaults to problem only and adds solutions on request', () => {
   const q={id:'p001',statement:{initials_tex:['a_1=1'],recurrence_tex:'a_{n+1}=2a_n'},
-    answer_tex:'a_n=2^{n-1}',routes:[{title:'等比',steps:['公比は2です。']}]};
+    answer_tex:'a_n=2^{n-1}',routes:[{title:'等比',hint:'係数が一定です。',steps:['公比は2です。']}]};
   assert.ok(!texDocument(q).includes('\\section*{解答}'));
   assert.ok(texDocument(q,true).includes(q.answer_tex));
+  assert.ok(texDocument(q,true).includes('着眼点：係数が一定です。'));
+});
+
+test('route explanations distinguish strict wins, numerical tie breaks and display ties', () => {
+  const main={cost:5,numeric_cost:2,parts:{B:2,R:1,A:2,T:0,P:0,U:0}};
+  const other={cost:6,numeric_cost:2,parts:{B:1,R:3,A:2,T:0,P:0,U:0}};
+  assert.ok(routeComparison([main]).reason.includes('だけを検出'));
+  const strict=routeComparison([main,other]);
+  assert.ok(strict.reason.includes('最小'));
+  assert.ok(strict.alternatives[0].includes('操作が1点低い、発見が2点高い'));
+  other.cost=5; other.numeric_cost=3;
+  assert.ok(routeComparison([main,other]).reason.includes('数値のコストが小さい'));
+  other.numeric_cost=2;
+  assert.ok(routeComparison([main,other]).reason.includes('優劣を表す順序ではありません'));
+  other.parts={...main.parts};
+  assert.ok(routeComparison([main,other]).alternatives[0].includes('各項目のスコアも同じ'));
 });
