@@ -86,7 +86,10 @@ def finish(ir, title, operations, hint, steps, formula, discovery, values, certi
         steps = [rf"\(v_n=\frac{{1}}{{a_n}}\) とおくと、\({linear_tex(ir, 'v')}\)、\(v_1={latex(num(initial))}\) です。"] + steps
         derivation = [{'variable':'v','formula':formula,'P':ir['P'],'Q':ir['Q'],'R':ir['R'],
                        'initials':[num(initial)],'source':'a','transform':reciprocal(term())}] + derivation
-        if certificate['kind']=='linear-particular':
+        positive_forcing = (certificate['kind']=='linear-particular'
+                            and polynomial(ir['R']).get(1,0)>=0 and evaluate(ir['R'],0)>=0
+                            and evaluate(ir['P'],0)>0 and evaluate(ir['Q'],0)>0)
+        if positive_forcing:
             steps.append('初項が正で、逆数をとった漸化式の係数と付加項も正なので、帰納的にすべての項で \\(v_n>0\\) です。')
         else:
             steps.append('得られた一般項の正値性を確認すると、すべての項で \\(v_n>0\\) です。')

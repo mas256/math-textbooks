@@ -132,6 +132,11 @@ else: raise AssertionError('incorrect intermediate recurrence accepted')
 nonunit={**particular['ir'],'P':num(2),'Q':num(4),'R':mul(num(2),index())}
 routes=find_routes(nonunit,config)
 assert routes and all('2(An+B)+n' in s for r in routes if r['certificate']['kind']=='linear-particular' for s in r['steps'] if 'A(n+1)' in s)
+negative_forcing=compile_blocks(recipe([{'kind':'index_add','value':index()},
+                                       {'kind':'reciprocal','requires':'positive_input'}]))
+for route in find_routes(negative_forcing,config):
+    assert not any('付加項も正' in step for step in route['steps'])
+    for n in range(24): check_derivation(negative_forcing,route,n)
 
 registry=load_registry()
 known={e['fingerprint']:e['id'] for e in registry['entries']}
