@@ -196,6 +196,9 @@ assert all(evaluate(log_second['ir']['formula'],n)>0 for n in range(24))
 try: compile_recipe('multiplicative_second',{'r':2,'c':1,'d':Fraction(1,2),'s':3},'n')
 except RuleViolation as e: assert str(e)=='unregistered_natural_exponent'
 else: raise AssertionError('nonintegral registered exponent accepted')
+scaled_three=compile_recipe('scaled_second_order',{'r':2,'c':1,'d':1,'s':3},'inverse:n')
+assert r'b_n=n\,a_{n}' in scaled_three['routes'][0]['steps'][0]
+validate(scaled_three)
 assert square['routes'][0]['operations'][-1]=='evaluate_sum'
 cube=compile_recipe('ratio_power',{'r':2,'c':1,'d':1,'s':3},'tetrahedral')
 assert cube['routes'][0]['operations'][-1]=='evaluate_quadratic_sum'

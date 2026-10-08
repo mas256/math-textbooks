@@ -32,7 +32,7 @@ def advanced_proofs(problem):
                   f'  · norm_num [{name}]',f'  · norm_num [{name}]','  · intro n; positivity','  · intro n',
                   *ring_step(name,ir['formula'])]
         lines += [f'theorem {name}_unique (a : ℕ → ℚ) (hi : a 0 = {init}) (hj : a 1 = {second})',
-                  f'    (ha : ∀ n, {P} * a (n + 2) = {Q} * a (n + 1) + {R} * a n) :',
+                  f'    (ha : ∀ n : ℕ, {P} * a (n + 2) = {Q} * a (n + 1) + {R} * a n) :',
                   f'    ∀ n, a n = {name} n := by',f'  apply general_second_unique {name}_valid',
                   f'  exact linear_second_certificate a {init} {second} (fun n => {P}) (fun n => {Q}) (fun n => {R}) hi hj (by intro n; positivity) ha']
     elif shape=='weighted_sum':
@@ -48,7 +48,7 @@ def advanced_proofs(problem):
                   f'  apply weighted_sum_from_second {name} {base} {gfn} {init} {first} {second} {alpha} {beta}',
                   f'  · convert {base}_valid using 1 <;> norm_num',
                   '  · norm_num','  · intro n; positivity',
-                  f'  · intro n; simp only [{name}, {base}]; ring',
+                  f'  · intro n; simp only [{name}, {base}] <;> ring',
                   f'  · norm_num [{name}]',
                   f'theorem {name}_unique (a : ℕ → ℚ) (ha : WeightedSumCertificate a {init} {gfn} {alpha} {beta}) :',
                   f'    ∀ n, a n = {name} n := weighted_sum_unique {name}_valid ha']
@@ -63,7 +63,7 @@ def advanced_proofs(problem):
         lines += [f'theorem {name}_valid : {cert} := by',*he,h,f'  convert h.1 using 1 <;> norm_num [{name}]',
                   f'theorem {name}_domain : ∀ n, {name} n ≠ 0 := by',f'  intro n; unfold {name}; positivity',
                   f'theorem {name}_unique (a : ℕ → ℚ) (hi : a 0 = {init}) (hj : a 1 = {second})',
-                  f'    (ha : ∀ n, a (n + 2) * a n = {base} ^ ({F}) * a (n + 1) ^ 2) :',
+                  f'    (ha : ∀ n : ℕ, a (n + 2) * a n = {base} ^ ({F}) * a (n + 1) ^ 2) :',
                   f'    ∀ n, a n = {name} n := by',f'  apply general_second_unique {name}_valid',
                   f'  apply multiplicative_from_relation a {init} {second} (fun n => {base} ^ ({F})) hi hj',
                   '  · norm_num','  · norm_num','  · intro n; positivity','  · exact ha',f'#print axioms {name}_domain']

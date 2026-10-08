@@ -50,9 +50,9 @@ def normalized_seconds(ir,config):
         root=roots_solution(p,q,b1,b2)
         if root is None: continue
         normalized=name!='identity'
-        transform=div(term(),g) if normalized else term()
-        steps=([rf"\(b_n=\frac{{a_n}}{{{latex(g)}}}\) とおき、各項の係数をそろえます。"] if normalized else [])
-        relation=sequence_tex(sub(term(2),add(mul(num(p),term(1)),mul(num(q),term()))),'b')+'=0'
+        transform=(mul(g['args'][1],term()) if g['op']=='div' and g['args'][0]==num(1) else div(term(),g)) if normalized else term()
+        steps=([rf"\(b_n={latex(transform)}\) とおき、各項の係数をそろえます。"] if normalized else [])
+        relation=sequence_tex(term(2),'b')+'='+sequence_tex(add(mul(num(p),term(1)),mul(num(q),term())),'b')
         steps += [rf"\({relation}\)、\(b_1={latex(num(b1))}\)、\(b_2={latex(num(b2))}\) です。",*root['steps']]
         if normalized: steps.append(rf"\(a_n={latex(mul(g,root['formula']))}\) と戻します。")
         derivation=[{'variable':'b','formula':root['formula'],'p':num(p),'q':num(q),'initials':[num(b1),num(b2)],'source':'a','transform':transform},*root['extra']]
@@ -105,7 +105,7 @@ def sum_routes(ir):
     normalized=g!=num(1)
     steps=[rf"\(b_n=\frac{{a_n}}{{{latex(g)}}}\)、\(T_n=\sum_{{k=1}}^n b_k\) とおきます。" if normalized else r"\(b_n=a_n\)、\(T_n=\sum_{k=1}^n b_k\) とおきます。",
            rf"\(b_{{n+1}}={coefficient_tex(alpha,'b_n')}{coefficient_tex(beta,'T_n') if beta<0 else '+'+coefficient_tex(beta,'T_n')}\) です。\(T_1=b_1\) より \(b_1={latex(num(b1))}\)、\(b_2={latex(num(b2))}\) です。",
-           rf"1つ添字を進めた式に \(T_{{n+1}}=T_n+b_{{n+1}}\) を代入し、\(T_n\) を消すと、\({sequence_tex(sub(term(2),add(mul(num(p),term(1)),mul(num(q),term()))),'b')}=0\) です。",
+           rf"1つ添字を進めた式に \(T_{{n+1}}=T_n+b_{{n+1}}\) を代入し、\(T_n\) を消すと、\({sequence_tex(term(2),'b')}={sequence_tex(add(mul(num(p),term(1)),mul(num(q),term())),'b')}\) です。",
            *root['steps'],rf"\(a_n={latex(mul(g,root['formula']))}\) と戻します。"]
     derivation=[{'variable':'b','formula':root['formula'],'p':num(p),'q':num(q),'initials':[num(b1),num(b2)],'source':'a','transform':div(term(),g)},*root['extra']]
     return [finish(ir,'総和を消去し、重解から階差を作る' if root['repeated'] else '総和を消去して3項間を解く',

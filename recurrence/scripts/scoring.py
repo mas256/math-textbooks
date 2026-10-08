@@ -79,6 +79,10 @@ def statement_metrics(ir):
     for key in keys:
         try: degrees.append(max(polynomial(ir[key]),default=0))
         except ValueError: pass
+    if ir.get('shape')=='weighted_sum':
+        g=ir['sum_scale']
+        for factor in g['args'] if g['op']=='div' else [g]:
+            degrees.append(max(polynomial(factor),default=0))
     result['coefficient_degree']=max(degrees,default=0)
     return result
 

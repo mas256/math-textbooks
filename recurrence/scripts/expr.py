@@ -146,6 +146,14 @@ def latex(expr):
     if op == 'log': return rf"\log_{{{latex(expr['args'][0])}}}\left({latex(expr['args'][1])}\right)"
     args = expr["args"]
     if op == "add":
+        # Simplify linear natural-index expressions for display; keep their
+        # natural-number type in the proof AST used as an exponent.
+        if any(a['op']=='nat_constant' or a['op']=='nat_index' or
+               a['op']=='mul' and any(x['op'].startswith('nat_') for x in a['args']) for a in args):
+            try:
+                p=polynomial(expr)
+                if max(p,default=0)<=1: return latex(from_polynomial(p))
+            except ValueError: pass
         out = ""
         for a in args:
             text = latex(a)
