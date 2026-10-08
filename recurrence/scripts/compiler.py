@@ -9,6 +9,9 @@ def compile_blocks(recipe, config=None):
     recipe = normalize_recipe(recipe, config)
     assert recipe["schema_version"] == "0.2"
     assert recipe["domain"] == {"index_start": 1, "sequence_type": "rational"}
+    from advanced import ADVANCED_BLOCKS, compile_advanced
+    if any(b['kind'] in ADVANCED_BLOCKS for b in recipe['blocks']) or any(b['kind']=='linear_combination' for b in recipe['blocks'][:-1]):
+        return compile_advanced(recipe)
     core = recipe["core"]
     params = core["parameters"]
     P, Q, R = num(1), num(1), num(0)

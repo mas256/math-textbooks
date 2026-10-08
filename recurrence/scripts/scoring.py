@@ -11,6 +11,7 @@ OPERATIONS = {"constant": 1, "geometric": 2, "fixed_point": 2,
               "ratio_product": 2, "evaluate_product": 1,
               "logarithm": 3, "difference_sum": 2, "evaluate_sum": 1,
               "polynomial_shift": 4}
+OPERATIONS.update(difference=2,eliminate_sum=3,geometric_sum=4,evaluate_quadratic_sum=2)
 
 
 def component_cost(n, preferred):
@@ -74,7 +75,8 @@ def expression_metrics(expressions):
 def statement_metrics(ir):
     result=expression_metrics([ir['lhs'],ir['rhs']])
     degrees=[]
-    for key in ('P','Q','R'):
+    keys=('P2','Q2','R2') if ir.get('shape')=='linear_second' else ('P','Q','R')
+    for key in keys:
         try: degrees.append(max(polynomial(ir[key]),default=0))
         except ValueError: pass
     result['coefficient_degree']=max(degrees,default=0)

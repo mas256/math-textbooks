@@ -11,7 +11,20 @@ REGISTRY_PATH = Path(__file__).resolve().parents[1] / 'reference/public-problem-
 
 def identity_key(ir, include_initials=True):
     initials = [str(evaluate(x,0)) for x in ir['initials']] if include_initials else []
-    if ir['second_order']:
+    if ir.get('shape')=='linear_second':
+        ps=[polynomial(ir[k]) for k in ('P2','Q2','R2')]
+        common=poly_gcd(poly_gcd(ps[0],ps[1]),ps[2])
+        ps=[poly_divmod(p,common)[0] for p in ps]
+        scale=ps[0][max(ps[0])]
+        if all(max(p,default=0)==0 for p in ps):
+            value=['second',str(ps[1].get(0,0)/scale),str(ps[2].get(0,0)/scale),initials]
+        else:
+            value=['linear_second',[sorted((d,str(c/scale)) for d,c in p.items()) for p in ps],initials]
+    elif ir.get('shape')=='weighted_sum':
+        value=['weighted_sum',ir['sum_scale'],ir['sum_alpha'],ir['sum_beta'],initials]
+    elif ir.get('shape')=='power_second':
+        value=['power_second',ir['power_base'],sorted((d,str(c)) for d,c in polynomial(ir['power_increment']).items()),initials]
+    elif ir['second_order']:
         value = ['second',str(evaluate(ir['p'],0)),str(evaluate(ir['q'],0)),initials]
     else:
         try:

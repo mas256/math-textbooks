@@ -28,6 +28,8 @@ FAMILIES={
     'ratio_power':'指数係数の階比型', 'reciprocal_affine':'逆数型＋特性方程式型',
     'reciprocal_scaled':'逆数型＋階比型',
     'polynomial_forcing':'一次式の付加項', 'reciprocal_forcing':'逆数型＋一次式の付加項',
+    'scaled_second_order':'正規化＋3項間', 'difference_scaled':'階差＋階比＋総和',
+    'weighted_sum':'総和消去＋3項間', 'multiplicative_second':'対数＋二重の階差',
 }
 SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 
@@ -35,7 +37,7 @@ SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 def compile_recipe(family, parameters, profile='gap_2', config=None):
     config=config or load_config()
     r,c,d,s=(Fraction(parameters[x]) for x in ('r','c','d','s'))
-    core='constant' if family in {'constant','scaled_constant','shifted_scaled','ratio_power'} else 'geometric' if family in {'geometric','second_order','polynomial_forcing','reciprocal_forcing'} else 'affine_fixed_point'
+    core='constant' if family in {'constant','scaled_constant','shifted_scaled','ratio_power','multiplicative_second'} else 'geometric' if family in {'geometric','second_order','polynomial_forcing','reciprocal_forcing','scaled_second_order','difference_scaled','weighted_sum'} else 'affine_fixed_point'
     params={'initial':num(d)} if core=='constant' else {'ratio':num(r),'amplitude':num(d)}
     if core=='affine_fixed_point': params.update(fixed_point=num(c),constant_term=num((1-r)*c))
     blocks=[]
@@ -56,6 +58,28 @@ def compile_recipe(family, parameters, profile='gap_2', config=None):
     if family=='second_order':
         if r==s: raise RuleViolation('repeated_root')
         blocks.append({'kind':'linear_combination','other_core':{'kind':'geometric','ratio':num(s),'initial':num(c)}})
+    if family=='scaled_second_order':
+        if r==s: raise RuleViolation('repeated_root')
+        blocks.append({'kind':'linear_combination','other_core':{'kind':'geometric','ratio':num(s),'initial':num(c)}})
+        blocks.append({'kind':'index_scale','profile':profile,'factor':dict(scale_options(config))[profile]})
+    if family=='difference_scaled':
+        blocks.append({'kind':'index_scale','profile':profile,'factor':dict(scale_options(config))[profile]})
+        blocks.append({'kind':'difference_lift','initial':num(c)})
+    if family=='weighted_sum':
+        mode,scale_profile=profile.split(':',1)
+        if mode=='repeated': blocks.append({'kind':'repeated_factor','slope':num(d*(r-1)/r)})
+        else:
+            if r==s: raise RuleViolation('repeated_root')
+            params['amplitude']=num(-d)
+            blocks.append({'kind':'linear_combination','other_core':{'kind':'geometric','ratio':num(s),'initial':num(d*(s-1)/(r-1))}})
+        if scale_profile!='identity': blocks.append({'kind':'index_scale','profile':scale_profile,'factor':dict(scale_options(config))[scale_profile]})
+        blocks.append({'kind':'sum_encode'})
+    if family=='multiplicative_second':
+        params={'initial':num(c)}
+        if profile!='constant': blocks.append({'kind':'index_scale','profile':profile,'factor':dict(scale_options(config))[profile]})
+        blocks.extend([{'kind':'cumulative_sum','initial':num(d)},
+                       {'kind':'cumulative_sum','initial':num(s-2)},
+                       {'kind':'power_sequence','base':num(r)}])
     if family in {'reciprocal_affine','reciprocal_scaled','reciprocal_forcing'}:
         blocks.append({'kind':'reciprocal','requires':'positive_input'})
     previous='core'
@@ -81,11 +105,14 @@ def compile_recipe(family, parameters, profile='gap_2', config=None):
                          'recurrence_tex':latex(ir['lhs'])+'='+latex(ir['rhs']),
                          'condition':'n は 1 以上の整数とする。数列の一般項 a_n を求めよ。'},
             'answer_tex':'a_n='+latex(ir['formula']),'routes':routes,'scores':scores,'quality':quality,
-            'generation':{'profile':profile if family in SCALED|{'ratio_power'} else None,
+            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'} else None,
                           'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
 def proofs(problem):
+    if problem['ir'].get('shape'):
+        from advanced_proofs import advanced_proofs
+        return advanced_proofs(problem)
     name,ir=problem['id'],problem['ir']
     init=lean(ir['initials'][0])
     lines=[f"def {name} (n : ℕ) : ℚ := {lean(ir['formula'])}"]
@@ -153,7 +180,7 @@ def validate(problem):
     ir=problem['ir']
     assert problem['scores']['level'] in range(1,5)
     for n in range(24):
-        xs={i:evaluate(ir['formula'],n+i) for i in (0,1,2)}
+        xs={i:evaluate(ir['formula'],n+i) for i in range(-n,3)}
         assert evaluate(ir['lhs'],n,xs)==evaluate(ir['rhs'],n,xs),(problem.get('id'),n)
         for route in problem['routes']:
             assert evaluate(route['formula'],n)==xs[0],('forward route',route['title'],n)
@@ -173,9 +200,20 @@ def summarize(problems):
             'families':dict(Counter(p['family'] for p in problems))}
 
 
+def level_diversity(problems):
+    result={}
+    for lv in range(1,5):
+        ps=[p for p in problems if p['scores']['level']==lv]
+        fraction=sum(p['ir']['reciprocal'] for p in ps)
+        result[str(lv)]={'count':len(ps),'fraction_count':fraction,
+                         'nonfraction_count':len(ps)-fraction,
+                         'nonfraction_families':sorted({p['family'] for p in ps if not p['ir']['reciprocal']})}
+    return result
+
+
 def comparison_report(problems,config,counters,rejections):
     baseline=json.loads((ROOT/'reference/quality-baseline.json').read_text())
-    previous=json.loads((ROOT/'reference/quality-v0.2.json').read_text())
+    previous=json.loads((ROOT/'reference/quality-v0.3.json').read_text())
     # Forward recognition, with no construction history, supplies comparable
     # parameter information even for the frozen snapshot.
     for p in previous['problems']: p['routes']=score_routes(p['ir'],find_routes(p['ir'],config))
@@ -196,6 +234,7 @@ def comparison_report(problems,config,counters,rejections):
             'baseline_rejected_count':len(rejected),'baseline_rejected_examples':rejected,
             'diversity':{'previous_version':previous['version'],'before':diversity_summary(previous['problems']),
                          'after':diversity_summary(problems)},
+            'level_diversity':{'before':level_diversity(previous['problems']),'after':level_diversity(problems)},
             'examples':examples,'limits':config,'status':'structural-comparison',
             'note':'式の構造と対応済み解法の比較です。学習者による難易度・良問性の実測は未実施です。'}
 
@@ -215,7 +254,13 @@ def main():
     for family in FAMILIES:
         quota=config['quotas'].get(family,0)
         if not quota: continue
-        profiles=[name for name,_ in scale_options(config)] if family in SCALED else config['exponent_profiles'] if family=='ratio_power' else ['none']
+        if family in SCALED: profiles=[name for name,_ in scale_options(config)]
+        elif family=='ratio_power': profiles=config['exponent_profiles']
+        elif family=='scaled_second_order': profiles=[name for name,_ in scale_options(config) if name.removeprefix('inverse:') in {'n','n_plus_1','odd'}]
+        elif family=='difference_scaled': profiles=['n','n_plus_1','odd']
+        elif family=='weighted_sum': profiles=[mode+':'+g for mode in ('distinct','repeated') for g in ('identity','n','n_plus_1','odd')]
+        elif family=='multiplicative_second': profiles=['constant','n','odd']
+        else: profiles=['none']
         candidates=[]
         for profile in profiles:
             for r,c,d,s in parameters:
@@ -242,10 +287,15 @@ def main():
             raise RuntimeError(f'{family}: only {len(selected)} acceptable problems for quota {quota}; reasons={dict(rejections)}')
         problems.extend(selected)
     if not problems: raise RuntimeError('No problems were selected')
+    mix=level_diversity(problems)
+    for lv,limits in config['difficulty_mix'].items():
+        measured=mix[lv]
+        assert len(measured['nonfraction_families'])>=limits['min_nonfraction_families'], ('Insufficient non-fraction families',lv)
+        assert measured['fraction_count']*100<=measured['count']*limits['max_fraction_percent'], ('Fractional bias',lv)
     added_ids=assign_ids(problems,registry,args.update_id_registry)
     for p in problems:
         validate(p)
-        p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] else [])
+        p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] or p['ir'].get('shape')=='power_second' else [])
         p['lean_source']='import Recurrence.Theory\n\nnamespace Recurrence\n'+proofs(p)+'end Recurrence\n'
     if args.update_id_registry:
         REGISTRY_PATH.write_text(json.dumps(registry,indent=2)+'\n')
@@ -253,10 +303,10 @@ def main():
     (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
     report=comparison_report(problems,config,counters,rejections)
     (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.3.0',
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.4.0',
              'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
              'generation_config':config,'function_catalog':profile_catalog(config),
-             'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity')},
+             'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity','level_diversity')},
              'checks':{'exact_arithmetic_cases':len(problems)*24},
              'proof_source_sha256':hashlib.sha256(source.encode()).hexdigest()}
     (BUILD/'candidates.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')

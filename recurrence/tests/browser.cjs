@@ -81,6 +81,11 @@ const fs = require('node:fs');
   assert.ok((await page.locator('#generation-summary').textContent()).includes(`${bank.problems.length} 問`));
   assert.ok((await page.locator('#diversity-summary').textContent()).includes(`${bank.comparison.diversity.after.coefficient_patterns} 種類`));
   assert.equal(await page.locator('#diversity-summary tbody tr').count(),3);
+  assert.equal(await page.locator('#level-diversity tbody tr').count(),2);
+  assert.ok((await page.locator('#level-diversity').textContent()).includes('対数と二重の階差'));
+  for (const family of ['scaled_second_order','difference_scaled','weighted_sum','multiplicative_second']) {
+    assert.ok(bank.problems.some(p=>p.family===family && p.scores.level>=3),family);
+  }
   await page.setViewportSize({width:375,height:900});
   const widest=bank.problems.reduce((a,b)=>a.quality.metrics.nodes>b.quality.metrics.nodes?a:b);
   await page.goto('http://127.0.0.1:8787/recurrence/?problem='+widest.id);

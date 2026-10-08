@@ -223,14 +223,15 @@ def power_routes(ir, config, initial):
         steps=[rf"倍率を掛け合わせると、\(a_n={prefix}{latex(base)}^{{{summed}}}\) です。",
                rf"\({summed}={latex(total)}\) なので、一般項は \(a_n={latex(formula)}\) です。"]
         derivation = [sequence_trace('a',formula,Q,num(0),initial)]
-        main=finish(ir,'比を掛けて指数を足す',['ratio_product','evaluate_product'],
+        summation='evaluate_quadratic_sum' if name=='tetrahedral' else 'evaluate_sum'
+        main=finish(ir,'比を掛けて指数を足す',['ratio_product','evaluate_product',summation],
                     '掛けられる数の指数を、1からn−1まで足します。',steps,formula,1,[initial,evaluate(base,0)],
                     {'kind':'exponent-sum','profile':name},derivation)
         routes=[main]
         if initial>0 and base != num(1):
             steps=[rf"初項と倍率が正なので全項が正です。\(b_n=\log_{{{latex(base)}}}a_n\) とおくと、\(b_{{n+1}}-b_n={latex(increment)}\) です。",
                    rf"差を足し合わせて \(b_n=\log_{{{latex(base)}}}{latex(num(initial))}+{latex(total)}\) とし、指数の形に戻します。"]
-            alternate=finish(ir,'対数をとって和にする',['logarithm','difference_sum','evaluate_sum'],
+            alternate=finish(ir,'対数をとって和にする',['logarithm','difference_sum',summation],
                              '各項の正値性を確認し、対数をとって差の関係にします。',steps,formula,1,
                              [initial,evaluate(base,0)],{'kind':'logarithmic-sum','profile':name},derivation)
             alternate['domain']=1
@@ -271,17 +272,21 @@ def check_derivation(ir, route, n):
         formula = step['formula']
         if step.get('source'):
             source = sequences[step['source']]
-            assert evaluate(step['transform'],n,{0:evaluate(source,n)}) == evaluate(formula,n)
+            terms={j:evaluate(source,n+j) for j in range(-n,3)}
+            assert evaluate(step['transform'],n,terms) == evaluate(formula,n)
         for k,value in enumerate(step['initials']):
             assert evaluate(formula,k) == evaluate(value,0)
         if 'p' in step:
-            assert evaluate(formula,n+2) == evaluate(step['p'],n)*evaluate(formula,n+1) + evaluate(step['q'],n)*evaluate(formula,n)
+            assert evaluate(formula,n+2) == evaluate(step['p'],n)*evaluate(formula,n+1) + evaluate(step['q'],n)*evaluate(formula,n)+evaluate(step.get('forcing',num(0)),n)
         else:
             assert evaluate(step['P'],n)*evaluate(formula,n+1) == evaluate(step['Q'],n)*evaluate(formula,n) + evaluate(step['R'],n)
         sequences[step['variable']] = formula
 
 
 def find_routes(ir, config):
+    if ir.get('shape'):
+        from advanced_solve import advanced_routes
+        return advanced_routes(ir,config)
     if ir['second_order']: return second_routes(ir)
     actual_initial=evaluate(ir['initials'][0],0)
     if ir['reciprocal'] and not actual_initial: return []

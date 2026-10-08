@@ -36,7 +36,7 @@ for p in bank["problems"]:
     for theorem in p["lean_theorems"]:
         assert f"Recurrence.{theorem}" in log, f"Missing axiom audit: {theorem}"
     p["verification"] = {"status": "lean-verified", "scope": "general-term-initial-recurrence-uniqueness"}
-    if p["ir"]["reciprocal"]: p["verification"]["domain"] = "all-natural-indices"
+    if p["ir"]["reciprocal"] or p["ir"].get("shape")=="power_second": p["verification"]["domain"] = "all-natural-indices"
 bank["verification"] = {"status": "lean-verified", "toolchain": "leanprover/lean4:v4.19.0",
                         "mathlib": "v4.19.0", "commit": os.environ.get("GITHUB_SHA", "local"),
                         "run_id": os.environ.get("GITHUB_RUN_ID"), "count": len(bank["problems"])}

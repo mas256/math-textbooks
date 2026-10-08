@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from compiler import compile_blocks
-from expr import add, evaluate, latex, mul, num, index, power, nat, nat_const
+from expr import add, evaluate, latex, mul, num, index, power, nat, nat_const, sub, term
 from generate import compile_recipe, identity_key, validate
 from profiles import EXPONENTS, SCALES, scale_options
 from rules import RuleViolation, load_config, normalize_recipe
@@ -31,7 +31,9 @@ for p in bank['problems']:
     assert p['quality']['metrics']['coefficient_degree']<=2
     assert all(count<=config['max_transforms'][kind] for kind,count in p['generation']['transform_counts'].items())
     # The forward solver still succeeds after removing construction/formula data.
-    stripped={k:v for k,v in p['ir'].items() if k not in {'formula','underlying','exponent_profile'}}
+    hidden={'formula','underlying','exponent_profile','sum_base','power_exponent'}
+    if p['ir'].get('shape')=='weighted_sum': hidden.update({'p','q'})
+    stripped={k:v for k,v in p['ir'].items() if k not in hidden}
     routes=score_routes(stripped,find_routes(stripped,config))
     assert routes
     for route in routes:
@@ -142,6 +144,8 @@ registry=load_registry()
 known={e['fingerprint']:e['id'] for e in registry['entries']}
 previous=json.loads((Path(__file__).resolve().parents[1]/'reference/quality-v0.2.json').read_text())
 for p in previous['problems']: assert known[fingerprint(p['ir'])]==p['id']
+recent=json.loads((Path(__file__).resolve().parents[1]/'reference/quality-v0.3.json').read_text())
+for p in recent['problems']: assert known[fingerprint(p['ir'])]==p['id']
 for p in bank['problems']:
     assert known[fingerprint(p['ir'])]==p['id']
     assert fingerprint(json.loads(json.dumps(p['ir'],sort_keys=True)))==fingerprint(p['ir'])
@@ -156,10 +160,43 @@ assert unknown['id']==f"p{registry['next_id']:03}"
 assert assign_ids([unknown],protected)==0
 
 diversity=bank['comparison']['diversity']
-assert diversity['before']['count']==diversity['after']['count']==70
+assert diversity['before']['count']==len(recent['problems'])==70
+assert diversity['after']['count']==len(bank['problems'])
 assert diversity['after']['coefficient_patterns']>=diversity['before']['coefficient_patterns']
 for family in ['scaled_affine','reciprocal_scaled','ratio_power']:
     distribution=diversity['after']['families'][family]['parameters']
     assert len(distribution)==2 and max(distribution.values())-min(distribution.values())<=1
-assert max(p['scores']['cleanliness'] for p in bank['problems'])<=max(p['scores']['cleanliness'] for p in previous['problems'])
+for lv,limits in config['difficulty_mix'].items():
+    mix=bank['comparison']['level_diversity']['after'][lv]
+    assert len(mix['nonfraction_families'])>=limits['min_nonfraction_families']
+    assert mix['fraction_count']*100<=mix['count']*limits['max_fraction_percent']
+
+# Mixed sums need the first boundary; the two roots alone are insufficient.
+summed=compile_recipe('weighted_sum',{'r':2,'c':1,'d':1,'s':3},'distinct:identity')
+validate(summed)
+assert summed['ir']['initials']==[num(1)]
+assert evaluate(summed['ir']['formula'],1)==4
+bad_boundary=copy.deepcopy(summed)
+bad_boundary['ir']['formula']=add(power(num(2),nat()),power(num(3),nat()))
+try: validate(bad_boundary)
+except AssertionError: pass
+else: raise AssertionError('arbitrary two-root combination passed the sum boundary')
+lifted=compile_recipe('difference_scaled',{'r':2,'c':1,'d':1,'s':3},'n')
+validate(lifted)
+wrong_difference=copy.deepcopy(lifted['routes'][0])
+wrong_difference['derivation'][0]['transform']=sub(term(1),mul(num(2),term()))
+try: check_derivation(lifted['ir'],wrong_difference,0)
+except AssertionError: pass
+else: raise AssertionError('incorrect adjacent difference accepted')
+log_second=compile_recipe('multiplicative_second',{'r':2,'c':1,'d':1,'s':3},'n')
+validate(log_second)
+assert latex(log_second['ir']['power_increment'])=='n'
+assert '2^{n}' in log_second['statement']['recurrence_tex']
+assert all(evaluate(log_second['ir']['formula'],n)>0 for n in range(24))
+try: compile_recipe('multiplicative_second',{'r':2,'c':1,'d':Fraction(1,2),'s':3},'n')
+except RuleViolation as e: assert str(e)=='unregistered_natural_exponent'
+else: raise AssertionError('nonintegral registered exponent accepted')
+assert square['routes'][0]['operations'][-1]=='evaluate_sum'
+cube=compile_recipe('ratio_power',{'r':2,'c':1,'d':1,'s':3},'tetrahedral')
+assert cube['routes'][0]['operations'][-1]=='evaluate_quadratic_sum'
 print('Checks passed: recipe replay, forward routes, intermediate relations, notation, domain guards, balanced selection and all historical public IDs.')

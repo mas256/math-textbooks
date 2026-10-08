@@ -7,8 +7,9 @@ from identity import fingerprint, identity_key
 
 def parameter_key(problem):
     ir,certificate = problem['ir'],problem['routes'][0]['certificate']
-    if ir['second_order']:
+    if 'roots' in certificate:
         return 'roots:' + ','.join(sorted(str(evaluate(x,0)) for x in certificate['roots']))
+    if ir.get('shape')=='power_second': return 'base:'+str(evaluate(ir['power_base'],0))
     if ir['Q']['op']=='pow': return 'base:' + str(evaluate(ir['Q']['args'][0],0))
     return 'ratio:' + str(evaluate(certificate['ratio'],0))
 

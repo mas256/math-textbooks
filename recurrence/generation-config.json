@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "seed": 20261008,
   "max_transforms": {
     "add_constant": 1,
@@ -7,13 +7,32 @@
     "index_scale": 1,
     "index_add": 1,
     "reciprocal": 1,
-    "linear_combination": 1
+    "linear_combination": 1,
+    "repeated_factor": 1,
+    "difference_lift": 1,
+    "sum_encode": 1,
+    "cumulative_sum": 2,
+    "power_sequence": 1
   },
-  "max_blocks": 3,
-  "selection": {"balance_parameters": true, "prefer_existing_ids": true},
-  "scale_profiles": ["n", "n_plus_1", "n_squared", "consecutive", "gap_2", "odd"],
+  "max_blocks": 4,
+  "selection": {
+    "balance_parameters": true,
+    "prefer_existing_ids": true
+  },
+  "scale_profiles": [
+    "n",
+    "n_plus_1",
+    "n_squared",
+    "consecutive",
+    "gap_2",
+    "odd"
+  ],
   "allow_inverse_scales": true,
-  "exponent_profiles": ["triangular", "square_minus_one", "tetrahedral"],
+  "exponent_profiles": [
+    "triangular",
+    "square_minus_one",
+    "tetrahedral"
+  ],
   "quality_limits": {
     "max_coefficient_degree": 2,
     "max_statement_nodes": 44,
@@ -34,6 +53,20 @@
     "reciprocal_affine": 5,
     "reciprocal_scaled": 5,
     "polynomial_forcing": 5,
-    "reciprocal_forcing": 5
+    "reciprocal_forcing": 5,
+    "scaled_second_order": 12,
+    "difference_scaled": 12,
+    "weighted_sum": 12,
+    "multiplicative_second": 12
+  },
+  "difficulty_mix": {
+    "3": {
+      "min_nonfraction_families": 3,
+      "max_fraction_percent": 40
+    },
+    "4": {
+      "min_nonfraction_families": 3,
+      "max_fraction_percent": 40
+    }
   }
 }

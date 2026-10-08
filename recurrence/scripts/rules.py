@@ -24,6 +24,11 @@ def load_config(path=CONFIG_PATH):
     assert all(isinstance(v, int) and v >= 0 for v in config["quotas"].values())
     assert set(config['selection']) == {'balance_parameters','prefer_existing_ids'}
     assert all(isinstance(v,bool) for v in config['selection'].values())
+    for lv,limits in config['difficulty_mix'].items():
+        assert lv in {'1','2','3','4'}
+        assert set(limits)=={'min_nonfraction_families','max_fraction_percent'}
+        assert isinstance(limits['min_nonfraction_families'],int) and limits['min_nonfraction_families']>=0
+        assert isinstance(limits['max_fraction_percent'],int) and 0<=limits['max_fraction_percent']<=100
     return config
 
 
@@ -71,6 +76,11 @@ def normalize_recipe(recipe, config=None):
             from expr import polynomial
             if max(polynomial(block["value"]), default=0) > 1:
                 raise RuleViolation("unregistered_additive_degree")
+        if kind in {'repeated_factor','difference_lift','cumulative_sum','power_sequence'}:
+            key='slope' if kind=='repeated_factor' else 'base' if kind=='power_sequence' else 'initial'
+            assert block[key]['op']=='rational'
+        if kind=='power_sequence' and evaluate(block['base'],0) not in {2,3}:
+            raise RuleViolation('unregistered_power_base')
         normalized.append(block)
     assert previous == result["output"], "Dangling output"
     counts = Counter(b["kind"] for b in normalized)

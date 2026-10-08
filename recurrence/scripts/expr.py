@@ -88,6 +88,9 @@ def shift(expr, offset=1):
         args = [shift(a, offset) for a in expr["args"]]
         if expr["op"] in {'add','mul'}:
             result=(add if expr['op']=='add' else mul)(*args)
+            def natural(x):
+                return x['op'] in {'nat_index','nat_constant','choose','triangular'} or any(natural(a) for a in x.get('args',[]))
+            if natural(result): return result
             try:
                 p=polynomial(result)
                 if max(p,default=0)<=1: return from_polynomial(p)
@@ -105,6 +108,11 @@ def evaluate(expr, k, terms=None):
     if op == "nat_constant": return expr["value"]
     if op == "triangular": return k * (k + 1) // 2
     if op == "term": return terms[expr["offset"]]
+    if op == 'prefix_sum':
+        return sum((evaluate(expr['args'][0],j,{0:terms[j-k]}) for j in range(k+1)),Fraction(0))
+    if op == 'log':
+        from algebra import integer_log
+        return Fraction(integer_log(evaluate(expr['args'][1],k,terms),evaluate(expr['args'][0],k,terms)))
     a = [evaluate(x, k, terms) for x in expr["args"]]
     if op == "add": return sum(a, Fraction(0))
     if op == "mul":
@@ -131,6 +139,11 @@ def latex(expr):
     if op == "term":
         o = expr["offset"]
         return "a_{n}" if not o else "a_{n+" + str(o) + "}"
+    if op == 'prefix_sum':
+        import re
+        body=re.sub(r'(?<![a-zA-Z\\])n(?![a-zA-Z])','k',latex(expr['args'][0]))
+        return rf"\sum_{{k=1}}^{{n}}{body}"
+    if op == 'log': return rf"\log_{{{latex(expr['args'][0])}}}\left({latex(expr['args'][1])}\right)"
     args = expr["args"]
     if op == "add":
         out = ""
@@ -155,6 +168,8 @@ def latex(expr):
         return ("-" if negative else "") + (out or "1")
     if op == "div": return rf"\frac{{{latex(args[0])}}}{{{latex(args[1])}}}"
     if op == "pow":
+        if args[1] in (nat_const(0), num(0)): return "1"
+        if args[1] in (nat_const(1), num(1)): return latex(args[0])
         base = latex(args[0])
         if args[0]["op"] not in {"rational", "index"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
             base = r"\left(" + base + r"\right)"
@@ -178,6 +193,10 @@ def lean(expr, sequence="f"):
     if op == "nat_index": return "n" if expr["offset"] == 0 else f"(n + {expr['offset']})"
     if op == "triangular": return "((n + 1).choose 2)"
     if op == "term": return f"({sequence} n)" if expr["offset"] == 0 else f"({sequence} (n + {expr['offset']}))"
+    if op == 'prefix_sum':
+        import re
+        body=re.sub(r'\bn\b','k',lean(expr['args'][0],sequence))
+        return f'(∑ k ∈ Finset.range (n + 1), {body})'
     a = [lean(x, sequence) for x in expr["args"]]
     if op == "choose": return f"({a[0]}).choose {a[1]}"
     symbol = {"add": " + ", "mul": " * ", "div": " / ", "pow": " ^ "}[op]
@@ -200,6 +219,16 @@ def polynomial(expr):
     op = expr["op"]
     if op == "rational": return {0: Fraction(expr["num"], expr["den"])} if expr['num'] else {}
     if op == "index": return {1: Fraction(1)}
+    if op == 'nat_constant': return {0:Fraction(expr['value'])} if expr['value'] else {}
+    if op == 'nat_index': return {1:Fraction(1),0:Fraction(expr['offset']-1)} if expr['offset']!=1 else {1:Fraction(1)}
+    if op == 'choose':
+        result={0:Fraction(1)}
+        base=polynomial(expr['args'][0])
+        k=expr['args'][1]['value']
+        for j in range(k):
+            factor=dict(base);factor[0]=factor.get(0,Fraction(0))-j
+            result=poly_mul(result,{d:c for d,c in factor.items() if c})
+        return {d:c/factorial(k) for d,c in result.items() if c}
     if op == "pow" and expr["args"][1]["op"] == "nat_constant":
         result = {0: Fraction(1)}
         base = polynomial(expr["args"][0])

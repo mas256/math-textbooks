@@ -3,7 +3,7 @@ import { poolFor, chooseProblem, validateBank, texDocument, routeComparison } fr
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
 const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '定数数列・等比数列の基本を確認します。',
-  2: '一つの変形や、和・積の規則を使います。', 3: '正規化や特解を使い、基本形に帰着します。', 4: '逆数と正規化・特解を組み合わせます。'};
+  2: '一つの変形や、和・積の規則を使います。', 3: '正規化、総和の消去、指数の和などを使います。', 4: '3項間、階差、対数などを組み合わせ、段階的に解きます。'};
 let mathQueue = Promise.resolve();
 
 function showScrollHints() {
@@ -64,7 +64,8 @@ function updatePool() {
 
 function renderRecipe(p) {
   const names = {constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
-    index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ'};
+    index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ',
+    repeated_factor:'一次式を掛けて重解へ', difference_lift:'階差を元の数列へ', sum_encode:'総和を含む式へ', cumulative_sum:'差を足して一段戻す', power_sequence:'指数の数列を元の数列へ'};
   const list = $('block-list');
   list.replaceChildren(el('span', names[p.recipe.core.kind], 'block'));
   for (const b of p.recipe.blocks) list.append(el('span', '→', 'block-arrow'), el('span', names[b.kind] || b.kind, 'block'));
@@ -97,7 +98,7 @@ function renderGenerationSummary() {
   const summary = $('generation-summary');
   summary.replaceChildren(el('p', `旧版の ${comparison.before.count} 問を同じ基準で再評価し、${comparison.baseline_rejected_count} 問を採用条件から除外しました。調整版は ${comparison.after.count} 問です。`),
     el('p', `多項式係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
-    el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
+    el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、差を足して戻す操作は ${config.max_transforms.cumulative_sum} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
     el('p', 'この比較は式の構造を測った結果です。学習者の正答率や、良問としての評価は今後確認します。'));
   const diversity = comparison.diversity;
   const diversitySummary = $('diversity-summary');
@@ -117,6 +118,27 @@ function renderGenerationSummary() {
       tbody.append(row);
     }
     table.append(tbody); diversitySummary.append(table);
+  }
+  const levelMix=$('level-diversity');
+  levelMix.replaceChildren();
+  if (comparison.level_diversity) {
+    levelMix.append(el('p', '発展問題には、正規化した3項間、階差から階比へ進む型、総和を消去する型、対数と二重の階差を使う型を加えました。Lv3・4では、逆数を使わない系統を各3種類以上、逆数型の割合を各40%以下にする条件も検査します。'));
+    const table=el('table',undefined,'score-table');
+    table.append(el('caption','難易度別の構成（逆数型は一次分数型などの系統）'));
+    const head=el('tr');
+    for (const label of ['難易度','前版：逆数型 / 全問','今回：逆数型 / 全問','今回：逆数以外の系統数']) head.append(el('th',label));
+    const thead=el('thead'); thead.append(head); table.append(thead);
+    const tbody=el('tbody');
+    for (const lv of ['3','4']) {
+      const before=comparison.level_diversity.before[lv],after=comparison.level_diversity.after[lv];
+      const count=data=>`${data.fraction_count} / ${data.count}問（${data.count?Math.round(100*data.fraction_count/data.count):0}%）`;
+      const row=el('tr');
+      for (const text of [`Lv.${lv}`,count(before),count(after),`${after.nonfraction_families.length} 系統`]) row.append(el('td',text));
+      tbody.append(row);
+    }
+    table.append(tbody);
+    const wrapper=el('div',undefined,'math-block'); wrapper.append(table); levelMix.append(wrapper);
+    levelMix.append(el('p','難易度の配点は暫定です。系統数と割合の改善は、学習者にとっての良問性や難しさの一致を保証するものではありません。','details-note'));
   }
   const functions = $('function-catalog');
   const normalizers = catalog.scales.filter(p => !p.id.startsWith('inverse:')).map(p => '\\(' + p.normalizer_tex + '\\)').join('、');
