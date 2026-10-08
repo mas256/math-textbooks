@@ -156,7 +156,10 @@ function renderProblem(p, updateUrl = true) {
   $('problem-level').textContent = `Lv.${p.scores.level}`;
   $('problem-id').textContent = p.id.toUpperCase();
   const content = $('problem-content');
-  content.replaceChildren(el('p', '次の条件で定められる数列について、一般項を求めよ。'),
+  const instruction = p.ir?.shape === 'system' ? '次の条件で定められる2つの数列について、一般項をそれぞれ求めよ。'
+    : p.ir?.shape === 'power_second' || p.family === 'multiplicative_second' ? '次の条件を満たす正の数列について、一般項を求めよ。'
+    : '次の条件で定められる数列について、一般項を求めよ。';
+  content.replaceChildren(el('p', instruction),
     mathBlock(p.statement.initials_tex.join(',\\quad ')), mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '')+p.statement.recurrence_tex),
     el('p', 'n は 1 以上の整数とする。', 'question-line'));
   $('hints').replaceChildren();

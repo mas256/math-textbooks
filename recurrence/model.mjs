@@ -132,7 +132,7 @@ export function texDocument(p, includeAnswer = false) {
   text += displayMath(p.statement.recurrence_tex);
   const system = p.statement.initials_tex.some(tex => /b_/.test(tex));
   text += system ? 'を満たす数列 $a_n$, $b_n$ の一般項をそれぞれ求めよ。\\par\n'
-    : p.family === 'power_second' ? 'を満たす正の数列の一般項を求めよ。\\par\n'
+    : (p.ir?.shape === 'power_second' || p.family === 'multiplicative_second') ? 'を満たす正の数列の一般項を求めよ。\\par\n'
     : 'を満たす数列の一般項を求めよ。\\par\n';
   text += '\\end{multicols*}\n';
   if (includeAnswer) {

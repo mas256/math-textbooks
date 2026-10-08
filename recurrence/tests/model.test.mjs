@@ -49,6 +49,8 @@ test('TeX defaults to problem only and adds solutions on request', () => {
   assert.ok(texDocument(q,true).includes('\\documentclass[dvipdfmx,a4paper,11pt,fleqn,openany]{jsbook}'));
   assert.ok(texDocument(q,true).includes('\\begin{multicols*}{2}'));
   assert.ok(!texDocument(q,true).includes('スコア'));
+  assert.ok(texDocument({...q, family:'multiplicative_second'}).includes('正の数列'));
+  assert.ok(texDocument({...q,statement:{...q.statement,initials_tex:['a_1=1','b_1=2']}}).includes('それぞれ求めよ')); 
   assert.equal(textbookText('\\(a_n=2^{n-1}\\) です。'), '\\(a_n=2^{n-1}\\) である。');
   assert.ok(texDocument(q,true).includes('係数が一定である。'));
 });
