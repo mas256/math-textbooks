@@ -52,6 +52,17 @@ const fs = require('node:fs');
     await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
     assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(),0,family);
   }
+  const multiple=bank.problems.find(p=>p.routes.length>1);
+  assert.ok(multiple,'The bank must exercise alternative-method comparisons.');
+  await page.goto('http://127.0.0.1:8787/recurrence/?problem='+multiple.id);
+  await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
+  await page.locator('#answer-button').click();
+  assert.equal(await page.locator('.alternate').count(),Math.min(2,multiple.routes.length-1));
+  for (const alternate of await page.locator('.alternate').all()) {
+    await alternate.locator('summary').click();
+    assert.ok((await alternate.textContent()).includes('主解法との比較：'));
+    assert.ok((await alternate.textContent()).includes('着眼点：'));
+  }
   const formulas=bank.problems.flatMap(p=>[...p.statement.initials_tex,p.statement.recurrence_tex,p.answer_tex,
     ...p.routes.flatMap(r=>r.steps.flatMap(s=>[...s.matchAll(/\\\((.*?)\\\)/gs)].map(m=>m[1]))) ]);
   const renderingErrors=await page.evaluate(async formulas=>{
