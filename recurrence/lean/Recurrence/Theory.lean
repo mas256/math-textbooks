@@ -193,16 +193,16 @@ theorem weighted_sum_from_second (f b g : ℕ → ℚ) (initial first second α 
   rw [hf (n + 1), hdiv n, hsum, ← second_to_sum hb hboundary n]
 
 
-def prefix (f : ℕ → ℚ) (n : ℕ) : ℚ := ∑ k ∈ Finset.range (n + 1), f k
+def partialSum (f : ℕ → ℚ) (n : ℕ) : ℚ := ∑ k ∈ Finset.range (n + 1), f k
 
-theorem prefix_succ (f : ℕ → ℚ) (n : ℕ) : prefix f (n + 1) = prefix f n + f (n + 1) := by
-  simp only [prefix, Finset.sum_range_succ]
+theorem prefix_succ (f : ℕ → ℚ) (n : ℕ) : partialSum f (n + 1) = partialSum f n + f (n + 1) := by
+  simp only [partialSum, Finset.sum_range_succ]
 
-theorem prefix_injective {f a : ℕ → ℚ} (h : ∀ n, prefix a n = prefix f n) :
+theorem prefix_injective {f a : ℕ → ℚ} (h : ∀ n, partialSum a n = partialSum f n) :
     ∀ n, a n = f n := by
   intro n
   cases n with
-  | zero => simpa [prefix] using h 0
+  | zero => simpa [partialSum] using h 0
   | succ n =>
     have hn := h n
     have hs := h (n + 1)
@@ -210,10 +210,10 @@ theorem prefix_injective {f a : ℕ → ℚ} (h : ∀ n, prefix a n = prefix f n
     linarith
 
 abbrev PureSumCertificate (f : ℕ → ℚ) (initial : ℚ) (step : ℕ → ℚ → ℚ) :=
-  FirstCertificate (prefix f) initial step
+  FirstCertificate (partialSum f) initial step
 
 abbrev PureSecondSumCertificate (f : ℕ → ℚ) (initial second : ℚ)
-    (step : ℕ → ℚ → ℚ → ℚ) := GeneralSecondCertificate (prefix f) initial second step
+    (step : ℕ → ℚ → ℚ → ℚ) := GeneralSecondCertificate (partialSum f) initial second step
 
 theorem pure_sum_unique {f a : ℕ → ℚ} {initial : ℚ} {step : ℕ → ℚ → ℚ}
     (hf : PureSumCertificate f initial step) (ha : PureSumCertificate a initial step) :
@@ -227,7 +227,7 @@ theorem pure_second_sum_unique {f a : ℕ → ℚ} {initial second : ℚ}
 
 structure SumRelationCertificate (f : ℕ → ℚ) (initial α : ℚ) (F : ℕ → ℚ) : Prop where
   init : f 0 = initial
-  recurrence : ∀ n, prefix f n = α * f n + F n
+  recurrence : ∀ n, partialSum f n = α * f n + F n
 
 theorem sum_relation_unique {f a : ℕ → ℚ} {initial α : ℚ} {F : ℕ → ℚ}
     (hf : SumRelationCertificate f initial α F)
@@ -241,7 +241,7 @@ theorem sum_relation_unique {f a : ℕ → ℚ} {initial α : ℚ} {F : ℕ → 
       exact ih k (Finset.mem_range.mp hk)
     have hf' := hf.recurrence n
     have ha' := ha.recurrence n
-    simp only [prefix, Finset.sum_range_succ] at hf' ha'
+    simp only [partialSum, Finset.sum_range_succ] at hf' ha'
     rw [hsum] at ha'
     have hz : (1 - α) * (a n - f n) = 0 := by nlinarith
     have hn : 1 - α ≠ 0 := sub_ne_zero.mpr hα.symm

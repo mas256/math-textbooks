@@ -4,9 +4,9 @@ from advanced_proofs import ring_step
 
 
 def prefix_proof(name,S):
-    return [f'theorem {name}_prefix : ∀ n, prefix {name} n = {S} n := by',
+    return [f'theorem {name}_prefix : ∀ n, partialSum {name} n = {S} n := by',
         '  intro n','  induction n with',
-        f'  | zero => norm_num [prefix, {name}, {S}]',
+        f'  | zero => norm_num [partialSum, {name}, {S}]',
         '  | succ n ih =>','    rw [prefix_succ, ih]',
         f'    simp only [{name}, {S}, Nat.cast_add, Nat.cast_one, pow_succ, pow_add]',
         '    norm_num <;> ring']
@@ -43,8 +43,8 @@ def variety_proofs(problem):
             step=f'(fun n x => ({Q} * x + {R}) / {P})'
             cert=f'PureSumCertificate {name} {init} {step}';unique='pure_sum_unique'
         lines += [f'theorem {name}_valid : {cert} := by',
-            f'  have heq : prefix {name} = {S} := funext {name}_prefix',
-            f'  change '+('GeneralSecondCertificate' if ir['second_order'] else 'FirstCertificate')+f' (prefix {name}) {init} '+(second+' ' if ir['second_order'] else '')+step,
+            f'  have heq : partialSum {name} = {S} := funext {name}_prefix',
+            f'  change '+('GeneralSecondCertificate' if ir['second_order'] else 'FirstCertificate')+f' (partialSum {name}) {init} '+(second+' ' if ir['second_order'] else '')+step,
             f'  rw [heq]',f'  exact {S}_valid',
             f'theorem {name}_unique (a : ℕ → ℚ) (ha : '+cert.replace(name,'a',1)+') :',
             f'    ∀ n, a n = {name} n := {unique} {name}_valid ha']
