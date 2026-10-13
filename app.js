@@ -50,12 +50,20 @@ function bookCard(book, index) {
   const arrow = createTextElement("span", "", "↗");
   arrow.setAttribute("aria-hidden", "true");
   primaryLink.append(document.createTextNode(" "), arrow);
+  const mobileLink = externalLink(null, "スマホ版で読む", "card-primary");
+  mobileLink.id = "release-mobile-pdf-" + index;
+  mobileLink.hidden = true;
+  const primaryLinks = createTextElement("div", "card-action-group", "");
+  primaryLinks.append(primaryLink, mobileLink);
   const secondaryLinks = createTextElement("div", "card-secondary", "");
   const latestLink = externalLink(null, "最新版PDF（開発中）");
   latestLink.id = "latest-pdf-" + index;
-  secondaryLinks.append(latestLink, externalLink(book.releases, "版一覧"),
+  const latestMobileLink = externalLink(null, "最新版スマホ版（開発中）");
+  latestMobileLink.id = "latest-mobile-pdf-" + index;
+  latestMobileLink.hidden = true;
+  secondaryLinks.append(latestLink, latestMobileLink, externalLink(book.releases, "版一覧"),
     externalLink(book.repository, "GitHub", "", (book.title || "書籍") + "のRepository"));
-  actions.append(primaryLink, secondaryLinks);
+  actions.append(primaryLinks, secondaryLinks);
   article.append(cardTop, title, description, tagList, actions);
   return article;
 }
@@ -89,6 +97,13 @@ function validateCatalog(catalog) {
     if (info.pdf !== expected || /[\\/]/.test(info.pdf)) {
       throw new Error("公開PDFのファイル名が正しくありません");
     }
+    if (info.mobile) {
+      const mobileExpected = (kind === "latest" ? "latest-" : "")
+        + catalog.title + "-スマホ版-" + info.version + ".pdf";
+      if (info.mobile.pdf !== mobileExpected || !/^[a-f0-9]{64}$/.test(info.mobile.sha256)) {
+        throw new Error("スマホ版PDFのファイル名・SHA-256が正しくありません");
+      }
+    }
   }
   return catalog;
 }
@@ -116,11 +131,17 @@ async function updatePublications() {
       for (const kind of ["release", "latest"]) {
         const time = document.getElementById(kind + "-updated-" + index);
         const link = document.getElementById(kind + "-pdf-" + index);
+        const mobileLink = document.getElementById(kind + "-mobile-pdf-" + index);
         const info = catalog[kind];
         if (info) {
           showUpdatedTime(time, info.updated_at);
           link.href = pdfUrl(site, info, kind === "latest");
           link.removeAttribute("aria-disabled");
+          if (info.mobile) {
+            mobileLink.href = pdfUrl(site, info.mobile, kind === "latest");
+            mobileLink.removeAttribute("aria-disabled");
+            mobileLink.hidden = false;
+          }
         } else {
           time.textContent = "未公開";
           link.hidden = true;
