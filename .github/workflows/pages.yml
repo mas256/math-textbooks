@@ -8,6 +8,7 @@ on:
       - "styles.css"
       - "app.js"
       - "books.json"
+      - "tests/**"
       - "equashare/**"
       - "recurrence/**"
       - ".github/workflows/recurrence-check.yml"
@@ -38,6 +39,9 @@ jobs:
 
       - name: Generate and verify the recurrence bank
         uses: ./.github/actions/verify-recurrence
+
+      - name: Check catalog reading links
+        run: NODE_PATH=/tmp/recurrence-browser/node_modules node tests/catalog-browser.cjs
 
       - name: Validate catalog
         run: |

@@ -1,0 +1,22 @@
+name: Check catalog reading links
+
+on:
+  pull_request:
+    paths: ['app.js', 'styles.css', 'books.json', 'tests/**', '.github/workflows/catalog-check.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser
+        run: |
+          npm install --prefix /tmp/recurrence-browser --no-save --ignore-scripts playwright@1.55.1
+          /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check the reading links
+        run: |
+          python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/catalog-http.log 2>&1 &
+          NODE_PATH=/tmp/recurrence-browser/node_modules node tests/catalog-browser.cjs
