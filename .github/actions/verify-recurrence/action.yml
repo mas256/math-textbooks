@@ -9,6 +9,7 @@ runs:
         python3 recurrence/scripts/generate.py
         python3 recurrence/tests/math_check.py
         node --test recurrence/tests/model.test.mjs
+        node --test recurrence/tests/regeneration.test.mjs
     - name: Install Lean and check all generated theorems
       uses: leanprover/lean-action@v1
       with:
@@ -35,3 +36,4 @@ runs:
         /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
         python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/recurrence-http.log 2>&1 &
         NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/browser.cjs
+        NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/regeneration-browser.cjs
