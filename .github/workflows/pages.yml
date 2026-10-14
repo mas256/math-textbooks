@@ -1,4 +1,5 @@
 name: Deploy Pages
+run-name: ${{ inputs.regeneration_request && format('Recurrence regeneration {0}', inputs.regeneration_request) || 'Deploy Pages' }}
 
 on:
   push:
@@ -15,6 +16,11 @@ on:
       - ".github/actions/verify-recurrence/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
+    inputs:
+      regeneration_request:
+        description: Request ID supplied by the public regeneration API
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -67,13 +73,15 @@ jobs:
 
       - name: Assemble site
         run: |
+          node --input-type=module -e 'import { apiEndpoint } from "./recurrence/regeneration.mjs"; apiEndpoint(process.env.REGENERATION_API_URL);'
           mkdir -p site/equashare site/recurrence/data
           cp index.html styles.css app.js books.json site/
           cp -a equashare/. site/equashare/
-          cp recurrence/index.html recurrence/styles.css recurrence/app.js recurrence/model.mjs recurrence/mathjax-config.js site/recurrence/
+          cp recurrence/index.html recurrence/styles.css recurrence/app.js recurrence/model.mjs recurrence/mathjax-config.js recurrence/regeneration.mjs site/recurrence/
           cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/build/quality-report.json site/recurrence/data/
           python3 - <<'PY'
           import os, re
+          import json
           from pathlib import Path
           path = Path("site/index.html")
           page = path.read_text(encoding="utf-8")
@@ -83,12 +91,15 @@ jobs:
           recurrence = Path("site/recurrence")
           index = recurrence / "index.html"
           text = index.read_text(encoding="utf-8")
-          for name in ("styles.css", "app.js", "mathjax-config.js"):
+          for name in ("styles.css", "app.js", "mathjax-config.js", "regeneration.mjs"):
               text = text.replace('"' + name + '"', '"' + name + '?v=' + os.environ["GITHUB_SHA"] + '"')
           index.write_text(text, encoding="utf-8")
           app = recurrence / "app.js"
           app.write_text(app.read_text(encoding="utf-8").replace("'./model.mjs'", "'./model.mjs?v=" + os.environ["GITHUB_SHA"] + "'"), encoding="utf-8")
+          (recurrence / "regeneration-config.json").write_text(json.dumps({"endpoint": os.environ["REGENERATION_API_URL"]}), encoding="utf-8")
           PY
+        env:
+          REGENERATION_API_URL: ${{ vars.RECURRENCE_REGENERATION_API_URL }}
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
