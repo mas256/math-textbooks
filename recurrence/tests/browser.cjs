@@ -3,18 +3,56 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 (async () => {
-  const {textbookText} = await import('../model.mjs');
-  const browser = await chromium.launch();
+  const {textbookText,equashareSource} = await import('../model.mjs');
+  const browser = await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
+  const origin=process.env.RECURRENCE_TEST_ORIGIN || 'http://127.0.0.1:8787';
   const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
   const bank=JSON.parse(fs.readFileSync('recurrence/build/problems.json','utf8'));
   const first=bank.problems.find(p=>p.family==='shifted_scaled');
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://127.0.0.1:8787/recurrence/?problem='+first.id);
+  await page.goto(origin+'/recurrence/?problem='+first.id);
   await page.locator('#bank-status').filter({hasText:'Lean検証済み'}).waitFor();
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
   assert.equal(await page.locator('#answer').isVisible(),false);
   assert.equal(await page.locator('#problem-content').textContent().then(t=>t.includes('階比型')),false);
+  assert.equal(await page.locator('#download-tex + #open-equashare').count(),1);
+  async function checkEquasharePreview(editor,problem) {
+    await editor.evaluate(source=>new Promise((resolve,reject)=>{
+      const preview=document.querySelector('#preview');
+      const timeout=setTimeout(()=>{observer.disconnect();reject(new Error('Equashare preview did not update'));},10000);
+      const observer=new MutationObserver(()=>{
+        observer.disconnect(); clearTimeout(timeout); resolve();
+      });
+      observer.observe(preview,{childList:true});
+      const input=document.querySelector('#input');
+      input.value=source; input.dispatchEvent(new Event('input',{bubbles:true}));
+    }),equashareSource(problem));
+    if (/フォント|[Ff]ont/.test(await editor.locator('#status').textContent())) {
+      await editor.waitForFunction(()=>document.querySelector('#status').textContent==='');
+    }
+    assert.equal(await editor.locator('#status').textContent(),'','Equashare '+problem.id);
+    assert.equal(await editor.locator('#preview [data-mml-node="merror"],#preview [data-mjx-error]').count(),0,problem.id);
+  }
+  async function openInEquashare(problem) {
+    const popup=page.waitForEvent('popup');
+    await page.locator('#open-equashare').click();
+    const editor=await popup;
+    editor.on('pageerror',e=>errors.push(e.message));
+    await editor.waitForFunction(source=>document.querySelector('#input')?.value===source,equashareSource(problem));
+    await checkEquasharePreview(editor,problem);
+    assert.equal(new URL(editor.url()).pathname,new URL('../equashare/',page.url()).pathname);
+    assert.equal(new URL(editor.url()).search,'');
+    assert.equal(await editor.evaluate(()=>window.opener),null);
+    return editor;
+  }
+  const editor=await openInEquashare(first);
+  // Render every exported problem using the distributed Equashare parser, including
+  // cases environments, partial-sum definitions, fractions and positivity conditions.
+  for (const problem of bank.problems) {
+    await checkEquasharePreview(editor,problem);
+  }
+  await editor.close();
   await page.screenshot({path:'recurrence/build/desktop.png',fullPage:true});
   await page.locator('#hint-button').click();
   assert.equal(await page.locator('.hint').count(),1);
@@ -59,6 +97,10 @@ const fs = require('node:fs');
   assert.ok(exported.includes('{jsbook}'));
   assert.ok(exported.includes('\\begin{multicols*}{2}'));
   assert.ok(!exported.includes('スコア'));
+  const current=bank.problems.find(p=>p.id===new URL(page.url()).searchParams.get('problem'));
+  const answerEditor=await openInEquashare(current);
+  assert.equal(await answerEditor.locator('#input').inputValue(),equashareSource(current));
+  await answerEditor.close();
   await page.locator('#all-levels').click();
   await page.locator('#family').selectOption('all');
   for(const family of Object.keys(bank.families)) {
@@ -70,7 +112,7 @@ const fs = require('node:fs');
   }
   const multiple=bank.problems.find(p=>p.routes.length>1);
   assert.ok(multiple,'The bank must exercise alternative-method comparisons.');
-  await page.goto('http://127.0.0.1:8787/recurrence/?problem='+multiple.id);
+  await page.goto(origin+'/recurrence/?problem='+multiple.id);
   await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('.alternate').count(),Math.min(2,multiple.routes.length-1));
@@ -104,7 +146,7 @@ const fs = require('node:fs');
   }
   await page.setViewportSize({width:375,height:900});
   const widest=bank.problems.reduce((a,b)=>a.quality.metrics.nodes>b.quality.metrics.nodes?a:b);
-  await page.goto('http://127.0.0.1:8787/recurrence/?problem='+widest.id);
+  await page.goto(origin+'/recurrence/?problem='+widest.id);
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   await page.screenshot({path:'recurrence/build/mobile.png',fullPage:true});
@@ -117,7 +159,7 @@ const fs = require('node:fs');
   for (const family of Object.keys(bank.families)) {
     const examples=bank.problems.filter(p=>p.family===family);
     const longest=examples.reduce((a,b)=>a.routes[0].steps.join('').length>b.routes[0].steps.join('').length?a:b);
-    await page.goto('http://127.0.0.1:8787/recurrence/?problem='+longest.id);
+    await page.goto(origin+'/recurrence/?problem='+longest.id);
     await page.locator('#answer-button').waitFor({state:'visible'});
     await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
     await page.locator('#answer-button').click();
@@ -126,6 +168,6 @@ const fs = require('node:fs');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile '+family);
   }
   assert.deepEqual(errors,[]);
-  console.log(`Browser checks passed: ${formulas.length} formulas, every family, hints, filters, exports, comparison and mobile layout.`);
+  console.log(`Browser checks passed: ${formulas.length} formulas, ${bank.problems.length} Equashare problems, every family, hints, filters, exports, comparison and mobile layout.`);
   await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

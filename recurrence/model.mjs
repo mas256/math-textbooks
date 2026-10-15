@@ -48,6 +48,24 @@ export function validateBank(bank, manifest) {
 
 const scoreLabels = {B:'操作', R:'発見', A:'計算', T:'条件の確認', P:'式の複雑さ', U:'未評価部分'};
 
+export function problemInstruction(p) {
+  return p.ir?.shape === 'system' ? '次の条件で定められる2つの数列について、一般項をそれぞれ求めよ。'
+    : p.ir?.shape === 'power_second' || p.family === 'multiplicative_second' ? '次の条件を満たす正の数列について、一般項を求めよ。'
+    : '次の条件で定められる数列について、一般項を求めよ。';
+}
+
+// Equashare renders one formula per line, without a document preamble or math delimiters.
+export function equashareSource(p) {
+  return [
+    '\\text{問題 ' + p.id.toUpperCase() + (p.scores ? '（Lv' + p.scores.level + '）' : '') + '}',
+    '\\text{' + problemInstruction(p) + '}',
+    p.statement.definitions_tex,
+    p.statement.initials_tex.join(',\\quad '),
+    p.statement.recurrence_tex,
+    'n\\in\\mathbb{Z},\\quad n\\ge1',
+  ].filter(Boolean).join('\n') + '\n';
+}
+
 export function routeComparison(routes) {
   const main = routes[0];
   const others = routes.slice(1);
