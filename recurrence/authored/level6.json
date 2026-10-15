@@ -1,0 +1,2500 @@
+{
+  "schema_version": 1,
+  "title": "難易度6 固定問題集",
+  "created": "2026-10-15",
+  "level": 6,
+  "authorship": "hand_authored",
+  "publication_status": "ready_for_practice",
+  "verification_status": "worked_solutions_with_finite_exact_checks_not_lean_certified",
+  "description": "手作業で事前作成した固定問題。数学的な係数・初期値・小問を出題時に変更しない。",
+  "categories": [
+    {
+      "id": "gauss",
+      "label": "ガウス型"
+    },
+    {
+      "id": "four_term",
+      "label": "隣接4項間"
+    },
+    {
+      "id": "newton",
+      "label": "ニュートン法"
+    },
+    {
+      "id": "symmetric",
+      "label": "対称式"
+    },
+    {
+      "id": "trigonometric",
+      "label": "三角関数"
+    },
+    {
+      "id": "nonadjacent",
+      "label": "非隣接型"
+    },
+    {
+      "id": "other",
+      "label": "その他の未生成分野"
+    },
+    {
+      "id": "two_dimensional",
+      "label": "二重数列"
+    },
+    {
+      "id": "generating_functions",
+      "label": "母関数・畳み込み"
+    },
+    {
+      "id": "number_theory",
+      "label": "整数・近似分数"
+    },
+    {
+      "id": "advanced_extensions",
+      "label": "高階・変則添字・パラメーター"
+    }
+  ],
+  "problems": [
+    {
+      "id": "L6-G01",
+      "level": 6,
+      "category": "gauss",
+      "title": "平方根の整数部分を確定する",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/01_整数部分を確定する.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/01_%E6%95%B4%E6%95%B0%E9%83%A8%E5%88%86%E3%82%92%E7%A2%BA%E5%AE%9A%E3%81%99%E3%82%8B.tex",
+        "location": "01_整数部分を確定する.tex：例題(1)",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "a3bb6a115e467e7f50549d3d454371abef4dbcbfe9bad16bbd4dde1b2fe94b71"
+      },
+      "statement": "数列を\n\\[\na_1=1,\\qquad a_{n+1}=\\left\\lfloor\\sqrt{a_n^2+4a_n+5}\\right\\rfloor\\quad(n\\ge1)\n\\]\nで定める。各項が正の整数であることを示し、一般項を求めよ。",
+      "hint": "平方根の中身を、隣り合う平方数 $(a_n+2)^2$ と $(a_n+3)^2$ で挟む。",
+      "answer": "\\[a_n=2n-1\\quad(n\\ge1).\\]",
+      "solution": [
+        "非負整数 $x$ に対して\n\\[(x+2)^2\\le x^2+4x+5<(x+3)^2\\]\nである。左右の差はそれぞれ $1$ と $2x+4>0$ である。",
+        "よって床関数の値は $x+2$。初項から帰納的に各項は正の整数となり、$a_{n+1}=a_n+2$。初項 $1$ から一般項を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "2*n-1",
+        "residual": "a(n+1)-floor(sqrt(a(n)**2+4*a(n)+5))",
+        "initials": {
+          "1": "1"
+        },
+        "start": 1,
+        "samples": 100
+      }
+    },
+    {
+      "id": "L6-G02",
+      "level": 6,
+      "category": "gauss",
+      "title": "平方数の境界で群に分ける",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/02_同じ値を群にまとめる.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/02_%E5%90%8C%E3%81%98%E5%80%A4%E3%82%92%E7%BE%A4%E3%81%AB%E3%81%BE%E3%81%A8%E3%82%81%E3%82%8B.tex",
+        "location": "02_同じ値を群にまとめる.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "096b2c2053be0a631a76802fc7823496691c45d33808183a6ba1c80e6f281d39"
+      },
+      "statement": "\\[\na_1=2,\\qquad a_{n+1}=a_n+\\lfloor\\sqrt{n+2}\\rfloor\\quad(n\\ge1)\n\\]\nで定まる数列の一般項を求めよ。$m=\\lfloor\\sqrt{n+1}\\rfloor$ を用いてよい。",
+      "hint": "$a_n$ を $\\sum_{k=1}^{n+1}\\lfloor\\sqrt k\\rfloor$ と表し、$j^2\\le k<(j+1)^2$ の群を数える。",
+      "answer": "\\[a_n=m(n+2)-\\frac{m(m+1)(2m+1)}6,\\qquad m=\\lfloor\\sqrt{n+1}\\rfloor.\\]",
+      "solution": [
+        "階差を足すと $a_n=2+\\sum_{k=3}^{n+1}\\lfloor\\sqrt k\\rfloor=\\sum_{k=1}^{n+1}\\lfloor\\sqrt k\\rfloor$。$n=1$ の最初の和は空の和とする。",
+        "$N=n+1$ とする。$\\lfloor\\sqrt k\\rfloor$ は $j^2\\le k$ を満たす正整数 $j$ の個数なので、組 $(j,k)$ を $j$ ごとに数え直せば\n\\[a_n=\\sum_{j=1}^m(N-j^2+1)=m(N+1)-\\frac{m(m+1)(2m+1)}6.\\]\n最後の群が途中で終わる場合もこの数え方に含まれる。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "floor(sqrt(n+1))*(n+2)-floor(sqrt(n+1))*(floor(sqrt(n+1))+1)*(2*floor(sqrt(n+1))+1)/6",
+        "residual": "a(n+1)-a(n)-floor(sqrt(n+2))",
+        "initials": {
+          "1": "2"
+        },
+        "start": 1,
+        "samples": 150
+      }
+    },
+    {
+      "id": "L6-G03",
+      "level": 6,
+      "category": "gauss",
+      "title": "値と添字の余りを追う",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/03_余りと周期.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/03_%E4%BD%99%E3%82%8A%E3%81%A8%E5%91%A8%E6%9C%9F.tex",
+        "location": "03_余りと周期.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "d719b183dfe7727c1128404ebf2db037a357d2e4432563f5dcd9434604ab90c7"
+      },
+      "statement": "\\[\na_1=1,\\quad X_n=a_n^2+n^2+n,\\quad a_{n+1}=X_n-4\\left\\lfloor\\frac{X_n}{4}\\right\\rfloor\\quad(n\\ge1)\n\\]\nで定まる数列の一般項と最小の正の周期を求めよ。",
+      "hint": "$(a_n,n\\bmod4)$ を一つの状態とみなす。値だけが同じでも、更新が一致するとは限らない。",
+      "answer": "\\[\na_n=\\begin{cases}1&(n\\equiv0,1\\pmod4),\\\\3&(n\\equiv2,3\\pmod4).\\end{cases}\n\\]\n最小の正の周期は $4$。",
+      "solution": [
+        "更新は $X_n$ を $4$ で割った余りを返す。$n(n+1)$ は偶数であり、奇数の二乗は $4$ を法として $1$ なので、初項から各項は $1$ または $3$ となる。",
+        "順に計算すると $a_1,a_2,a_3,a_4,a_5=1,3,3,1,1$。$n=1,5$ で値と添字の余りの組が一致するから、同じ更新を繰り返し $a_{n+4}=a_n$ となる。",
+        "$1,2$ は $a_1\\ne a_2,a_3$ から周期ではなく、$3$ も $a_2\\ne a_5$ から周期ではない。よって最小周期は $4$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((1,Or(Eq(Mod(n,4),0),Eq(Mod(n,4),1))),(3,True))",
+        "residual": "a(n+1)-(a(n)**2+n**2+n-4*floor((a(n)**2+n**2+n)/4))",
+        "initials": {
+          "1": "1"
+        },
+        "start": 1,
+        "samples": 100,
+        "claims": [
+          "a(n+4)-a(n)"
+        ]
+      }
+    },
+    {
+      "id": "L6-G04",
+      "level": 6,
+      "category": "gauss",
+      "title": "倍数の境界を検出する階差",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/04_境界と繰り上がり.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/04_%E5%A2%83%E7%95%8C%E3%81%A8%E7%B9%B0%E3%82%8A%E4%B8%8A%E3%81%8C%E3%82%8A.tex",
+        "location": "04_境界と繰り上がり.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "7ac2349f2956553f97c0647c26d64c8eb903e9eb4936000ba54732615390a43b"
+      },
+      "statement": "$a_0=0$ とし、$n\\ge1$ に対して\n\\[\n\\begin{aligned}\na_n&=a_{n-1}+d_n,\\\\\nd_n&=\\left\\lfloor\\frac n4\\right\\rfloor-\\left\\lfloor\\frac{n-1}4\\right\\rfloor-\\left\\lfloor\\frac n6\\right\\rfloor+\\left\\lfloor\\frac{n-1}6\\right\\rfloor\n\\end{aligned}\n\\]\nと定める。一般項を求め、$d_n$ がどのような条件を表しているか説明せよ。",
+      "hint": "$\\lfloor n/m\\rfloor-\\lfloor(n-1)/m\\rfloor$ は $n$ が $m$ の倍数のときだけ $1$。",
+      "answer": "\\[a_n=\\left\\lfloor\\frac n4\\right\\rfloor-\\left\\lfloor\\frac n6\\right\\rfloor\\quad(n\\ge0).\\]\n$d_n$ は $4$ の倍数だけなら $1$、$6$ の倍数だけなら $-1$、両方の倍数またはいずれの倍数でもないなら $0$。",
+      "solution": [
+        "商が一つ増えるのは $n$ が割る数の倍数のときである。二つの指示を引けば $d_n$ の説明を得る。",
+        "$a_n=\\sum_{k=1}^n d_k$ であり、途中の項が消えるので\n\\[\\sum_{k=1}^n\\left(\\left\\lfloor\\frac km\\right\\rfloor-\\left\\lfloor\\frac{k-1}m\\right\\rfloor\\right)=\\left\\lfloor\\frac nm\\right\\rfloor.\\]\n$m=4,6$ の差を取る。初項 $a_0=0$ にも合う。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "floor(n/4)-floor(n/6)",
+        "residual": "a(n)-a(n-1)-floor(n/4)+floor((n-1)/4)+floor(n/6)-floor((n-1)/6)",
+        "initials": {
+          "0": "0"
+        },
+        "start": 1,
+        "samples": 120
+      }
+    },
+    {
+      "id": "L6-G05",
+      "level": 6,
+      "category": "gauss",
+      "title": "丸め誤差から線形化する",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/05_丸め誤差を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/05_%E4%B8%B8%E3%82%81%E8%AA%A4%E5%B7%AE%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "05_丸め誤差を使う.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "48020dad9901f691dc0556bd45fdf82cc7a5a5f190c2289507443f2b0e8b1a34"
+      },
+      "statement": "\\[a_1=1,\\qquad a_{n+1}=\\lfloor(1+\\sqrt2)a_n\\rfloor\\quad(n\\ge1)\\]\nを床関数を含まない漸化式に帰着させ、一般項を求めよ。",
+      "hint": "$\\lambda=1+\\sqrt2$ とし、捨てた部分 $\\varepsilon_n=\\lambda a_n-a_{n+1}$ の範囲と $\\lambda^2=2\\lambda+1$ を使う。",
+      "answer": "\\[a_2=2,\\qquad a_{n+2}=2a_{n+1}+a_n-1.\\]\n\\[a_n=\\frac12+\\frac{(1+\\sqrt2)^n+(1-\\sqrt2)^n}{4}.\\]",
+      "solution": [
+        "初項からすべての項は正整数であり、$\\lambda a_n$ は無理数なので $0<\\varepsilon_n<1$。",
+        "$\\lambda^2=2\\lambda+1$ より\n\\[\\lambda a_{n+1}=2a_{n+1}+a_n-(\\lambda-2)\\varepsilon_n.\\]\n整数 $M_n=2a_{n+1}+a_n$ に対し $0<(\\lambda-2)\\varepsilon_n<1$。したがって床は $M_n-1$ となる。",
+        "$b_n=a_n-\\tfrac12$ とおけば $b_{n+2}=2b_{n+1}+b_n$、$b_1=\\tfrac12,b_2=\\tfrac32$。特性根は $1\\pm\\sqrt2$ である。初期値を合わせて $b_n=\\{(1+\\sqrt2)^n+(1-\\sqrt2)^n\\}/4$、これを戻す。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "1/2+((1+sqrt(2))**n+(1-sqrt(2))**n)/4",
+        "residual": "a(n+1)-floor((1+sqrt(2))*a(n))",
+        "initials": {
+          "1": "1",
+          "2": "2"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "a(n+2)-2*a(n+1)-a(n)+1"
+        ]
+      }
+    },
+    {
+      "id": "L6-G06",
+      "level": 6,
+      "category": "gauss",
+      "title": "丸めを伴う停止と初項依存",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/06_止まる値を調べる.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/06_%E6%AD%A2%E3%81%BE%E3%82%8B%E5%80%A4%E3%82%92%E8%AA%BF%E3%81%B9%E3%82%8B.tex",
+        "location": "06_止まる値を調べる.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "2af763036d10d0c867442729a5113113713c271142e53c49d51fea9a8fdce92d"
+      },
+      "statement": "$M$ は非負整数とする。\n\\[a_1=M,\\qquad a_{n+1}=\\left\\lfloor\\frac{a_n+6}{2}\\right\\rfloor\\quad(n\\ge1).\\]\n一般項と、有限回の更新後に一定になる値を $M$ によって場合分けして求めよ。",
+      "hint": "$b_n=a_n-6$ により $b_{n+1}=\\lfloor b_n/2\\rfloor$ とする。負数の床は零への切り捨てではない。",
+      "answer": "\\[a_n=6+\\left\\lfloor\\frac{M-6}{2^{n-1}}\\right\\rfloor.\\]\n最終的な値は $M<6$ なら $5$、$M\\ge6$ なら $6$。",
+      "solution": [
+        "$6$ を引くと $b_{n+1}=\\lfloor b_n/2\\rfloor$。正整数 $m$ に対する $\\lfloor\\lfloor x\\rfloor/m\\rfloor=\\lfloor x/m\\rfloor$ を帰納的に用いて一般項を得る。",
+        "$M\\ge6$ なら十分大きな $n$ で $(M-6)/2^{n-1}\\in[0,1)$、$M<6$ なら $(-1,0)$ に入る。床はそれぞれ $0,-1$ なので有限回で $6,5$ に達する。",
+        "不動点の条件は $x\\le(x+6)/2<x+1$、すなわち $4<x\\le6$。整数の不動点は $5,6$ であり、その後も同じ値を保つ。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "6+floor((M-6)/2**(n-1))",
+        "residual": "a(n+1)-floor((a(n)+6)/2)",
+        "initials": {
+          "1": "M"
+        },
+        "start": 1,
+        "samples": 20,
+        "parameter_cases": [
+          {
+            "M": "0"
+          },
+          {
+            "M": "1"
+          },
+          {
+            "M": "5"
+          },
+          {
+            "M": "6"
+          },
+          {
+            "M": "7"
+          },
+          {
+            "M": "8"
+          },
+          {
+            "M": "14"
+          },
+          {
+            "M": "1000"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L6-G07",
+      "level": 6,
+      "category": "gauss",
+      "title": "半分の添字と階差の群",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/07_添字を分ける.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/07_%E6%B7%BB%E5%AD%97%E3%82%92%E5%88%86%E3%81%91%E3%82%8B.tex",
+        "location": "07_添字を分ける.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "e7b0add69659ae670b6e70263caab45d59294cf5efe3c4f7b12187e17ac5af39"
+      },
+      "statement": "\\[\na_1=2,\\qquad a_n=a_{\\lfloor(n+1)/2\\rfloor}+a_{\\lfloor n/2\\rfloor}+n-1\\quad(n\\ge2).\n\\]\n一般項を求めよ。$2^m\\le n<2^{m+1}$ を満たす整数 $m\\ge0$ を用いてよい。",
+      "hint": "偶奇で式を分け、$b_n=a_{n+1}-a_n$ が $b_{2k}=b_{2k+1}=b_k+1$ を満たすことを示す。",
+      "answer": "\\[a_n=(m+3)n-2^{m+1}+1\\qquad(2^m\\le n<2^{m+1}).\\]",
+      "solution": [
+        "$n\\ge2$ では右辺の添字が $1$ 以上 $n-1$ 以下なので順に定義できる。$a_{2k}=2a_k+2k-1$、$a_{2k+1}=a_{k+1}+a_k+2k$。差を取ると $b_{2k}=b_{2k+1}=b_k+1$、$b_1=3$。",
+        "$2^j\\le k<2^{j+1}$ の群で $b_k=j+3$ となることを群番号の帰納法で示せる。",
+        "したがって\n\\[a_n=2+\\sum_{j=0}^{m-1}2^j(j+3)+(n-2^m)(m+3).\\]\n$\\sum_{j=0}^{m-1}2^j=2^m-1$、$\\sum_{j=0}^{m-1}j2^j=(m-2)2^m+2$ を代入する。$m=0$ の空の和も含めて答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "(floor(log(n,2))+3)*n-2**(floor(log(n,2))+1)+1",
+        "residual": "a(n)-a(floor((n+1)/2))-a(floor(n/2))-n+1",
+        "initials": {
+          "1": "2"
+        },
+        "start": 2,
+        "samples": 128
+      }
+    },
+    {
+      "id": "L6-G08",
+      "level": 6,
+      "category": "gauss",
+      "title": "床関数で三進法の桁を取り出す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/08_桁を取り出す.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/08_%E6%A1%81%E3%82%92%E5%8F%96%E3%82%8A%E5%87%BA%E3%81%99.tex",
+        "location": "08_桁を取り出す.tex：例題(1)",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "7b30c2874e86b55dcc4d836d975f2ea9a2db6971ac0d1996804205c17863c315"
+      },
+      "statement": "\\[a_0=0,\\qquad a_n=a_{\\lfloor n/3\\rfloor}+n-3\\lfloor n/3\\rfloor\\quad(n\\ge1).\\]\n$a_n$ と $n$ の三進表示との関係を証明し、$a_{14}$ および $a_{2026}$ を求めよ。",
+      "hint": "$n=3q+r$、$0\\le r<3$ と書く。$q$ は末尾の桁を除いた数、$r$ はその桁である。",
+      "answer": "$a_n$ は $n$ の三進表示の各桁の数字の和。\n\\[14=(112)_3,\\quad 2026=(2210001)_3,\\qquad a_{14}=4,\\quad a_{2026}=6.\\]",
+      "solution": [
+        "$q=\\lfloor n/3\\rfloor<n$、$r=n-3q\\in\\{0,1,2\\}$ とすると $a_n=a_q+r$。末尾の桁を付け足す操作と、桁の和を増やす量が一致する。$a_0=0$ から強い帰納法で意味を証明できる。",
+        "$14=9+3+2$、$2026=2\\cdot3^6+2\\cdot3^5+3^4+1$ から表示と桁の和を得る。"
+      ],
+      "verification": {
+        "mode": "digit_sum",
+        "base": 3,
+        "initials": {
+          "0": "0"
+        },
+        "start": 1,
+        "samples": 300,
+        "special_values": {
+          "14": 4,
+          "2026": 6
+        }
+      }
+    },
+    {
+      "id": "L6-G09",
+      "level": 6,
+      "category": "gauss",
+      "title": "小数部分の回転と非周期性",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/09_小数部分と回転.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/09_%E5%B0%8F%E6%95%B0%E9%83%A8%E5%88%86%E3%81%A8%E5%9B%9E%E8%BB%A2.tex",
+        "location": "09_小数部分と回転.tex：例題(1)",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "3d50ba45be5a66df20e63ea004c805b7308d5d04a6e3525674ae3c6f58087238"
+      },
+      "statement": "$\\alpha=\\sqrt2-1$ とし、\n\\[a_0=0,\\qquad a_{n+1}=a_n+\\alpha-\\lfloor a_n+\\alpha\\rfloor\\quad(n\\ge0)\\]\nと定める。一般項を求め、異なる添字の項が一致するか調べよ。さらに $\\alpha=p/q$（$0<p<q$、互いに素）に変えた場合の最小周期を求めよ。",
+      "hint": "$n\\alpha$ の小数部分を候補とする。二項が一致すると、添字の差と $\\alpha$ の積が整数になる。",
+      "answer": "\\[a_n=n\\alpha-\\lfloor n\\alpha\\rfloor\\quad(n\\ge0).\\]\n$\\alpha=\\sqrt2-1$ のとき異なる二項は一致せず、周期的でない。$\\alpha=p/q$ のとき最小周期は $q$。",
+      "solution": [
+        "整数を床の外に出せることから、$a_n=n\\alpha-\\lfloor n\\alpha\\rfloor$ を代入すれば $a_{n+1}=(n+1)\\alpha-\\lfloor(n+1)\\alpha\\rfloor$。初項にも合い、各項は $[0,1)$ に入る。",
+        "$a_{n+t}=a_n$、$t\\ge1$ なら $t\\alpha=\\lfloor(n+t)\\alpha\\rfloor-\\lfloor n\\alpha\\rfloor$ が整数となる。無理数 $\\alpha$ では不可能。",
+        "有理数 $p/q$ では $t\\alpha$ が整数であることと $q\\mid t$ が同値。よって全項で $a_{n+q}=a_n$、それより小さい正の周期はない。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n*alpha-floor(n*alpha)",
+        "residual": "a(n+1)-a(n)-alpha+floor(a(n)+alpha)",
+        "initials": {
+          "0": "0"
+        },
+        "start": 0,
+        "samples": 36,
+        "parameter_cases": [
+          {
+            "alpha": "sqrt(2)-1"
+          },
+          {
+            "alpha": "2/5"
+          },
+          {
+            "alpha": "3/7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L6-G10",
+      "level": 6,
+      "category": "gauss",
+      "title": "床の和を格子点として数える",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/02_ガウス記号を含む式/10_整数の個数を数える.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/02_%E3%82%AC%E3%82%A6%E3%82%B9%E8%A8%98%E5%8F%B7%E3%82%92%E5%90%AB%E3%82%80%E5%BC%8F/10_%E6%95%B4%E6%95%B0%E3%81%AE%E5%80%8B%E6%95%B0%E3%82%92%E6%95%B0%E3%81%88%E3%82%8B.tex",
+        "location": "10_整数の個数を数える.tex：例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "e63acd25f8e1a862cce11029fa52728689d57f24b21d17fce70b1280c2d1d8e1"
+      },
+      "statement": "\\[a_0=0,\\qquad a_n=a_{n-1}+\\left\\lfloor\\frac{5n}{2}\\right\\rfloor\\quad(n\\ge1).\\]\n一般項を求め、$a_n$ をある範囲の格子点の個数として説明せよ。",
+      "hint": "$\\lfloor5k/2\\rfloor=2k+\\lfloor k/2\\rfloor$ と分ける。後半の和は偶奇で計算する。",
+      "answer": "\\[a_n=n(n+1)+\\left\\lfloor\\frac{n^2}{4}\\right\\rfloor\\quad(n\\ge0).\\]\nこれは $1\\le x\\le n$、$1\\le y\\le5x/2$ を満たす整数の組 $(x,y)$ の個数。",
+      "solution": [
+        "階差を足すと\n\\[a_n=n(n+1)+\\sum_{k=1}^n\\left\\lfloor\\frac k2\\right\\rfloor.\\]\n後ろの和は $n=2m$ で $m^2$、$n=2m+1$ で $m(m+1)$ となり、いずれも $\\lfloor n^2/4\\rfloor$ である。",
+        "$x=k$ を固定すると $1\\le y\\le5k/2$ の整数は $\\lfloor5k/2\\rfloor$ 個。それを $k=1,\\ldots,n$ で足したものが $a_n$ である。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n*(n+1)+floor(n**2/4)",
+        "residual": "a(n)-a(n-1)-floor(5*n/2)",
+        "initials": {
+          "0": "0"
+        },
+        "start": 1,
+        "samples": 100
+      }
+    },
+    {
+      "id": "L6-F01",
+      "level": 6,
+      "category": "four_term",
+      "title": "三階差を零にする",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[a_1=1,\\ a_2=2,\\ a_3=4,\\qquad a_{n+3}=3a_{n+2}-3a_{n+1}+a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "二階差 $d_n=a_{n+2}-2a_{n+1}+a_n$ が一定となる。",
+      "answer": "\\[a_n=\\frac{n^2-n+2}{2}.\\]",
+      "solution": [
+        "$d_{n+1}-d_n=0$、$d_1=1$ なので $d_n=1$。$e_n=a_{n+1}-a_n$ とおけば $e_{n+1}-e_n=1$、$e_1=1$ より $e_n=n$。",
+        "$a_n=1+\\sum_{k=1}^{n-1}k=1+n(n-1)/2$ を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "(n*n-n+2)/2",
+        "residual": "a(n+3)-3*a(n+2)+3*a(n+1)-a(n)",
+        "initials": {
+          "1": "1",
+          "2": "2",
+          "3": "4"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-F02",
+      "level": 6,
+      "category": "four_term",
+      "title": "補助数列から項数を減らす",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "例題(2)",
+        "adaptation": "教科書と同じ",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[a_1=2,\\ a_2=1,\\ a_3=5,\\qquad a_{n+3}=2a_{n+2}+a_{n+1}-2a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "$d_n=a_{n+2}-a_{n+1}-2a_n$ が一定であることと初期値を使う。",
+      "answer": "\\[a_n=2^{n-1}+(-1)^{n-1}.\\]",
+      "solution": [
+        "$d_{n+1}-d_n=a_{n+3}-2a_{n+2}-a_{n+1}+2a_n=0$。$d_1=5-1-4=0$ だから $a_{n+2}=a_{n+1}+2a_n$。",
+        "特性方程式 $(r-2)(r+1)=0$ から $a_n=A2^{n-1}+B(-1)^{n-1}$。$A+B=2,2A-B=1$ より $A=B=1$。第三の初期値は $d_1=0$ に使われている。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "2**(n-1)+(-1)**(n-1)",
+        "residual": "a(n+3)-2*a(n+2)-a(n+1)+2*a(n)",
+        "initials": {
+          "1": "2",
+          "2": "1",
+          "3": "5"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-F03",
+      "level": 6,
+      "category": "four_term",
+      "title": "等比の二階差と特解",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "例題(3)",
+        "adaptation": "教科書と同じ",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[a_1=1,\\ a_2=4,\\ a_3=11,\\qquad a_{n+3}=5a_{n+2}-7a_{n+1}+3a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "二階差が公比 $3$ の等比数列になる。$3^{n-1}$ の二階差と比べる。",
+      "answer": "\\[a_n=n-1+3^{n-1}.\\]",
+      "solution": [
+        "$d_n=a_{n+2}-2a_{n+1}+a_n$ とすると $d_{n+1}=3d_n$、$d_1=4$。よって $d_n=4\\cdot3^{n-1}$。",
+        "$3^{n-1}$ の二階差も $4\\cdot3^{n-1}$ なので $b_n=a_n-3^{n-1}$ の二階差は零。$b_1=0,b_2=1$ から $b_n=n-1$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n-1+3**(n-1)",
+        "residual": "a(n+3)-5*a(n+2)+7*a(n+1)-3*a(n)",
+        "initials": {
+          "1": "1",
+          "2": "4",
+          "3": "11"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-F04",
+      "level": 6,
+      "category": "four_term",
+      "title": "三つの異なる特性根",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：三次の特性方程式",
+        "adaptation": "教科書の方法による新作",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[a_1=3,\\ a_2=6,\\ a_3=14,\\qquad a_{n+3}=6a_{n+2}-11a_{n+1}+6a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "特性多項式を $(r-1)(r-2)(r-3)$ に分解する。",
+      "answer": "\\[a_n=1+2^{n-1}+3^{n-1}.\\]",
+      "solution": [
+        "$r^3-6r^2+11r-6=(r-1)(r-2)(r-3)$。異なる根から $a_n=A+B2^{n-1}+C3^{n-1}$ とおく。",
+        "$A+B+C=3$、$A+2B+3C=6$、$A+4B+9C=14$ を解くと $A=B=C=1$。候補は三つの初期値と更新を満たすので、一意性により求める数列である。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "1+2**(n-1)+3**(n-1)",
+        "residual": "a(n+3)-6*a(n+2)+11*a(n+1)-6*a(n)",
+        "initials": {
+          "1": "3",
+          "2": "6",
+          "3": "14"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-F05",
+      "level": 6,
+      "category": "four_term",
+      "title": "三重根を正規化する",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：補助数列と階差",
+        "adaptation": "教科書の方法による新作",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[a_1=1,\\ a_2=8,\\ a_3=36,\\qquad a_{n+3}=6a_{n+2}-12a_{n+1}+8a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "特性多項式は $(r-2)^3$。$b_n=a_n/2^{n-1}$ として三階差を取る。",
+      "answer": "\\[a_n=n^2\\,2^{n-1}.\\]",
+      "solution": [
+        "$b_n=a_n/2^{n-1}$ とおいて割ると $b_{n+3}=3b_{n+2}-3b_{n+1}+b_n$。初期値は $b_1=1,b_2=4,b_3=9$。",
+        "$b_n$ の二階差は一定で $2$。$e_n=b_{n+1}-b_n$ は $e_1=3$、$e_{n+1}-e_n=2$ だから $e_n=2n+1$。よって $b_n=1+\\sum_{k=1}^{n-1}(2k+1)=n^2$。正規化を戻す。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n*n*2**(n-1)",
+        "residual": "a(n+3)-6*a(n+2)+12*a(n+1)-8*a(n)",
+        "initials": {
+          "1": "1",
+          "2": "8",
+          "3": "36"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-N01",
+      "level": 6,
+      "category": "newton",
+      "title": "平方根のニュートン法を解く",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/03_ニュートン法/ニュートン法.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/03_%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95/%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95.tex",
+        "location": "本文：平方根2の近似と閉じた式",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "dcff6781ff962e982e35ba6c96d4f884f7eeb6469e2c1a2d0e6b40b8629bf528"
+      },
+      "statement": "\\[a_1=2,\\qquad a_{n+1}=\\frac{a_n^2+2}{2a_n}\\quad(n\\ge1).\\]\n全項が定義されることを示し、一般項と極限を求めよ。また $e_n=a_n-\\sqrt2$ の漸化式を求めよ。",
+      "hint": "$b_n=(a_n-\\sqrt2)/(a_n+\\sqrt2)$ とおく。誤差そのものではなく、この比が二乗される。",
+      "answer": "$u=3+2\\sqrt2$ とすると\n\\[a_n=\\sqrt2\\,\\frac{u^{2^{n-1}}+1}{u^{2^{n-1}}-1},\\qquad\\lim_{n\\to\\infty}a_n=\\sqrt2.\\]\n\\[e_{n+1}=\\frac{e_n^2}{2a_n}.\\]",
+      "solution": [
+        "正の項から次の項も正になるので、帰納的に $a_n>0$、分母は非零。$a_{n+1}-\\sqrt2=(a_n-\\sqrt2)^2/(2a_n)$、$a_{n+1}+\\sqrt2=(a_n+\\sqrt2)^2/(2a_n)$。前者が誤差の式である。",
+        "比を取ると $b_{n+1}=b_n^2$。$b_1=3-2\\sqrt2=u^{-1}$ より $b_n=u^{-2^{n-1}}$。$a_n=\\sqrt2(1+b_n)/(1-b_n)$ を解いて一般項を得る。",
+        "$u>1$ なので $0<b_n<1$、したがって一般項の分母も非零。$b_n\\to0$ から極限は $\\sqrt2$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "sqrt(2)*((3+2*sqrt(2))**(2**(n-1))+1)/((3+2*sqrt(2))**(2**(n-1))-1)",
+        "residual": "a(n+1)-(a(n)**2+2)/(2*a(n))",
+        "initials": {
+          "1": "2"
+        },
+        "start": 1,
+        "samples": 5,
+        "identities": [
+          "(x*x+r*r)/(2*x)-r-(x-r)**2/(2*x)",
+          "(((x*x+r*r)/(2*x)-r)/((x*x+r*r)/(2*x)+r))-((x-r)/(x+r))**2"
+        ],
+        "claims": [
+          "a(n)-sqrt(2)>0"
+        ]
+      }
+    },
+    {
+      "id": "L6-N02",
+      "level": 6,
+      "category": "newton",
+      "title": "根より下から始めるニュートン法",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/03_ニュートン法/ニュートン法.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/03_%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95/%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95.tex",
+        "location": "本文：平方根の更新と比の二乗",
+        "adaptation": "被開平数と初項を変更した新作",
+        "sha256": "dcff6781ff962e982e35ba6c96d4f884f7eeb6469e2c1a2d0e6b40b8629bf528"
+      },
+      "statement": "\\[a_1=1,\\qquad a_{n+1}=\\frac{a_n^2+3}{2a_n}\\quad(n\\ge1).\\]\n一般項と極限を求めよ。また第2項以降は $\\sqrt3$ より大きく、単調減少することを示せ。",
+      "hint": "$b_n=(a_n-\\sqrt3)/(a_n+\\sqrt3)$ は初項が負であるが、次から正になる。",
+      "answer": "$q=(1-\\sqrt3)/(1+\\sqrt3)$ とおくと\n\\[a_n=\\sqrt3\\,\\frac{1+q^{2^{n-1}}}{1-q^{2^{n-1}}},\\qquad\\lim_{n\\to\\infty}a_n=\\sqrt3.\\]\n$n\\ge2$ で $a_n>\\sqrt3$ かつ $a_{n+1}<a_n$。",
+      "solution": [
+        "正の初項と更新から $a_n>0$ であり全項が定義される。平方根2の場合と同様に $b_{n+1}=b_n^2$、$b_1=q$。$-1<q<0$ なので一般項の分母は非零で、$n=1$ の符号も含めて式が成り立つ。",
+        "$a_2=2>\\sqrt3$。$a_{n+1}-\\sqrt3=(a_n-\\sqrt3)^2/(2a_n)>0$ により第2項以降は根より大きい。",
+        "$a_{n+1}-a_n=(3-a_n^2)/(2a_n)<0$ より単調減少。一般項で $q^{2^{n-1}}\\to0$ として極限を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "sqrt(3)*(1+((1-sqrt(3))/(1+sqrt(3)))**(2**(n-1)))/(1-((1-sqrt(3))/(1+sqrt(3)))**(2**(n-1)))",
+        "residual": "a(n+1)-(a(n)**2+3)/(2*a(n))",
+        "initials": {
+          "1": "1",
+          "2": "2"
+        },
+        "start": 1,
+        "samples": 5,
+        "identities": [
+          "(x*x+r*r)/(2*x)-r-(x-r)**2/(2*x)"
+        ],
+        "claims": [
+          "a(n+1)-sqrt(3)>0",
+          "a(n+2)<a(n+1)"
+        ]
+      }
+    },
+    {
+      "id": "L6-N03",
+      "level": 6,
+      "category": "newton",
+      "title": "立方根のニュートン法と二次収束",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/03_ニュートン法/ニュートン法.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/03_%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95/%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95.tex",
+        "location": "本文末尾：一般のニュートン法／第4章の誤差評価に対応",
+        "adaptation": "教科書の考え方を立方根へ拡張した新作",
+        "sha256": "dcff6781ff962e982e35ba6c96d4f884f7eeb6469e2c1a2d0e6b40b8629bf528"
+      },
+      "statement": "\\[a_1=2,\\qquad a_{n+1}=\\frac{2a_n^3+2}{3a_n^2}\\quad(n\\ge1)\\]\nとし、$r=\\sqrt[3]2$ とおく。\n\n(1) この更新を $f(x)=x^3-2$ の接線から導け。\n\n(2) 全項について $a_n>r$、$a_{n+1}<a_n$ を示し、極限を求めよ。\n\n(3) $e_n=a_n-r$ が満たす式を求め、$0<e_{n+1}\\le e_n^2/r$ を示せ。一般項の閉じた表示は求めなくてよい。",
+      "hint": "$a_{n+1}-r$ の分子を $(a_n-r)^2(2a_n+r)$ と因数分解する。",
+      "answer": "\\[a_n\\downarrow r,\\qquad\\lim_{n\\to\\infty}a_n=\\sqrt[3]2.\\]\n\\[e_{n+1}=\\frac{(2a_n+r)e_n^2}{3a_n^2},\\qquad0<e_{n+1}\\le\\frac{e_n^2}{r}.\\]",
+      "solution": [
+        "接線 $y=(a_n^3-2)+3a_n^2(x-a_n)$ に $y=0$ を代入すると $x=a_n-(a_n^3-2)/(3a_n^2)=(2a_n^3+2)/(3a_n^2)$。",
+        "$r^3=2$ を用いると\n\\[a_{n+1}-r=\\frac{(a_n-r)^2(2a_n+r)}{3a_n^2}.\\]\n$a_1=2>r>0$ から帰納的に $a_n>r$ であり、すべての分母も非零。さらに $a_{n+1}-a_n=(2-a_n^3)/(3a_n^2)<0$。",
+        "下に有界な単調減少列なので極限 $L\\ge r$ が存在する。更新の極限から $3L^3=2L^3+2$、よって $L=r$。",
+        "$a_n\\ge r$ だから $2a_n+r\\le3a_n$。従って $(2a_n+r)/(3a_n^2)\\le1/a_n\\le1/r$ であり、誤差の評価を得る。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "1": "2"
+        },
+        "start": 1,
+        "samples": 5,
+        "next": "(2*x**3+2)/(3*x**2)",
+        "claims": [
+          "a(n)>2**(1/3)",
+          "a(n+1)<a(n)",
+          "a(n+1)-2**(1/3)-(a(n)-2**(1/3))**2*(2*a(n)+2**(1/3))/(3*a(n)**2)",
+          "a(n+1)-2**(1/3)<=(a(n)-2**(1/3))**2/2**(1/3)"
+        ],
+        "identities": [
+          "(2*x**3+r**3)/(3*x**2)-r-(x-r)**2*(2*x+r)/(3*x**2)"
+        ],
+        "special_values": {
+          "2": "3/2",
+          "3": "35/27"
+        }
+      }
+    },
+    {
+      "id": "L6-S01",
+      "level": 6,
+      "category": "symmetric",
+      "title": "逆数の和と指数の倍増",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/01_対称式を使う/対称式を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/01_%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86/%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "問題 example-symmetric-1",
+        "adaptation": "教科書と同じ",
+        "sha256": "13e0905955f8ec11c19c8273965c92c119ac2b2bd94987f814c6ca64f02e40dd"
+      },
+      "statement": "\\[a_1=3,\\qquad a_{n+1}=a_n^2-2\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "$(u+u^{-1})^2-2=u^2+u^{-2}$ を利用する。",
+      "answer": "$\\alpha=(3+\\sqrt5)/2$、$\\beta=(3-\\sqrt5)/2$ とすると\n\\[a_n=\\alpha^{2^{n-1}}+\\beta^{2^{n-1}}.\\]",
+      "solution": [
+        "$\\alpha\\beta=1$、$\\alpha+\\beta=3$。$b_n=\\alpha^{2^{n-1}}+\\alpha^{-2^{n-1}}$ とおくと $b_1=3$、$b_{n+1}=b_n^2-2$。",
+        "初項と更新が一致するから帰納法で $a_n=b_n$。$\\alpha^{-1}=\\beta$ として答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "((3+sqrt(5))/2)**(2**(n-1))+((3-sqrt(5))/2)**(2**(n-1))",
+        "residual": "a(n+1)-a(n)**2+2",
+        "initials": {
+          "1": "3"
+        },
+        "start": 1,
+        "samples": 6,
+        "identities": [
+          "(x+1/x)**2-2-x**2-1/x**2"
+        ]
+      }
+    },
+    {
+      "id": "L6-S02",
+      "level": 6,
+      "category": "symmetric",
+      "title": "逆数の和と指数の三倍",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/01_対称式を使う/対称式を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/01_%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86/%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "本文：三次式の恒等式",
+        "adaptation": "初項を固定した新作",
+        "sha256": "13e0905955f8ec11c19c8273965c92c119ac2b2bd94987f814c6ca64f02e40dd"
+      },
+      "statement": "\\[a_1=\\frac52,\\qquad a_{n+1}=a_n^3-3a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "$(u+u^{-1})^3-3(u+u^{-1})=u^3+u^{-3}$。初項を $2+1/2$ と見る。",
+      "answer": "\\[a_n=2^{3^{n-1}}+2^{-3^{n-1}}.\\]",
+      "solution": [
+        "$b_n=2^{3^{n-1}}+2^{-3^{n-1}}$ とおく。$b_1=2+1/2=5/2$。",
+        "恒等式に $u=2^{3^{n-1}}$ を代入すると $b_n^3-3b_n=2^{3^n}+2^{-3^n}=b_{n+1}$。初項と更新の一致から $a_n=b_n$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "2**(3**(n-1))+2**(-3**(n-1))",
+        "residual": "a(n+1)-a(n)**3+3*a(n)",
+        "initials": {
+          "1": "5/2"
+        },
+        "start": 1,
+        "samples": 5,
+        "identities": [
+          "(x+1/x)**3-3*(x+1/x)-x**3-1/x**3"
+        ]
+      }
+    },
+    {
+      "id": "L6-S03",
+      "level": 6,
+      "category": "symmetric",
+      "title": "逆数の差と三乗の恒等式",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/01_対称式を使う/対称式を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/01_%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86/%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "問題 example-symmetric-2",
+        "adaptation": "教科書と同じ",
+        "sha256": "13e0905955f8ec11c19c8273965c92c119ac2b2bd94987f814c6ca64f02e40dd"
+      },
+      "statement": "\\[a_1=\\frac83,\\qquad a_{n+1}=a_n^3+3a_n\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "和でなく差を使い、$(u-u^{-1})^3+3(u-u^{-1})=u^3-u^{-3}$ とする。",
+      "answer": "\\[a_n=3^{3^{n-1}}-3^{-3^{n-1}}.\\]",
+      "solution": [
+        "$3-1/3=8/3$ なので $b_n=3^{3^{n-1}}-3^{-3^{n-1}}$ を候補とする。",
+        "差の三乗の恒等式に $u=3^{3^{n-1}}$ を代入すれば $b_{n+1}=b_n^3+3b_n$。初項も一致するため帰納法で答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "3**(3**(n-1))-3**(-3**(n-1))",
+        "residual": "a(n+1)-a(n)**3-3*a(n)",
+        "initials": {
+          "1": "8/3"
+        },
+        "start": 1,
+        "samples": 5,
+        "identities": [
+          "(x-1/x)**3+3*(x-1/x)-x**3+1/x**3"
+        ]
+      }
+    },
+    {
+      "id": "L6-S04",
+      "level": 6,
+      "category": "symmetric",
+      "title": "四次式を保つ対称式",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/01_対称式を使う/対称式を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/01_%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86/%E5%AF%BE%E7%A7%B0%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "本文：指数を倍にする恒等式",
+        "adaptation": "二回の更新を合成した新作",
+        "sha256": "13e0905955f8ec11c19c8273965c92c119ac2b2bd94987f814c6ca64f02e40dd"
+      },
+      "statement": "\\[a_1=3,\\qquad a_{n+1}=a_n^4-4a_n^2+2\\quad(n\\ge1).\\]\n一般項を求めよ。",
+      "hint": "$x^4-4x^2+2=(x^2-2)^2-2$。逆数の和で指数が四倍になる。",
+      "answer": "$\\alpha=(3+\\sqrt5)/2$、$\\beta=(3-\\sqrt5)/2$ とすると\n\\[a_n=\\alpha^{4^{n-1}}+\\beta^{4^{n-1}}.\\]",
+      "solution": [
+        "$(u+u^{-1})^4-4(u+u^{-1})^2+2=u^4+u^{-4}$。これは二乗して $2$ を引く操作を二回続けても得られる。",
+        "$\\alpha\\beta=1$、$\\alpha+\\beta=3$ から $b_n=\\alpha^{4^{n-1}}+\\alpha^{-4^{n-1}}$ は初項と四次式の更新を満たす。よって帰納的に $a_n=b_n$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "((3+sqrt(5))/2)**(4**(n-1))+((3-sqrt(5))/2)**(4**(n-1))",
+        "residual": "a(n+1)-a(n)**4+4*a(n)**2-2",
+        "initials": {
+          "1": "3"
+        },
+        "start": 1,
+        "samples": 4,
+        "identities": [
+          "(x+1/x)**4-4*(x+1/x)**2+2-x**4-1/x**4"
+        ]
+      }
+    },
+    {
+      "id": "L6-T01",
+      "level": 6,
+      "category": "trigonometric",
+      "title": "余弦の倍角と固定値",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：角度に置き換える",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=\\frac{\\sqrt3}{2},\\qquad a_{n+1}=2a_n^2-1\\quad(n\\ge1).\\]\n一般項を求め、$n\\ge3$ の値を簡単に表せ。",
+      "hint": "$a_1=\\cos(\\pi/6)$ と倍角公式を使う。",
+      "answer": "\\[a_n=\\cos\\left(2^{n-1}\\frac\\pi6\\right),\\qquad a_n=-\\frac12\\quad(n\\ge3).\\]",
+      "solution": [
+        "$b_n=\\cos(2^{n-1}\\pi/6)$ とすれば $b_1=\\sqrt3/2$、倍角公式から $b_{n+1}=2b_n^2-1$。初項と更新の一致を帰納法で確かめる。",
+        "$a_2=1/2$、$a_3=-1/2$。$2(-1/2)^2-1=-1/2$ なので、それ以降はこの値を保つ。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "cos(2**(n-1)*pi/6)",
+        "residual": "a(n+1)-2*a(n)**2+1",
+        "initials": {
+          "1": "sqrt(3)/2"
+        },
+        "start": 1,
+        "samples": 16,
+        "identities": [
+          "cos(2*x)-2*cos(x)**2+1"
+        ],
+        "claims": [
+          "a(n+2)+1/2"
+        ]
+      }
+    },
+    {
+      "id": "L6-T02",
+      "level": 6,
+      "category": "trigonometric",
+      "title": "正接の倍角と分母の確認",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：正接と傾き",
+        "adaptation": "教科書と同じ",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=2-\\sqrt3,\\qquad a_{n+1}=\\frac{2a_n}{1-a_n^2}\\quad(n\\ge1).\\]\n一般項を求め、元の漸化式の分母が全項で零にならないことを示せ。",
+      "hint": "$2-\\sqrt3=\\tan(\\pi/12)$。候補の角度が正接の定義できない角度に達しないか調べる。",
+      "answer": "\\[a_n=\\tan\\left(2^{n-1}\\frac\\pi{12}\\right).\\]",
+      "solution": [
+        "$\\theta_n=2^{n-1}\\pi/12$ とする。$\\cos\\theta_n=0$ なら $2^{n-1}=6+12k$ となるが、右辺は $3$ の倍数、左辺はそうでない。よって候補の全項が定義される。",
+        "$1-\\tan^2\\theta_n=0$ なら $\\cos(2\\theta_n)=0$、すなわち $2^n=6+12k$。これも不可能なので元の分母は非零。",
+        "初項は $\\tan(\\pi/12)=2-\\sqrt3$。正接の倍角公式から候補は更新を満たし、帰納法で一般項を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "tan(2**(n-1)*pi/12)",
+        "residual": "a(n+1)-2*a(n)/(1-a(n)**2)",
+        "initials": {
+          "1": "2-sqrt(3)"
+        },
+        "start": 1,
+        "samples": 16,
+        "claims": [
+          "Ne(1-a(n)**2,0)"
+        ]
+      }
+    },
+    {
+      "id": "L6-T03",
+      "level": 6,
+      "category": "trigonometric",
+      "title": "二次の反復を正弦の二乗に直す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：倍角公式と式の一致",
+        "adaptation": "倍角公式から作成した新作",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=\\frac{3-\\sqrt5}{8},\\qquad a_{n+1}=4a_n(1-a_n)\\quad(n\\ge1).\\]\n一般項を求め、$0\\le a_n\\le1$ を示せ。",
+      "hint": "$a_1=\\sin^2(\\pi/10)$ と $\\sin^2(2x)=4\\sin^2x(1-\\sin^2x)$ を使う。",
+      "answer": "\\[a_n=\\sin^2\\left(2^{n-1}\\frac\\pi{10}\\right),\\qquad0\\le a_n\\le1.\\]",
+      "solution": [
+        "$\\sin(\\pi/10)=(\\sqrt5-1)/4$ なのでその二乗は $(3-\\sqrt5)/8$。",
+        "$b_n=\\sin^2(2^{n-1}\\pi/10)$ とおく。正弦の倍角公式と $\\cos^2x=1-\\sin^2x$ から $b_{n+1}=4b_n(1-b_n)$。初項も一致するので帰納法で一般項を得る。実角の正弦の二乗は $[0,1]$ に入る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "sin(2**(n-1)*pi/10)**2",
+        "residual": "a(n+1)-4*a(n)*(1-a(n))",
+        "initials": {
+          "1": "(3-sqrt(5))/8"
+        },
+        "start": 1,
+        "samples": 12,
+        "identities": [
+          "sin(2*x)**2-4*sin(x)**2*(1-sin(x)**2)"
+        ],
+        "claims": [
+          "a(n)>=0",
+          "a(n)<=1"
+        ]
+      }
+    },
+    {
+      "id": "L6-T04",
+      "level": 6,
+      "category": "trigonometric",
+      "title": "余弦の三倍角と最小周期",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：角度の整数倍",
+        "adaptation": "三倍角公式から作成した新作",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=\\cos\\frac\\pi7,\\qquad a_{n+1}=4a_n^3-3a_n\\quad(n\\ge1).\\]\n一般項と最小の正の周期を求めよ。",
+      "hint": "角度は三倍される。$3^k$ を $14$ を法として調べ、余弦では符号の違いが消えることに注意する。",
+      "answer": "\\[a_n=\\cos\\left(3^{n-1}\\frac\\pi7\\right).\\]\n最小の正の周期は $3$。",
+      "solution": [
+        "三倍角公式 $\\cos3x=4\\cos^3x-3\\cos x$ により、初項と更新を合わせれば一般項を得る。",
+        "$3^3=27\\equiv-1\\pmod{14}$ だから、$3^{n+2}\\equiv-3^{n-1}\\pmod{14}$。余弦の偶関数性と周期 $2\\pi$ より $a_{n+3}=a_n$。",
+        "$a_1=\\cos(\\pi/7)$、$a_2=\\cos(3\\pi/7)$、$a_3=\\cos(9\\pi/7)=\\cos(5\\pi/7)$ は異なる。従って周期 $1,2$ は不可能で、最小周期は $3$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "cos(3**(n-1)*pi/7)",
+        "residual": "a(n+1)-4*a(n)**3+3*a(n)",
+        "initials": {
+          "1": "cos(pi/7)"
+        },
+        "start": 1,
+        "samples": 6,
+        "identities": [
+          "cos(3*x)-4*cos(x)**3+3*cos(x)"
+        ],
+        "claims": [
+          "a(n+3)-a(n)"
+        ]
+      }
+    },
+    {
+      "id": "L6-T05",
+      "level": 6,
+      "category": "trigonometric",
+      "title": "余接の倍角と周期",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：角度の更新と有理式",
+        "adaptation": "余接の倍角公式による新作",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=\\cot\\frac\\pi5,\\qquad a_{n+1}=\\frac{a_n^2-1}{2a_n}\\quad(n\\ge1).\\]\n一般項と最小の正の周期を求め、すべての分母が非零であることを示せ。ただし $\\cot x=\\cos x/\\sin x$ とする。",
+      "hint": "$\\cot2x=(\\cot^2x-1)/(2\\cot x)$。余接の周期は $\\pi$ である。",
+      "answer": "\\[a_n=\\cot\\left(2^{n-1}\\frac\\pi5\\right).\\]\n最小の正の周期は $4$。",
+      "solution": [
+        "$\\theta_n=2^{n-1}\\pi/5$ とおく。$\\sin\\theta_n=0$ なら $5\\mid2^{n-1}$ となり不可能。$\\cos\\theta_n=0$ なら $2^n=5(2k+1)$ となり、やはり不可能。候補は定義され、$a_n\\ne0$ である。",
+        "余接の倍角公式から候補は初項と更新を満たす。$2^4\\equiv1\\pmod5$ なので周期 $4$。",
+        "正の周期 $t$ なら $a_{t+1}=a_1$。余接の一致から $2^t\\equiv1\\pmod5$ が必要。$t=1,2,3$ では余りが $2,4,3$ なので、最小周期は $4$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "cot(2**(n-1)*pi/5)",
+        "residual": "a(n+1)-(a(n)**2-1)/(2*a(n))",
+        "initials": {
+          "1": "cot(pi/5)"
+        },
+        "start": 1,
+        "samples": 8,
+        "claims": [
+          "Ne(a(n),0)",
+          "a(n+4)-a(n)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O01",
+      "level": 6,
+      "category": "other",
+      "title": "複素特性根を実数の式に戻す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/04_特性根が虚数の場合/特性根が虚数の場合.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/04_%E7%89%B9%E6%80%A7%E6%A0%B9%E3%81%8C%E8%99%9A%E6%95%B0%E3%81%AE%E5%A0%B4%E5%90%88/%E7%89%B9%E6%80%A7%E6%A0%B9%E3%81%8C%E8%99%9A%E6%95%B0%E3%81%AE%E5%A0%B4%E5%90%88.tex",
+        "location": "例題(2)",
+        "adaptation": "教科書と同じ",
+        "sha256": "053c6b55847b39647750f843772b568c9191ece9ac665642c907e8041d6d7975"
+      },
+      "statement": "\\[a_1=0,\\quad a_2=1,\\qquad a_{n+2}=2a_{n+1}-2a_n\\quad(n\\ge1).\\]\n一般項を実数の式で表せ。",
+      "hint": "特性根 $1\\pm i$ の絶対値と偏角を求める。",
+      "answer": "\\[a_n=(\\sqrt2)^{n-1}\\sin\\frac{(n-1)\\pi}{4}.\\]",
+      "solution": [
+        "特性方程式 $r^2-2r+2=0$ の根は $1\\pm i=\\sqrt2(\\cos(\\pi/4)\\pm i\\sin(\\pi/4))$。",
+        "実数の一般解は $(\\sqrt2)^{n-1}\\{C\\cos((n-1)\\pi/4)+D\\sin((n-1)\\pi/4)\\}$。$a_1=0$ から $C=0$、$a_2=1$ から $D=1$。この式は二つの初期値と更新を満たす。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "sqrt(2)**(n-1)*sin((n-1)*pi/4)",
+        "residual": "a(n+2)-2*a(n+1)+2*a(n)",
+        "initials": {
+          "1": "0",
+          "2": "1"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-O02",
+      "level": 6,
+      "category": "other",
+      "title": "振動する成分と増大する振幅",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/04_特性根が虚数の場合/特性根が虚数の場合.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/04_%E7%89%B9%E6%80%A7%E6%A0%B9%E3%81%8C%E8%99%9A%E6%95%B0%E3%81%AE%E5%A0%B4%E5%90%88/%E7%89%B9%E6%80%A7%E6%A0%B9%E3%81%8C%E8%99%9A%E6%95%B0%E3%81%AE%E5%A0%B4%E5%90%88.tex",
+        "location": "例題(4)",
+        "adaptation": "教科書の問題・例に小問を追加",
+        "sha256": "053c6b55847b39647750f843772b568c9191ece9ac665642c907e8041d6d7975"
+      },
+      "statement": "\\[a_1=1,\\quad a_2=0,\\qquad a_{n+2}=2a_{n+1}-4a_n\\quad(n\\ge1).\\]\n一般項を実数の式で表せ。また $b_n=a_n/2^{n-1}$ の最小の正の周期を求め、$a_n$ 自身が周期的か調べよ。",
+      "hint": "特性根は $1\\pm\\sqrt3i$。振幅 $2^{n-1}$ と三角関数の部分を分ける。",
+      "answer": "\\[a_n=2^{n-1}\\left\\{\\cos\\frac{(n-1)\\pi}{3}-\\frac1{\\sqrt3}\\sin\\frac{(n-1)\\pi}{3}\\right\\}.\\]\n$b_n$ の最小周期は $6$。$a_n$ は周期的でない。",
+      "solution": [
+        "特性根の絶対値は $2$、偏角は $\\pm\\pi/3$。$a_1=1$ から余弦の係数は $1$、$a_2=0$ から正弦の係数は $-1/\\sqrt3$ と決まる。",
+        "$b_1,\\ldots,b_6=1,0,-1,-1,0,1$、$b_{n+6}=b_n$。$b_1\\ne b_2,b_3,b_4,b_5$ より $1,2,3,4$ は周期でなく、$b_2\\ne b_7$ より $5$ も周期でない。よって最小周期は $6$。",
+        "$a_{6k+1}=2^{6k}$ は非有界である。周期数列は有限個の値しか取らず有界だから $a_n$ は周期的でない。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "2**(n-1)*(cos((n-1)*pi/3)-sin((n-1)*pi/3)/sqrt(3))",
+        "residual": "a(n+2)-2*a(n+1)+4*a(n)",
+        "initials": {
+          "1": "1",
+          "2": "0"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "a(n+6)-64*a(n)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O03",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "奇数項と偶数項で二乗を繰り返す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "例題(1)",
+        "adaptation": "教科書と同じ",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[a_1=2,\\quad a_2=3,\\qquad a_{n+2}=a_n^2\\quad(n\\ge1).\\]\n一般項を奇数番目と偶数番目に分けて求めよ。",
+      "hint": "二つの部分列は、それぞれ独立に二乗の更新をする。",
+      "answer": "\\[a_{2k-1}=2^{2^{k-1}},\\qquad a_{2k}=3^{2^{k-1}}\\quad(k\\ge1).\\]",
+      "solution": [
+        "$u_k=a_{2k-1}$、$v_k=a_{2k}$ とすると $u_1=2,v_1=3$、$u_{k+1}=u_k^2,v_{k+1}=v_k^2$。",
+        "帰納法により $u_k=2^{2^{k-1}}$、$v_k=3^{2^{k-1}}$。$k=1$ で両方の初期値に合い、元の添字に戻して答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((2**(2**((n-1)/2)),Eq(Mod(n,2),1)),(3**(2**((n-2)/2)),True))",
+        "residual": "a(n+2)-a(n)**2",
+        "initials": {
+          "1": "2",
+          "2": "3"
+        },
+        "start": 1,
+        "samples": 12
+      }
+    },
+    {
+      "id": "L6-O04",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "三つの部分列への分離",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "間隔を3に拡張した新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[a_1=1,\\quad a_2=2,\\quad a_3=3,\\qquad a_{n+3}=2a_n+1\\quad(n\\ge1).\\]\n一般項を $n$ を $3$ で割った余りによって表せ。",
+      "hint": "$b_n=a_n+1$ とすると $b_{n+3}=2b_n$。三つの初期値から三本の部分列が決まる。",
+      "answer": "$k\\ge0$ として\n\\[a_{3k+1}=2\\cdot2^k-1,\\quad a_{3k+2}=3\\cdot2^k-1,\\quad a_{3k+3}=4\\cdot2^k-1.\\]",
+      "solution": [
+        "$b_n=a_n+1$ とすれば $b_{n+3}=2b_n$。初期値は $2,3,4$。",
+        "$b_{3k+1}=2\\cdot2^k$、$b_{3k+2}=3\\cdot2^k$、$b_{3k+3}=4\\cdot2^k$ を各部分列について帰納的に得る。$a_n=b_n-1$ と戻す。$3\\mid n$ の項は $n=3k+3$、$k\\ge0$ と数えている。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((2*2**((n-1)/3)-1,Eq(Mod(n,3),1)),(3*2**((n-2)/3)-1,Eq(Mod(n,3),2)),(4*2**((n-3)/3)-1,True))",
+        "residual": "a(n+3)-2*a(n)-1",
+        "initials": {
+          "1": "1",
+          "2": "2",
+          "3": "3"
+        },
+        "start": 1,
+        "samples": 36
+      }
+    },
+    {
+      "id": "L6-O05",
+      "level": 6,
+      "category": "other",
+      "title": "周期係数を二回分まとめる",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：一周期分をまとめる",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "$a_1=1$ とし、\n\\[a_{n+1}=\\begin{cases}2a_n+1&(n\\text{ が奇数}),\\\\3a_n+2&(n\\text{ が偶数})\\end{cases}\\quad(n\\ge1)\\]\nと定める。一般項を求めよ。",
+      "hint": "奇数項 $x_k=a_{2k-1}$ の更新は $x_{k+1}=3(2x_k+1)+2$。",
+      "answer": "\\[a_{2k-1}=2\\cdot6^{k-1}-1,\\qquad a_{2k}=4\\cdot6^{k-1}-1\\quad(k\\ge1).\\]",
+      "solution": [
+        "$a_{2k}=2x_k+1$、$x_{k+1}=3(2x_k+1)+2=6x_k+5$。$x_k+1$ は公比 $6$ の等比数列で $x_1+1=2$。よって $x_k=2\\cdot6^{k-1}-1$。",
+        "$a_{2k}=2x_k+1=4\\cdot6^{k-1}-1$ を得る。付加項 $1$ は次の倍率 $3$ を受けるので、二回分の付加項は $1+2$ でなく $3\\cdot1+2=5$ である。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((2*6**((n-1)/2)-1,Eq(Mod(n,2),1)),(4*6**((n-2)/2)-1,True))",
+        "residual": "a(n+1)-Piecewise((2*a(n)+1,Eq(Mod(n,2),1)),(3*a(n)+2,True))",
+        "initials": {
+          "1": "1"
+        },
+        "start": 1,
+        "samples": 36
+      }
+    },
+    {
+      "id": "L6-O06",
+      "level": 6,
+      "category": "other",
+      "title": "不変量で非線形を線形に直す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/05_変わらない量を使う.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/05_%E5%A4%89%E3%82%8F%E3%82%89%E3%81%AA%E3%81%84%E9%87%8F%E3%82%92%E4%BD%BF%E3%81%86.tex",
+        "location": "本文：例題と保存量",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "28afc4a78d2761b45da69374b8f600b49f07e52a2edcc1b3709109bf2166e7cd"
+      },
+      "statement": "\\[a_1=a_2=1,\\qquad a_{n+2}=\\frac{a_{n+1}^2+1}{a_n}\\quad(n\\ge1).\\]\n全項が正の整数であることを示し、一般項を求めよ。必要なら\n\\[I_n=\\frac{a_n^2+a_{n+1}^2+1}{a_na_{n+1}}\\]\nを考えてよい。",
+      "hint": "まず正値性を示す。$I_n$ が一定なら $a_n+a_{n+2}=I_n a_{n+1}$ となる。",
+      "answer": "$\\alpha=(3+\\sqrt5)/2$、$\\beta=(3-\\sqrt5)/2$ として\n\\[a_n=\\frac{\\alpha^{n-1}+\\beta^{n-1}}2-\\frac{\\alpha^{n-1}-\\beta^{n-1}}{2\\sqrt5}.\\]\n全項は正の整数。",
+      "solution": [
+        "正の二項から次も正になるので、すべての分母は非零である。$x=a_n,y=a_{n+1},z=a_{n+2}$ とすると $xz=y^2+1$。",
+        "$(x^2+y^2+1)/(xy)=(x+z)/y=(y^2+z^2+1)/(yz)$ より $I_{n+1}=I_n$。$I_1=3$ だから $a_{n+2}=3a_{n+1}-a_n$。",
+        "初めの二項が整数で、線形の更新の係数も整数なので、帰納的に全項は整数である。正値性は元の更新から既に分かっている。",
+        "特性方程式 $r^2-3r+1=0$ の根は $\\alpha,\\beta$。$a_1=a_2=1$ になる係数を決めると答えの式となる。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "(((3+sqrt(5))/2)**(n-1)+((3-sqrt(5))/2)**(n-1))/2-(((3+sqrt(5))/2)**(n-1)-((3-sqrt(5))/2)**(n-1))/(2*sqrt(5))",
+        "residual": "a(n+2)-(a(n+1)**2+1)/a(n)",
+        "initials": {
+          "1": "1",
+          "2": "1"
+        },
+        "start": 1,
+        "samples": 24,
+        "identities": [
+          "(y**2+((y*y+1)/x)**2+1)/(y*((y*y+1)/x))-(x*x+y*y+1)/(x*y)"
+        ],
+        "claims": [
+          "a(n+2)-3*a(n+1)+a(n)",
+          "a(n)>0",
+          "Eq(floor(a(n)),a(n))"
+        ]
+      }
+    },
+    {
+      "id": "L6-O07",
+      "level": 6,
+      "category": "other",
+      "title": "二項の組の復帰と五周期",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/06_非線形の周期性.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/06_%E9%9D%9E%E7%B7%9A%E5%BD%A2%E3%81%AE%E5%91%A8%E6%9C%9F%E6%80%A7.tex",
+        "location": "本文：一般の初期値と最小周期",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "b023650a1556693d3dad28cd8d45d7e3f3282c1a32d173bdc9ca4c85598e574e"
+      },
+      "statement": "$x,y>0$ とし、\n\\[a_1=x,\\quad a_2=y,\\qquad a_{n+2}=\\frac{1+a_{n+1}}{a_n}\\quad(n\\ge1)\\]\nと定める。全項が定義され $a_{n+5}=a_n$ となることを示し、一般項と最小周期を求めよ。",
+      "hint": "第6項が第1項に戻るだけでなく、第7項も第2項に戻ることを確かめる。",
+      "answer": "$k\\ge0$ として\n\\[\n\\begin{aligned}\na_{5k+1}&=x,&a_{5k+2}&=y,&a_{5k+3}&=\\frac{1+y}{x},\\\\\na_{5k+4}&=\\frac{1+x+y}{xy},&a_{5k+5}&=\\frac{1+x}{y}.\n\\end{aligned}\n\\]\n$x=y=(1+\\sqrt5)/2$ なら最小周期は $1$、それ以外は $5$。",
+      "solution": [
+        "正の二項から次の項も正になるので、全項が定義される。更新を順に使うと $a_3=(1+y)/x$、$a_4=(1+x+y)/(xy)$、$a_5=(1+x)/y$。",
+        "さらに $a_6=x$、$a_7=y$。初めの二項の組に戻り、その先も同じ更新で一意に決まるから $a_{n+5}=a_n$。",
+        "最小周期は $5$ の約数なので $1$ または $5$。定数列の条件は $x=y=t>0$、$t^2=t+1$、すなわち $t=(1+\\sqrt5)/2$。これ以外は最小周期 $5$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((x,Eq(Mod(n,5),1)),(y,Eq(Mod(n,5),2)),((1+y)/x,Eq(Mod(n,5),3)),((1+x+y)/(x*y),Eq(Mod(n,5),4)),((1+x)/y,True))",
+        "residual": "a(n+2)-(1+a(n+1))/a(n)",
+        "initials": {
+          "1": "x",
+          "2": "y"
+        },
+        "start": 1,
+        "samples": 20,
+        "parameter_cases": [
+          {},
+          {
+            "x": "2",
+            "y": "3"
+          },
+          {
+            "x": "1/2",
+            "y": "4/3"
+          },
+          {
+            "x": "(1+sqrt(5))/2",
+            "y": "(1+sqrt(5))/2"
+          }
+        ],
+        "claims": [
+          "a(n+5)-a(n)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O08",
+      "level": 6,
+      "category": "other",
+      "title": "根号の反復と半角公式",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/02_三角関数型/三角関数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/02_%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：角度を更新して解く方法",
+        "adaptation": "半角公式による新作",
+        "sha256": "6a53465a0f059d46f0f3d36edfcb1e44761ab0936f851d3224763859a92e45ee"
+      },
+      "statement": "\\[a_1=0,\\qquad a_{n+1}=\\sqrt{2+a_n}\\quad(n\\ge1)\\]\nと定める。一般項と極限を求めよ。平方根は非負のものとする。",
+      "hint": "$2+2\\cos\\theta=4\\cos^2(\\theta/2)$。平方根を外すときの符号を確認する。",
+      "answer": "\\[a_n=2\\cos\\frac{\\pi}{2^n},\\qquad\\lim_{n\\to\\infty}a_n=2.\\]",
+      "solution": [
+        "候補 $b_n=2\\cos(\\pi/2^n)$ は $b_1=0$、$0\\le b_n<2$ を満たす。$0<\\pi/2^{n+1}\\le\\pi/4$ なので $\\cos(\\pi/2^{n+1})>0$。",
+        "したがって半角公式から\n\\[\\sqrt{2+b_n}=\\sqrt{4\\cos^2(\\pi/2^{n+1})}=2\\cos(\\pi/2^{n+1})=b_{n+1}.\\]\n非負の平方根の条件も満たすので、帰納法により一般項を得る。",
+        "角度 $\\pi/2^n$ は零に近づく。余弦の連続性から極限は $2$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "2*cos(pi/2**n)",
+        "residual": "a(n+1)**2-2-a(n)",
+        "initials": {
+          "1": "0"
+        },
+        "start": 1,
+        "samples": 6,
+        "identities": [
+          "(2*cos(x))**2-2-2*cos(2*x)"
+        ],
+        "claims": [
+          "a(n+1)>0",
+          "a(n)<2"
+        ]
+      }
+    },
+    {
+      "id": "L6-O09",
+      "level": 6,
+      "category": "other",
+      "title": "閉じた一般項を使わずに収束を示す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/08_式の構造を使う/04_初項による違い/初項による違い.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/08_%E5%BC%8F%E3%81%AE%E6%A7%8B%E9%80%A0%E3%82%92%E4%BD%BF%E3%81%86/04_%E5%88%9D%E9%A0%85%E3%81%AB%E3%82%88%E3%82%8B%E9%81%95%E3%81%84/%E5%88%9D%E9%A0%85%E3%81%AB%E3%82%88%E3%82%8B%E9%81%95%E3%81%84.tex",
+        "location": "本文：初項による違いと定数解",
+        "adaptation": "教科書の例に誤差評価を追加した新作",
+        "sha256": "c1a1c3ca18aed6c9497243c836a1a2ab829f445a22c85f47796dd38fae7bd565"
+      },
+      "statement": "$f(x)=(x^2-1)/2$ とする。\n\n(1) $a_{n+1}=f(a_n)$ が定数列となる初項をすべて求めよ。\n\n(2) 以下 $a_1=2$ とする。$a_2,a_3,a_4$ を求め、$n\\ge4$ で $-1/2\\le a_n\\le0$ を示せ。\n\n(3) $c=1-\\sqrt2$ とおき、$n\\ge4$ で\n\\[|a_{n+1}-c|\\le\\tfrac12|a_n-c|\\]\nを示して極限を求めよ。一般項の閉じた表示は求めなくてよい。",
+      "hint": "区間 $[-1/2,0]$ が更新で保たれることを確かめ、$f(x)-f(c)=(x+c)(x-c)/2$ と因数分解する。",
+      "answer": "(1) 初項は $1\\pm\\sqrt2$。\n\n(2) $a_2=3/2$、$a_3=5/8$、$a_4=-39/128$。$n\\ge4$ で $a_n\\in[-1/2,0]$。\n\n(3) $|a_n-c|\\le2^{-(n-4)}|a_4-c|$ より $\\lim_{n\\to\\infty}a_n=1-\\sqrt2$。",
+      "solution": [
+        "定数列の条件 $t=(t^2-1)/2$ は $t^2-2t-1=0$ なので、実数解は $1\\pm\\sqrt2$。これらを初項とすれば更新で同じ値を保つ。",
+        "$a_1=2$ を順に代入すると指定の三項を得る。$-39/128\\in[-1/2,0]$。$x\\in[-1/2,0]$ なら $x^2\\in[0,1/4]$ だから $f(x)\\in[-1/2,-3/8]\\subset[-1/2,0]$。帰納法で区間が保たれる。",
+        "$c=1-\\sqrt2\\in[-1/2,0]$、$f(c)=c$。$a_n,c$ がともにこの区間にあるから $|a_n+c|\\le1$。従って $|a_{n+1}-c|=|a_n+c||a_n-c|/2\\le|a_n-c|/2$。",
+        "繰り返すと $|a_n-c|\\le2^{-(n-4)}|a_4-c|\\to0$。単調性を仮定せずに収束を示せた。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "1": "2",
+          "2": "3/2",
+          "3": "5/8",
+          "4": "-39/128"
+        },
+        "start": 1,
+        "samples": 9,
+        "next": "(x*x-1)/2",
+        "claims": [
+          "a(n)>=-1/2",
+          "a(n)<=0",
+          "Abs(a(n+1)-(1-sqrt(2)))<=Abs(a(n)-(1-sqrt(2)))/2"
+        ],
+        "claims_start": 4,
+        "identities": [
+          "((x*x-1)/2-(c*c-1)/2)-(x+c)*(x-c)/2",
+          "((1+sqrt(2))**2-1)/2-(1+sqrt(2))",
+          "((1-sqrt(2))**2-1)/2-(1-sqrt(2))"
+        ]
+      }
+    },
+    {
+      "id": "L6-R01",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "定数項を除いて奇数項・偶数項に分ける",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "例題(2)",
+        "adaptation": "教科書と同じ",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=1,\\quad a_2=2,\\qquad a_{n+2}=2a_n+1\\quad(n\\ge1).\n\\]\n一般項を奇数番目と偶数番目に分けて求めよ。",
+      "hint": "$b_n=a_n+1$ として定数項を消す。二つの部分列の初項は異なる。",
+      "answer": "\\[a_{2k-1}=2^k-1,\\qquad a_{2k}=3\\cdot2^{k-1}-1\\quad(k\\ge1).\\]",
+      "solution": [
+        "$b_n=a_n+1$ とおくと $b_{n+2}=2b_n$、$b_1=2,b_2=3$。",
+        "奇数番目と偶数番目はそれぞれ公比 $2$ の等比数列だから、$b_{2k-1}=2\\cdot2^{k-1}=2^k$、$b_{2k}=3\\cdot2^{k-1}$。",
+        "$a_n=b_n-1$ と戻す。$k=1$ で両方の初期値を満たし、各部分列の更新も一致するので全項について成り立つ。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((2**((n+1)/2)-1,Eq(Mod(n,2),1)),(3*2**((n-2)/2)-1,True))",
+        "residual": "a(n+2)-2*a(n)-1",
+        "initials": {
+          "1": "1",
+          "2": "2"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-R02",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "正規化してから二つの部分列を解く",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "教科書の部分列分離の方法による新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=1,\\quad a_2=4,\\qquad a_{n+2}=\\frac{n+2}{n}a_n+(n+2)\\quad(n\\ge1).\n\\]\n一般項を求めよ。",
+      "hint": "添字が二つ進むことに合わせて $b_n=a_n/n$ とおく。",
+      "answer": "\\[a_{2k-1}=k(2k-1),\\qquad a_{2k}=2k(k+1)\\quad(k\\ge1).\\]",
+      "solution": [
+        "$n\\ge1$ なので $n$ で割れる。$b_n=a_n/n$ とおくと、元の式を $n+2$ で割って $b_{n+2}=b_n+1$。初期値は $b_1=1,b_2=2$。",
+        "従って $b_{2k-1}=1+(k-1)=k$、$b_{2k}=2+(k-1)=k+1$。$a_n=nb_n$ と戻して答えを得る。",
+        "部分列の番号が一つ増える間に元の添字は二つ増える。初期値を別々に合わせることで、その差を一般項にも反映できる。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((n*(n+1)/2,Eq(Mod(n,2),1)),(n*(n/2+1),True))",
+        "residual": "a(n+2)-(n+2)*a(n)/n-(n+2)",
+        "initials": {
+          "1": "1",
+          "2": "4"
+        },
+        "start": 1,
+        "samples": 36
+      }
+    },
+    {
+      "id": "L6-R03",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "逆数置換と非隣接型",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "教科書の部分列分離の方法による新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=1,\\quad a_2=2,\\qquad a_{n+2}=\\frac{a_n}{1+a_n}\\quad(n\\ge1).\n\\]\n全項が定義され正であることを示し、一般項と極限を求めよ。",
+      "hint": "正値性を先に示し、$b_n=1/a_n$ とおくと二つの等差数列になる。",
+      "answer": "\\[a_{2k-1}=\\frac1k,\\qquad a_{2k}=\\frac2{2k-1}\\quad(k\\ge1).\\]\n全項が正で、$\\displaystyle\\lim_{n\\to\\infty}a_n=0$。",
+      "solution": [
+        "初めの二項は正である。正の $a_n$ から $1+a_n>0$、$a_{n+2}>0$ となるので、各部分列に沿った帰納法で全項が定義され正となる。",
+        "$b_n=1/a_n$ とすると $b_{n+2}=(1+a_n)/a_n=b_n+1$、$b_1=1,b_2=1/2$。従って $b_{2k-1}=k$、$b_{2k}=k-1/2$。逆数を取れば答えを得る。",
+        "奇数番目と偶数番目のいずれも零に収束するので数列全体も零に収束する。実際、$n\\ge2$ の偶数項は $2/(n-1)$、奇数項は $2/(n+1)$ であり、どちらも $0<a_n\\le2/(n-1)$ を満たす。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((2/(n+1),Eq(Mod(n,2),1)),(2/(n-1),True))",
+        "residual": "a(n+2)-a(n)/(1+a(n))",
+        "initials": {
+          "1": "1",
+          "2": "2"
+        },
+        "start": 1,
+        "samples": 36,
+        "claims": [
+          "a(n)>0",
+          "Ne(1+a(n),0)"
+        ]
+      }
+    },
+    {
+      "id": "L6-R04",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "非隣接型を余弦の倍角で解く",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "教科書の部分列分離の方法による新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=\\cos\\frac\\pi5,\\quad a_2=\\cos\\frac\\pi7,\\qquad a_{n+2}=2a_n^2-1\\quad(n\\ge1).\n\\]\n一般項を奇数番目と偶数番目に分けて求め、$-1\\le a_n\\le1$ を示せ。",
+      "hint": "各部分列で余弦の角度が二倍になる。元の添字 $n$ ではなく、部分列の番号 $k$ を使う。",
+      "answer": "\\[\na_{2k-1}=\\cos\\left(2^{k-1}\\frac\\pi5\\right),\\qquad\na_{2k}=\\cos\\left(2^{k-1}\\frac\\pi7\\right)\\quad(k\\ge1).\n\\]\n全項で $-1\\le a_n\\le1$。",
+      "solution": [
+        "$u_k=a_{2k-1}$、$v_k=a_{2k}$ とおくと、どちらも $w_{k+1}=2w_k^2-1$ の更新を満たす。初項はそれぞれ $\\cos(\\pi/5)$ と $\\cos(\\pi/7)$。",
+        "倍角公式 $2\\cos^2\\theta-1=\\cos2\\theta$ から、初項の角度を $2^{k-1}$ 倍した余弦が各部分列の更新を満たす。初項と更新の一致を帰納的に確認し、元の添字に戻す。",
+        "角度はすべて実数なので、余弦の値域から $-1\\le a_n\\le1$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((cos(2**((n-1)/2)*pi/5),Eq(Mod(n,2),1)),(cos(2**((n-2)/2)*pi/7),True))",
+        "residual": "a(n+2)-2*a(n)**2+1",
+        "initials": {
+          "1": "cos(pi/5)",
+          "2": "cos(pi/7)"
+        },
+        "start": 1,
+        "samples": 12,
+        "claims": [
+          "a(n)>=-1",
+          "a(n)<=1"
+        ],
+        "identities": [
+          "cos(2*x)-2*cos(x)**2+1"
+        ]
+      }
+    },
+    {
+      "id": "L6-R05",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "三つの非線形な部分列と対称式",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "教科書の部分列分離の方法による新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=3,\\quad a_2=\\frac52,\\quad a_3=\\frac{10}3,\\qquad\na_{n+3}=a_n^2-2\\quad(n\\ge1).\n\\]\n一般項を $n$ を $3$ で割った余りによって表せ。",
+      "hint": "三つの部分列に分け、$(u+u^{-1})^2-2=u^2+u^{-2}$ を使う。",
+      "answer": "$\\alpha=(3+\\sqrt5)/2$、$\\beta=(3-\\sqrt5)/2$ とおくと、$k\\ge0$ に対し\n\\[\n\\begin{aligned}\na_{3k+1}&=\\alpha^{2^k}+\\beta^{2^k},\\\\\na_{3k+2}&=2^{2^k}+2^{-2^k},\\\\\na_{3k+3}&=3^{2^k}+3^{-2^k}.\n\\end{aligned}\n\\]",
+      "solution": [
+        "$u_k=a_{3k+1}$、$v_k=a_{3k+2}$、$w_k=a_{3k+3}$（$k\\ge0$）に分ける。どの部分列も一回の更新は「二乗して $2$ を引く」である。",
+        "初項は $\\alpha+\\beta=3$、$2+2^{-1}=5/2$、$3+3^{-1}=10/3$ と書け、$\\alpha\\beta=1$。それぞれ逆数の和である。",
+        "恒等式により、一回の更新で二つの冪の指数が二倍になる。部分列の最初を $k=0$ としているので指数は $2^k$。初期値と更新の一致から三つの表示を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((((3+sqrt(5))/2)**(2**((n-1)/3))+((3-sqrt(5))/2)**(2**((n-1)/3)),Eq(Mod(n,3),1)),(2**(2**((n-2)/3))+2**(-2**((n-2)/3)),Eq(Mod(n,3),2)),(3**(2**((n-3)/3))+3**(-2**((n-3)/3)),True))",
+        "residual": "a(n+3)-a(n)**2+2",
+        "initials": {
+          "1": "3",
+          "2": "5/2",
+          "3": "10/3"
+        },
+        "start": 1,
+        "samples": 12,
+        "identities": [
+          "(x+1/x)**2-2-x**2-1/x**2"
+        ]
+      }
+    },
+    {
+      "id": "L6-R06",
+      "level": 6,
+      "category": "nonadjacent",
+      "title": "非隣接3項間を二本の3項間に直す",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/05_非隣接2項型/非隣接2項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/05_%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B/%E9%9D%9E%E9%9A%A3%E6%8E%A52%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：部分列に分ける方法",
+        "adaptation": "教科書の部分列分離の方法による新作",
+        "sha256": "0368c2df104d59b01ea247b7f0d707d2fab1cbe8a8ecebcedebcafc59613a500"
+      },
+      "statement": "\\[\na_1=1,\\quad a_2=2,\\quad a_3=5,\\quad a_4=7,\\qquad\na_{n+4}=5a_{n+2}-4a_n\\quad(n\\ge1).\n\\]\n一般項を求めよ。",
+      "hint": "奇数番目・偶数番目のそれぞれで、隣接3項間の特性方程式を立てる。",
+      "answer": "\\[\na_{2k-1}=\\frac{4^k-1}{3},\\qquad\na_{2k}=\\frac{1+5\\cdot4^{k-1}}3\\quad(k\\ge1).\n\\]",
+      "solution": [
+        "$u_k=a_{2k-1}$、$v_k=a_{2k}$ とすると、どちらも $w_{k+2}=5w_{k+1}-4w_k$ を満たす。$u_1=1,u_2=5$、$v_1=2,v_2=7$。元の四つの初期値を二つずつ振り分ける。",
+        "特性方程式 $r^2-5r+4=(r-1)(r-4)=0$ から、各部分列は $A+B4^{k-1}$ と表される。",
+        "奇数番目では $A+B=1,A+4B=5$ から $A=-1/3,B=4/3$。偶数番目では $A+B=2,A+4B=7$ から $A=1/3,B=5/3$。それぞれ代入して答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise(((4**((n+1)/2)-1)/3,Eq(Mod(n,2),1)),((1+5*4**((n-2)/2))/3,True))",
+        "residual": "a(n+4)-5*a(n+2)+4*a(n)",
+        "initials": {
+          "1": "1",
+          "2": "2",
+          "3": "5",
+          "4": "7"
+        },
+        "start": 1,
+        "samples": 36
+      }
+    },
+    {
+      "id": "L6-F06",
+      "level": 6,
+      "category": "four_term",
+      "title": "定数の付加項をもつ隣接4項間",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/06_発展・特殊型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/06_%E7%99%BA%E5%B1%95%E3%83%BB%E7%89%B9%E6%AE%8A%E5%9E%8B.tex",
+        "location": "発展・特殊型 問4",
+        "adaptation": "教科書と同じ",
+        "sha256": "dd332b8f2925f94e4d21d9064349a1ea32484c078194520194b9daea24689336"
+      },
+      "statement": "\\[\na_1=2,\\quad a_2=9,\\quad a_3=28,\\qquad\na_{n+3}=3a_{n+2}-3a_{n+1}+a_n+6\\quad(n\\ge1).\n\\]\n(1) $d_n=a_{n+2}-2a_{n+1}+a_n$ の一般項を求めよ。\n\n(2) $a_n$ の一般項を求めよ。",
+      "hint": "三階差が一定である。二階差、階差、元の数列の順に足し戻す。",
+      "answer": "\\[d_n=6n+6,\\qquad a_n=n^3+1.\\]",
+      "solution": [
+        "$d_{n+1}-d_n=6$、$d_1=28-18+2=12$ なので $d_n=6n+6$。",
+        "$e_n=a_{n+1}-a_n$ とおくと $e_{n+1}-e_n=d_n$、$e_1=7$。従って $e_n=7+\\sum_{j=1}^{n-1}(6j+6)=3n^2+3n+1$。",
+        "これは $(n+1)^3-n^3$ に等しいので、$a_n=2+\\sum_{j=1}^{n-1}\\{(j+1)^3-j^3\\}=n^3+1$。三つの初期値にも一致する。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n**3+1",
+        "residual": "a(n+3)-3*a(n+2)+3*a(n+1)-a(n)-6",
+        "initials": {
+          "1": "2",
+          "2": "9",
+          "3": "28"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "a(n+2)-2*a(n+1)+a(n)-6*n-6"
+        ]
+      }
+    },
+    {
+      "id": "L6-F07",
+      "level": 6,
+      "category": "four_term",
+      "title": "指数の付加項と三重根の重なり",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/07_発展的な解法/03_隣接4項型/隣接4項型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/07_%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E8%A7%A3%E6%B3%95/03_%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B/%E9%9A%A3%E6%8E%A54%E9%A0%85%E5%9E%8B.tex",
+        "location": "本文：補助数列・階差と特性方程式",
+        "adaptation": "三重根と指数付加項を組み合わせた新作",
+        "sha256": "c8cde6c1a613555e44d90a8271ab3abc7f6659aa466350e841b12eb6249a4afe"
+      },
+      "statement": "\\[\na_1=1,\\quad a_2=16,\\quad a_3=108,\n\\]\n\\[\na_{n+3}=6a_{n+2}-12a_{n+1}+8a_n+6\\cdot2^{n+2}\\quad(n\\ge1).\n\\]\n一般項を求めよ。",
+      "hint": "同次部分の特性多項式は $(r-2)^3$。$b_n=a_n/2^{n-1}$ としてから階差を調べる。",
+      "answer": "\\[a_n=n^3\\,2^{n-1}.\\]",
+      "solution": [
+        "両辺を $2^{n+2}$ で割ると $b_{n+3}-3b_{n+2}+3b_{n+1}-b_n=6$。初期値は $b_1=1,b_2=8,b_3=27$。",
+        "$d_n=b_{n+2}-2b_{n+1}+b_n$ とおくと $d_{n+1}-d_n=6$、$d_1=12$。従って $d_n=6n+6$。",
+        "$e_n=b_{n+1}-b_n$ は $e_1=7$、$e_{n+1}-e_n=6n+6$ より $e_n=3n^2+3n+1=(n+1)^3-n^3$。よって $b_n=n^3$。正規化を戻して答えを得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "n**3*2**(n-1)",
+        "residual": "a(n+3)-6*a(n+2)+12*a(n+1)-8*a(n)-6*2**(n+2)",
+        "initials": {
+          "1": "1",
+          "2": "16",
+          "3": "108"
+        },
+        "start": 1,
+        "samples": 24
+      }
+    },
+    {
+      "id": "L6-O10",
+      "level": 6,
+      "category": "other",
+      "title": "非実不動点を用いる一次分数型",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/06_七つの応用型/04_分数型/03_複素平面で見る/複素平面で見る.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/06_%E4%B8%83%E3%81%A4%E3%81%AE%E5%BF%9C%E7%94%A8%E5%9E%8B/04_%E5%88%86%E6%95%B0%E5%9E%8B/03_%E8%A4%87%E7%B4%A0%E5%B9%B3%E9%9D%A2%E3%81%A7%E8%A6%8B%E3%82%8B/%E8%A4%87%E7%B4%A0%E5%B9%B3%E9%9D%A2%E3%81%A7%E8%A6%8B%E3%82%8B.tex",
+        "location": "本文：不動点が i と -i の例",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "e8ba678c2f5207f8e6c11327d07b6a601112af895e4574e115e2a6fe707f4cc9"
+      },
+      "statement": "\\[a_1=\\frac12,\\qquad a_{n+1}=\\frac{a_n+1}{1-a_n}\\quad(n\\ge1).\\]\n(1) $b_n=(a_n-i)/(a_n+i)$ とおき、$b_n$ の一般項を求めよ。ただし $i^2=-1$ とする。\n\n(2) $a_n$ の一般項と最小の正の周期を求め、すべての項で元の分母が非零であることを示せ。",
+      "hint": "不動点は $i,-i$。差の比を取ると、複素平面上の四分の一回転になる。",
+      "answer": "\\[b_n=i^{n-1}\\frac{-3-4i}{5}.\\]\n\\[\na_n=\\begin{cases}\n1/2&(n\\equiv1\\pmod4),\\\\\n3&(n\\equiv2\\pmod4),\\\\\n-2&(n\\equiv3\\pmod4),\\\\\n-1/3&(n\\equiv0\\pmod4).\n\\end{cases}\n\\]\n最小周期は $4$。",
+      "solution": [
+        "初めの四項と次の項を計算すると $1/2,3,-2,-1/3,1/2$。途中の分母は非零であり、一項で次が決まるのでこの四項が繰り返される。これにより全項が定義され実数であることも分かる。",
+        "実数 $a_n$ では $a_n+i\\ne0$。直接代入すると $b_{n+1}=i b_n$。$b_1=(1/2-i)/(1/2+i)=(-3-4i)/5$ から (1) を得る。",
+        "逆変換は $a_n=i(1+b_n)/(1-b_n)$。この例の四つの値、または上で求めた実数の軌道から (2) の一般項が得られる。四つの値は異なるため最小周期は $4$。いずれも $1$ ではないので $1-a_n\\ne0$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "Piecewise((1/2,Eq(Mod(n,4),1)),(3,Eq(Mod(n,4),2)),(-2,Eq(Mod(n,4),3)),(-1/3,True))",
+        "residual": "a(n+1)-(a(n)+1)/(1-a(n))",
+        "initials": {
+          "1": "1/2"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "Ne(1-a(n),0)",
+          "a(n+4)-a(n)",
+          "(a(n)-I)/(a(n)+I)-I**(n-1)*(-3-4*I)/5"
+        ],
+        "identities": [
+          "(((x+1)/(1-x)-I)/((x+1)/(1-x)+I))-I*(x-I)/(x+I)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O11",
+      "level": 6,
+      "category": "other",
+      "title": "不動点が重なる一次分数型",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第2章 漸化式の解法/06_七つの応用型/04_分数型/02_一次分数型/一次分数型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC2%E7%AB%A0%20%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%AE%E8%A7%A3%E6%B3%95/06_%E4%B8%83%E3%81%A4%E3%81%AE%E5%BF%9C%E7%94%A8%E5%9E%8B/04_%E5%88%86%E6%95%B0%E5%9E%8B/02_%E4%B8%80%E6%AC%A1%E5%88%86%E6%95%B0%E5%9E%8B/%E4%B8%80%E6%AC%A1%E5%88%86%E6%95%B0%E5%9E%8B.tex",
+        "location": "本文：不動点が一つの場合",
+        "adaptation": "重不動点を扱う新作",
+        "sha256": "864388173730f12086eb66dec9cfbddda079d204299ddbc630c18c4556371658"
+      },
+      "statement": "\\[a_1=2,\\qquad a_{n+1}=\\frac{3a_n-1}{a_n+1}\\quad(n\\ge1).\\]\n一般項と極限を求め、元の分母と置換に用いる分母が全項で非零であることを示せ。",
+      "hint": "不動点の方程式は $(x-1)^2=0$。差の比に代えて $b_n=1/(a_n-1)$ を使う。",
+      "answer": "\\[a_n=1+\\frac2{n+1},\\qquad\\lim_{n\\to\\infty}a_n=1.\\]",
+      "solution": [
+        "$a_1>1$。$a_n>1$ なら $a_n+1>0$ で、$a_{n+1}-1=2(a_n-1)/(a_n+1)>0$。従って全項で $a_n>1$ が保たれ、二つの分母は非零である。",
+        "$b_n=1/(a_n-1)$ とおくと $b_{n+1}=(a_n+1)/\\{2(a_n-1)\\}=b_n+1/2$、$b_1=1$。よって $b_n=(n+1)/2$。",
+        "逆数を取り $a_n=1+2/(n+1)$。極限は $1$ だが、有限の添字で $a_n=1$ になることはない。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "1+2/(n+1)",
+        "residual": "a(n+1)-(3*a(n)-1)/(a(n)+1)",
+        "initials": {
+          "1": "2"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "a(n)>1",
+          "Ne(a(n)+1,0)",
+          "Ne(a(n)-1,0)",
+          "1/(a(n+1)-1)-1/(a(n)-1)-1/2"
+        ]
+      }
+    },
+    {
+      "id": "L6-O12",
+      "level": 6,
+      "category": "other",
+      "title": "初項から定数列と二周期列を分類する",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/06_発展・特殊型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/06_%E7%99%BA%E5%B1%95%E3%83%BB%E7%89%B9%E6%AE%8A%E5%9E%8B.tex",
+        "location": "発展・特殊型 問14",
+        "adaptation": "教科書と同じ",
+        "sha256": "dd332b8f2925f94e4d21d9064349a1ea32484c078194520194b9daea24689336"
+      },
+      "statement": "$c$ を実数とし、$a_1=c$、$a_{n+1}=a_n^2-1$（$n\\ge1$）と定める。\n\n(1) 定数列となる $c$ をすべて求めよ。\n\n(2) 定数列ではなく、すべての $n\\ge1$ で $a_{n+2}=a_n$ となる $c$ をすべて求め、それぞれの一般項を表せ。",
+      "hint": "定数列には $f(c)=c$、二周期には $f(f(c))=c$ が必要。後者を解いてから定数解を除く。",
+      "answer": "(1) $\\displaystyle c=\\frac{1\\pm\\sqrt5}{2}$。\n\n(2) $c=0,-1$。$c=0$ なら $a_{2k-1}=0,a_{2k}=-1$、$c=-1$ なら $a_{2k-1}=-1,a_{2k}=0$（$k\\ge1$）。いずれも最小周期は $2$。",
+      "solution": [
+        "$f(t)=t^2-1$ とする。定数列の条件 $f(c)=c$ は $c^2-c-1=0$ なので (1) を得る。これらの初項では更新のたびに同じ値が続く。",
+        "二回後に戻る条件は\n\\[f(f(c))-c=(c^2-1)^2-1-c=c(c+1)(c^2-c-1)=0.\\]\n定数解を除くと $c=0,-1$ だけである。",
+        "$f(0)=-1$、$f(-1)=0$。従って二つの初項はいずれも最初から二項を交互に繰り返し、最小周期は $2$。途中から二周期になるだけの初項は、ここでは求めていない。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "1": "c"
+        },
+        "next": "x*x-1",
+        "start": 1,
+        "samples": 8,
+        "parameter_cases": [
+          {
+            "c": "0"
+          },
+          {
+            "c": "-1"
+          },
+          {
+            "c": "(1+sqrt(5))/2"
+          },
+          {
+            "c": "(1-sqrt(5))/2"
+          }
+        ],
+        "claims": [
+          "a(n+2)-a(n)"
+        ],
+        "identities": [
+          "(x*x-1)**2-1-x-x*(x+1)*(x*x-x-1)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O13",
+      "level": 6,
+      "category": "other",
+      "title": "有界となる初項の範囲を決める",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/06_発展・特殊型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/06_%E7%99%BA%E5%B1%95%E3%83%BB%E7%89%B9%E6%AE%8A%E5%9E%8B.tex",
+        "location": "発展・特殊型 問15",
+        "adaptation": "教科書の問題を整理",
+        "sha256": "dd332b8f2925f94e4d21d9064349a1ea32484c078194520194b9daea24689336"
+      },
+      "statement": "$c$ を実数とし、$a_1=c$、$a_{n+1}=a_n^2-2$（$n\\ge1$）と定める。\n\n(1) $c=-2,-1,0,2$ の各場合の最初の四項を求めよ。\n\n(2) $-2\\le c\\le2$ のとき、$c=2\\cos\\theta$（$0\\le\\theta\\le\\pi$）とおいて一般項を求め、有界性を示せ。\n\n(3) $|c|>2$ のとき $a_n\\to+\\infty$ を示し、有界となる初項の範囲を決定せよ。",
+      "hint": "区間内では倍角公式を使う。$a_n>2$ では $a_{n+1}-2=(a_n+2)(a_n-2)$ を使う。",
+      "answer": "(1) 順に $(-2,2,2,2)$、$(-1,-1,-1,-1)$、$(0,-2,2,2)$、$(2,2,2,2)$。\n\n(2) $\\displaystyle a_n=2\\cos(2^{n-1}\\theta)$、$|a_n|\\le2$。\n\n(3) $|c|>2$ では $a_n\\to+\\infty$。従って有界となる範囲は $-2\\le c\\le2$。",
+      "solution": [
+        "(1) は更新に直接代入する。(2) は $4\\cos^2t-2=2\\cos2t$ により候補の初項と更新を確認する。実数の余弦の値域から $|a_n|\\le2$。",
+        "$c>2$ なら $a_n>2$ が帰納的に保たれる。$b_n=a_n-2>0$ とすると $b_{n+1}=(a_n+2)b_n\\ge4b_n$。従って $b_n\\ge4^{n-1}(c-2)\\to\\infty$。",
+        "$c<-2$ では $a_2=c^2-2>2$ となるため、第2項から同じ議論を適用できる。これで範囲外の全初項を除き、有界性の必要十分条件を得る。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "1": "c"
+        },
+        "next": "x*x-2",
+        "start": 1,
+        "samples": 7,
+        "claims_start": 2,
+        "parameter_cases": [
+          {
+            "c": "-3"
+          },
+          {
+            "c": "-2"
+          },
+          {
+            "c": "-1"
+          },
+          {
+            "c": "0"
+          },
+          {
+            "c": "1"
+          },
+          {
+            "c": "2"
+          },
+          {
+            "c": "3"
+          }
+        ],
+        "claims": [
+          "Or(Abs(c)>2,And(a(n)>=-2,a(n)<=2))",
+          "Or(Abs(c)<=2,a(n)>2)",
+          "Or(Abs(c)<=2,a(n+1)-2>=4*(a(n)-2))"
+        ],
+        "identities": [
+          "(x*x-2)-2-(x+2)*(x-2)",
+          "4*cos(x)**2-2-2*cos(2*x)"
+        ]
+      }
+    },
+    {
+      "id": "L6-O14",
+      "level": 6,
+      "category": "other",
+      "title": "複素特性根による減衰振動",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/06_発展・特殊型.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/06_%E7%99%BA%E5%B1%95%E3%83%BB%E7%89%B9%E6%AE%8A%E5%9E%8B.tex",
+        "location": "発展・特殊型 問7",
+        "adaptation": "教科書と同じ",
+        "sha256": "dd332b8f2925f94e4d21d9064349a1ea32484c078194520194b9daea24689336"
+      },
+      "statement": "\\[a_1=1,\\quad a_2=0,\\qquad a_{n+2}=a_{n+1}-\\frac12a_n\\quad(n\\ge1).\\]\n一般項を実数の式で表し、$n\\to\\infty$ における極限を求めよ。",
+      "hint": "特性根は $(1\\pm i)/2$。絶対値が $1$ 未満であることから振幅を評価する。",
+      "answer": "\\[a_n=\\left(\\frac1{\\sqrt2}\\right)^{n-1}\\left\\{\\cos\\frac{(n-1)\\pi}4-\\sin\\frac{(n-1)\\pi}4\\right\\}.\\]\n\\[\\lim_{n\\to\\infty}a_n=0.\\]",
+      "solution": [
+        "特性方程式 $z^2-z+1/2=0$ の根は $(1\\pm i)/2$。絶対値は $1/\\sqrt2$、偏角は $\\pm\\pi/4$。よって実数の一般解は $(1/\\sqrt2)^{n-1}\\{A\\cos((n-1)\\pi/4)+B\\sin((n-1)\\pi/4)\\}$。",
+        "初項 $a_1=1$ から $A=1$、$a_2=0$ から $B=-1$。二つの初期値と更新を満たすことから、得られた式が求める一般項である。",
+        "三角不等式から $|a_n|\\le2(1/\\sqrt2)^{n-1}$。右辺が零に収束するので、はさみうちにより極限は零。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "(1/sqrt(2))**(n-1)*(cos((n-1)*pi/4)-sin((n-1)*pi/4))",
+        "residual": "a(n+2)-a(n+1)+a(n)/2",
+        "initials": {
+          "1": "1",
+          "2": "0"
+        },
+        "start": 1,
+        "samples": 24,
+        "claims": [
+          "Abs(a(n))<=2*(1/sqrt(2))**(n-1)"
+        ]
+      }
+    },
+    {
+      "id": "L6-D01",
+      "level": 6,
+      "category": "two_dimensional",
+      "title": "格子経路と二重数列",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/03_和と差から微積分へ/二方向の階差.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/03_%E5%92%8C%E3%81%A8%E5%B7%AE%E3%81%8B%E3%82%89%E5%BE%AE%E7%A9%8D%E5%88%86%E3%81%B8/%E4%BA%8C%E6%96%B9%E5%90%91%E3%81%AE%E9%9A%8E%E5%B7%AE.tex",
+        "location": "本文：格子経路を数える／接続演習 問3",
+        "adaptation": "教科書の問題を整理",
+        "sha256": "a293cc6cdfa1262de50f7e9f37eb0126afd24c4322f99a3188ed27a13de64fe1"
+      },
+      "statement": "非負整数 $n,m$ に対し、\n\\[\nA_{n,0}=A_{0,m}=1,\\qquad\nA_{n,m}=A_{n-1,m}+A_{n,m-1}\\quad(n,m\\ge1)\n\\]\nと定める。\n\n(1) この規則が境界の値から各 $A_{n,m}$ を一意に定めることを説明せよ。\n\n(2) $A_{n,m}$ の一般項を求め、原点から $(n,m)$ へ右または上に一歩ずつ進む格子経路の数として説明せよ。\n\n(3) $A_{5,4}$ を求めよ。",
+      "hint": "添字の和 $n+m$ で帰納法を使う。経路は最後の一歩で二つに分かれる。",
+      "answer": "\\[A_{n,m}=\\binom{n+m}{n}=\\binom{n+m}{m},\\qquad A_{5,4}=126.\\]",
+      "solution": [
+        "境界では値が与えられている。内側では参照する二つの位置の添字の和が $n+m-1$ なので、和の小さい順に計算すれば一意に定まる。",
+        "候補 $\\binom{n+m}{m}$ は境界で $1$。加法公式 $\\binom{n+m-1}{m}+\\binom{n+m-1}{m-1}=\\binom{n+m}{m}$ により更新も満たすので、帰納法と一意性から一般項を得る。",
+        "右に $n$ 回、上に $m$ 回進む全 $n+m$ 歩のうち、上に進む位置を $m$ 個選ぶと経路が一意に決まる。最後の一歩を右・上に分けても同じ漸化式となる。$A_{5,4}=\\binom94=126$。"
+      ],
+      "verification": {
+        "mode": "grid",
+        "formula": "binomial(n+m,m)",
+        "residual": "A(n,m)-A(n-1,m)-A(n,m-1)",
+        "boundaries": {
+          "n0": "1",
+          "0m": "1"
+        },
+        "start": 1,
+        "samples": 9,
+        "special_values": {
+          "5,4": "126"
+        }
+      }
+    },
+    {
+      "id": "L6-D02",
+      "level": 6,
+      "category": "two_dimensional",
+      "title": "二方向の階差と距離の解釈",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/03_和と差から微積分へ/二方向の階差.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/03_%E5%92%8C%E3%81%A8%E5%B7%AE%E3%81%8B%E3%82%89%E5%BE%AE%E7%A9%8D%E5%88%86%E3%81%B8/%E4%BA%8C%E6%96%B9%E5%90%91%E3%81%AE%E9%9A%8E%E5%B7%AE.tex",
+        "location": "本文：零の差から一定の差へ・数表と図形",
+        "adaptation": "教科書の例に条件分類を追加",
+        "sha256": "a293cc6cdfa1262de50f7e9f37eb0126afd24c4322f99a3188ed27a13de64fe1"
+      },
+      "statement": "実数 $c$ に対し、非負整数で添字を付けた数表を\n\\[\nB_{n,0}=n^2,\\qquad B_{0,m}=m^2,\n\\]\n\\[\nB_{n+1,m+1}-B_{n+1,m}-B_{n,m+1}+B_{n,m}=c\\quad(n,m\\ge0)\n\\]\nで定める。\n\n(1) $B_{n,m}$ を求めよ。\n\n(2) すべての非負整数 $n,m$ に対し $B_{n,m}\\ge0$ となる $c$ の範囲を求めよ。\n\n(3) 二つの単位ベクトル $\\boldsymbol u,\\boldsymbol v$ を選んで $B_{n,m}=|n\\boldsymbol u+m\\boldsymbol v|^2$ と表せる $c$ の範囲を求めよ。",
+      "hint": "横方向の階差を取ってから縦に足す。(2) の添字は非負整数に限られることと、(3) の内積の条件を区別する。",
+      "answer": "(1) $B_{n,m}=n^2+m^2+cnm$。\n\n(2) $c\\ge-2$。\n\n(3) $-2\\le c\\le2$。",
+      "solution": [
+        "$d_{n,m}=B_{n+1,m}-B_{n,m}$ とおくと $d_{n,m+1}-d_{n,m}=c$、$d_{n,0}=2n+1$。従って $d_{n,m}=2n+1+cm$。横に足すと $B_{n,m}=B_{0,m}+\\sum_{j=0}^{n-1}(2j+1+cm)=n^2+m^2+cnm$。境界からの一意性も添字の和について帰納的に分かる。",
+        "$B_{n,m}=(n-m)^2+(c+2)nm$。$c\\ge-2$ なら非負整数 $n,m$ について非負。逆に $n=m=1$ で $B_{1,1}=2+c$ なので $c\\ge-2$ が必要。",
+        "$|n\\boldsymbol u+m\\boldsymbol v|^2=n^2+m^2+2nm(\\boldsymbol u\\cdot\\boldsymbol v)$。単位ベクトルの内積は $[-1,1]$ の範囲なので $|c|\\le2$ が必要である。逆に $\\cos\\theta=c/2$ となる角を選べば実現できる。"
+      ],
+      "verification": {
+        "mode": "grid",
+        "formula": "n*n+m*m+c*n*m",
+        "residual": "A(n+1,m+1)-A(n+1,m)-A(n,m+1)+A(n,m)-c",
+        "boundaries": {
+          "n0": "n*n",
+          "0m": "m*m"
+        },
+        "start": 0,
+        "samples": 9,
+        "parameter_cases": [
+          {
+            "c": "-3"
+          },
+          {
+            "c": "-2"
+          },
+          {
+            "c": "-1"
+          },
+          {
+            "c": "0"
+          },
+          {
+            "c": "2"
+          },
+          {
+            "c": "3"
+          }
+        ],
+        "claims": [
+          "Or(c<-2,A(n,m)>=0)"
+        ],
+        "identities": [
+          "n*n+m*m+c*n*m-(n-m)**2-(c+2)*n*m"
+        ]
+      }
+    },
+    {
+      "id": "L6-C01",
+      "level": 6,
+      "category": "generating_functions",
+      "title": "母関数からフィボナッチ数列を解く",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/04_数列をまとめて見る.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/04_%E6%95%B0%E5%88%97%E3%82%92%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E8%A6%8B%E3%82%8B.tex",
+        "location": "本文：分母に現れる漸化式・長期的な増え方",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "b0f97b09c5d2b8f2feda32cd5adda6e2831ef942a50e05755759014e55b56f48"
+      },
+      "statement": "\\[F_0=0,\\quad F_1=1,\\qquad F_{n+2}=F_{n+1}+F_n\\quad(n\\ge0).\\]\n(1) 形式的母関数 $G(t)=\\sum_{n=0}^{\\infty}F_nt^n$ を求めよ。\n\n(2) 部分分数分解を用いて一般項を求めよ。\n\n(3) $\\lim_{n\\to\\infty}F_{n+1}/F_n$ を求めよ（比は $n\\ge1$ で考える）。",
+      "hint": "添字をずらす際に $F_0,F_1$ を分離する。母関数の分母は特性根の逆数に対応する。",
+      "answer": "\\[G(t)=\\frac{t}{1-t-t^2}.\\]\n$\\varphi=(1+\\sqrt5)/2$、$\\psi=(1-\\sqrt5)/2$ とすると\n\\[F_n=\\frac{\\varphi^n-\\psi^n}{\\sqrt5},\\qquad\\lim_{n\\to\\infty}\\frac{F_{n+1}}{F_n}=\\varphi.\\]",
+      "solution": [
+        "$G(t)-t=tG(t)+t^2G(t)$ なので $(1-t-t^2)G(t)=t$。定数項が $1$ の分母は形式的べき級数として逆数を持ち、(1) を得る。",
+        "$1-t-t^2=(1-\\varphi t)(1-\\psi t)$、$\\varphi-\\psi=\\sqrt5$ だから\n\\[G(t)=\\frac1{\\sqrt5}\\left\\{\\frac1{1-\\varphi t}-\\frac1{1-\\psi t}\\right\\}.\\]\n等比級数の $t^n$ の係数を読むと一般項を得る。",
+        "$F_n>0$（$n\\ge1$）は初期値と更新から分かる。また $|\\psi/\\varphi|<1$ なので $F_{n+1}/F_n=\\varphi\\{1-(\\psi/\\varphi)^{n+1}\\}/\\{1-(\\psi/\\varphi)^n\\}\\to\\varphi$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "(((1+sqrt(5))/2)**n-((1-sqrt(5))/2)**n)/sqrt(5)",
+        "residual": "a(n+2)-a(n+1)-a(n)",
+        "initials": {
+          "0": "0",
+          "1": "1"
+        },
+        "start": 0,
+        "samples": 24,
+        "identities": [
+          "(1-t-t*t)*(t/(1-t-t*t))-t"
+        ],
+        "generating_function": "t/(1-t-t*t)",
+        "series_terms": 16
+      }
+    },
+    {
+      "id": "L6-C02",
+      "level": 6,
+      "category": "generating_functions",
+      "title": "畳み込みからカタラン数へ",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/04_数列をまとめて見る.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/04_%E6%95%B0%E5%88%97%E3%82%92%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E8%A6%8B%E3%82%8B.tex",
+        "location": "本文：畳み込みと積",
+        "adaptation": "教科書の例に一般項の導出を追加",
+        "sha256": "b0f97b09c5d2b8f2feda32cd5adda6e2831ef942a50e05755759014e55b56f48"
+      },
+      "statement": "\\[C_0=1,\\qquad C_{n+1}=\\sum_{k=0}^{n}C_kC_{n-k}\\quad(n\\ge0).\\]\n(1) $G(t)=\\sum_{n=0}^{\\infty}C_nt^n$ の満たす方程式を導き、$G(t)$ を求めよ。\n\n(2) $C_n$ を二項係数で表せ。必要なら一般化二項展開 $(1+z)^{1/2}=\\sum_{j\\ge0}\\binom{1/2}{j}z^j$ を用いてよい。ただし $\\binom{1/2}{j}=(1/2)(1/2-1)\\cdots(1/2-j+1)/j!$、$\\binom{1/2}{0}=1$ とする。\n\n(3) $n+1$ 個の因子の順番を変えず、二つずつ掛ける括弧の付け方の個数として、この漸化式を説明せよ。",
+      "hint": "畳み込みは母関数の積になる。二次方程式の二つの解から、定数項が $1$ の方を選ぶ。",
+      "answer": "\\[G(t)=1+tG(t)^2,\\qquad G(t)=\\frac{1-\\sqrt{1-4t}}{2t}.\\]\n\\[C_n=\\frac1{n+1}\\binom{2n}{n}\\quad(n\\ge0).\\]",
+      "solution": [
+        "漸化式に $t^{n+1}$ を掛けて足すと $G(t)-1=tG(t)^2$。形式的べき級数では各次数の係数は有限個の積から決まるため、この畳み込みの操作ができる。",
+        "二次方程式の解は $\\{1\\pm\\sqrt{1-4t}\\}/(2t)$。平方根は定数項 $1$ の形式的展開を取る。正の符号では $t^{-1}$ の項が生じるため不適切。負の符号を選ぶと定数項が $1$ になる。",
+        "一般化二項展開から $t^n$ の係数は\n\\[C_n=-\\frac12\\binom{1/2}{n+1}(-4)^{n+1}=\\frac{(2n)!}{n!(n+1)!}.\\]\n$n=0$ にも一致し、二項係数の表示を得る。",
+        "最後の掛け算で左側が $k+1$ 個、右側が $n-k+1$ 個の因子に分かれる。左右の括弧の付け方は独立に $C_kC_{n-k}$ 通り。$k=0,\\ldots,n$ で足して、$n+2$ 個の因子に対する $C_{n+1}$ を得る。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "binomial(2*n,n)/(n+1)",
+        "residual": "a(n+1)-Sum(a(k)*a(n-k),(k,0,n))",
+        "initials": {
+          "0": "1"
+        },
+        "start": 0,
+        "samples": 14,
+        "claims": [
+          "Eq(floor(a(n)),a(n))",
+          "a(n)>0"
+        ],
+        "identities": [
+          "((1-sqrt(1-4*t))/(2*t))-1-t*((1-sqrt(1-4*t))/(2*t))**2"
+        ],
+        "generating_function": "(1-sqrt(1-4*t))/(2*t)",
+        "series_terms": 14
+      }
+    },
+    {
+      "id": "L6-C03",
+      "level": 6,
+      "category": "generating_functions",
+      "title": "中心二項係数と一定の畳み込み和",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/05_発展.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/05_%E7%99%BA%E5%B1%95.tex",
+        "location": "発展 問3：畳み込み和が一定になる数列",
+        "adaptation": "教科書の題材を母関数でも解く問題に再構成",
+        "sha256": "d392007879d99e5340d1d786138fad1e8d5d66f83e5f8ca6669f0790451c9a63"
+      },
+      "statement": "\\[c_0=1,\\qquad c_{n+1}=\\frac{2n+1}{2n+2}c_n\\quad(n\\ge0),\\qquad T_n=\\sum_{k=0}^nc_kc_{n-k}.\\]\n(1) $c_n$ を階乗または二項係数で表せ。\n\n(2) $H(t)=\\sum_{n\\ge0}c_nt^n$ が $2(1-t)H'(t)=H(t)$ を満たすことを示せ。\n\n(3) 形式的べき級数として $H(t)=(1-t)^{-1/2}$ を用い、$T_n$ を求めよ。必要なら一般化二項展開を用いてよい。",
+      "hint": "奇数の積を階乗で表す。畳み込みの母関数は $H(t)^2$ である。",
+      "answer": "\\[c_n=\\frac{(2n)!}{4^n(n!)^2}=\\frac1{4^n}\\binom{2n}{n},\\qquad H(t)=(1-t)^{-1/2},\\qquad T_n=1.\\]",
+      "solution": [
+        "$c_n=\\prod_{j=0}^{n-1}(2j+1)/(2j+2)$。偶数の積は $2^nn!$、奇数の積は $(2n)!/(2^nn!)$ なので一般項を得る。$n=0$ は空積 $1$。",
+        "元の式を $2(n+1)c_{n+1}=(2n+1)c_n$ とし、$t^n$ を掛けて足す。左辺は $2H'(t)$、右辺は $2tH'(t)+H(t)$。従って (2) を得る。",
+        "$H(0)=1$ の下で (2) は係数を一意に定める。一般化二項展開による $(1-t)^{-1/2}$ は同じ定数項と方程式を満たすので一致する。",
+        "$T_n$ は $H(t)^2=(1-t)^{-1}=\\sum_{n\\ge0}t^n$ の $t^n$ の係数である。従ってすべての $n\\ge0$ で $T_n=1$。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "binomial(2*n,n)/4**n",
+        "residual": "a(n+1)-(2*n+1)*a(n)/(2*n+2)",
+        "initials": {
+          "0": "1"
+        },
+        "start": 0,
+        "samples": 16,
+        "claims": [
+          "Sum(a(k)*a(n-k),(k,0,n))-1"
+        ],
+        "generating_function": "(1-t)**(-1/2)",
+        "series_terms": 16
+      }
+    },
+    {
+      "id": "L6-P01",
+      "level": 6,
+      "category": "number_theory",
+      "title": "ペル方程式・近似誤差・添字の倍増",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/02_漸化式と行列/整数から作る近似分数.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/02_%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%A8%E8%A1%8C%E5%88%97/%E6%95%B4%E6%95%B0%E3%81%8B%E3%82%89%E4%BD%9C%E3%82%8B%E8%BF%91%E4%BC%BC%E5%88%86%E6%95%B0.tex",
+        "location": "本文：分子と分母・比から一次分数型・添字の倍増",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "6bb7cfba6bdb1fc1d8864a8c8c4e93bc170499bbc09ca3f9be2fd2edfe4c06b6"
+      },
+      "statement": "\\[\nx_1=3,\\quad y_1=2,\\qquad\nx_{n+1}=3x_n+4y_n,\\quad y_{n+1}=2x_n+3y_n\\quad(n\\ge1).\n\\]\n(1) $x_n,y_n$ の一般項を求めよ。\n\n(2) 両数列の各項が正の整数であり、$x_n^2-2y_n^2=1$ を満たすことを示せ。\n\n(3) $r_n=x_n/y_n$ とおく。$r_n-\\sqrt2$ を $y_n,r_n$ で表し、$r_n$ の極限を求めよ。\n\n(4) $r_{2n}=\\tfrac12(r_n+2/r_n)$ を示せ。",
+      "hint": "$x_n+y_n\\sqrt2$ とその共役を追う。二乗すると添字が二倍になる。",
+      "answer": "$u=3+2\\sqrt2$、$v=3-2\\sqrt2$ として\n\\[x_n=\\frac{u^n+v^n}{2},\\qquad y_n=\\frac{u^n-v^n}{2\\sqrt2}.\\]\n\\[x_n^2-2y_n^2=1,\\qquad r_n-\\sqrt2=\\frac1{y_n^2(r_n+\\sqrt2)}>0,\\qquad\\lim_{n\\to\\infty}r_n=\\sqrt2.\\]\n\\[r_{2n}=\\frac12\\left(r_n+\\frac2{r_n}\\right).\\]",
+      "solution": [
+        "$x_{n+1}+y_{n+1}\\sqrt2=(3+2\\sqrt2)(x_n+y_n\\sqrt2)$ なので $x_n+y_n\\sqrt2=u^n$。共役な式 $x_n-y_n\\sqrt2=v^n$ との和と差から一般項を得る。",
+        "正の整数二つから次も正の整数になる。さらに $(x_n+y_n\\sqrt2)(x_n-y_n\\sqrt2)=(uv)^n=1$ であり、ペル方程式が保たれる。",
+        "$(r_n-\\sqrt2)(r_n+\\sqrt2)=1/y_n^2$ より誤差の式を得る。$y_{n+1}>3y_n$ なので $y_n\\to\\infty$、分母は正で $r_n+\\sqrt2>\\sqrt2$。従って誤差は零に近づく。",
+        "$(x_n+y_n\\sqrt2)^2=x_{2n}+y_{2n}\\sqrt2$ より $x_{2n}=x_n^2+2y_n^2$、$y_{2n}=2x_ny_n$。両者の比を取り (4) を得る。"
+      ],
+      "verification": {
+        "mode": "system",
+        "formula": "((3+2*sqrt(2))**n+(3-2*sqrt(2))**n)/2",
+        "b_formula": "((3+2*sqrt(2))**n-(3-2*sqrt(2))**n)/(2*sqrt(2))",
+        "residual": "a(n+1)-3*a(n)-4*b(n)",
+        "b_residual": "b(n+1)-2*a(n)-3*b(n)",
+        "initials": {
+          "1": "3"
+        },
+        "b_initials": {
+          "1": "2"
+        },
+        "start": 1,
+        "samples": 16,
+        "claims": [
+          "a(n)**2-2*b(n)**2-1",
+          "a(n)>0",
+          "b(n)>0",
+          "Eq(floor(a(n)),a(n))",
+          "Eq(floor(b(n)),b(n))",
+          "a(n)/b(n)-sqrt(2)-1/(b(n)**2*(a(n)/b(n)+sqrt(2)))",
+          "a(2*n)/b(2*n)-(a(n)/b(n)+2*b(n)/a(n))/2"
+        ],
+        "identities": [
+          "(3*x+4*y)**2-2*(2*x+3*y)**2-x*x+2*y*y"
+        ]
+      }
+    },
+    {
+      "id": "L6-P02",
+      "level": 6,
+      "category": "number_theory",
+      "title": "連分数の近似と交互の誤差",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/02_漸化式と行列/整数から作る近似分数.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/02_%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%A8%E8%A1%8C%E5%88%97/%E6%95%B4%E6%95%B0%E3%81%8B%E3%82%89%E4%BD%9C%E3%82%8B%E8%BF%91%E4%BC%BC%E5%88%86%E6%95%B0.tex",
+        "location": "本文：連分数にも現れる分数",
+        "adaptation": "教科書の例を問題化",
+        "sha256": "6bb7cfba6bdb1fc1d8864a8c8c4e93bc170499bbc09ca3f9be2fd2edfe4c06b6"
+      },
+      "statement": "\\[c_0=1,\\qquad c_{n+1}=1+\\frac1{1+c_n}\\quad(n\\ge0).\\]\n(1) $c_n=P_n/Q_n$ と表し、$P_0=Q_0=1$ から始める整数の連立漸化式を作れ。\n\n(2) $P_n^2-2Q_n^2=(-1)^{n+1}$ を示し、$P_n,Q_n,c_n$ の一般項を求めよ。\n\n(3) $c_n$ が $\\sqrt2$ の上下に交互に現れることと、$\\sqrt2$ に収束することを示せ。",
+      "hint": "既約分数に直す前の分子・分母を一緒に追い、$P_n+Q_n\\sqrt2$ を考える。",
+      "answer": "\\[P_{n+1}=P_n+2Q_n,\\qquad Q_{n+1}=P_n+Q_n.\\]\n$\\lambda=1+\\sqrt2$、$\\mu=1-\\sqrt2$ とすると\n\\[P_n=\\frac{\\lambda^{n+1}+\\mu^{n+1}}2,\\qquad Q_n=\\frac{\\lambda^{n+1}-\\mu^{n+1}}{2\\sqrt2},\\]\n\\[c_n=\\sqrt2\\,\\frac{\\lambda^{n+1}+\\mu^{n+1}}{\\lambda^{n+1}-\\mu^{n+1}}.\\]\n偶数番目は $\\sqrt2$ 未満、奇数番目は $\\sqrt2$ より大きく、極限は $\\sqrt2$。",
+      "solution": [
+        "$c_{n+1}=(c_n+2)/(c_n+1)$ なので (1) の連立更新を選べる。初期値と更新から $P_n,Q_n$ は正の整数であり、元の全分母も非零。",
+        "$P_n+Q_n\\sqrt2=(1+\\sqrt2)^{n+1}$ とその共役から一般項を得る。積を取れば $P_n^2-2Q_n^2=(\\lambda\\mu)^{n+1}=(-1)^{n+1}$。この式から共通の約数は $1$ なので既約性も分かる。",
+        "$c_n-\\sqrt2=(-1)^{n+1}/\\{Q_n^2(c_n+\\sqrt2)\\}$。分母は正なので誤差の符号が交互に変わる。また $P_n\\ge1$、$Q_{n+1}=P_n+Q_n\\ge Q_n+1$ から $Q_n\\to\\infty$。誤差の絶対値は $1/(\\sqrt2 Q_n^2)$ 未満なので零に近づく。"
+      ],
+      "verification": {
+        "mode": "closed_form",
+        "formula": "sqrt(2)*((1+sqrt(2))**(n+1)+(1-sqrt(2))**(n+1))/((1+sqrt(2))**(n+1)-(1-sqrt(2))**(n+1))",
+        "residual": "a(n+1)-1-1/(1+a(n))",
+        "initials": {
+          "0": "1"
+        },
+        "start": 0,
+        "samples": 16,
+        "claims": [
+          "a(n)>0",
+          "Ne(1+a(n),0)",
+          "(-1)**(n+1)*(a(n)-sqrt(2))>0"
+        ]
+      }
+    },
+    {
+      "id": "L6-P03",
+      "level": 6,
+      "category": "number_theory",
+      "title": "偶奇分岐と奇数が続く長さ",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第3章 解法の選択と演習/04_演習/05_発展.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC3%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E9%81%B8%E6%8A%9E%E3%81%A8%E6%BC%94%E7%BF%92/04_%E6%BC%94%E7%BF%92/05_%E7%99%BA%E5%B1%95.tex",
+        "location": "発展 問2：奇数が続く条件と2の因子",
+        "adaptation": "教科書と同じ",
+        "sha256": "d392007879d99e5340d1d786138fad1e8d5d66f83e5f8ca6669f0790451c9a63"
+      },
+      "statement": "正の整数 $a_0$ から\n\\[\na_{n+1}=\\begin{cases}a_n/2&(a_n\\text{ が偶数}),\\\\(3a_n+1)/2&(a_n\\text{ が奇数})\\end{cases}\\quad(n\\ge0)\n\\]\nと定める。\n\n(1) $a_0,\\ldots,a_m$ がすべて奇数であるとき、$a_j+1$ を $a_0,j$ で表せ（$0\\le j\\le m$）。\n\n(2) 非負整数 $m$ に対し、$a_0,\\ldots,a_m$ がすべて奇数となる正整数 $a_0$ をすべて求め、その最小値を答えよ。\n\n(3) $a_0+1=2^st$（$s\\ge0$ は整数、$t$ は正の奇数）と表す。初項から連続する奇数項の個数を求めよ。",
+      "hint": "奇数の更新中は $a_{j+1}+1=\\tfrac32(a_j+1)$。偶数の因子が何回取り除かれるかを追う。",
+      "answer": "(1) $\\displaystyle a_j+1=\\left(\\frac32\\right)^j(a_0+1)$。\n\n(2) $\\displaystyle a_0=2^{m+1}t-1$（$t$ は正の整数）、最小値は $2^{m+1}-1$。\n\n(3) 連続する奇数項の個数は $s$。$s=0$ なら初項から偶数で、個数は $0$。",
+      "solution": [
+        "奇数の項からの更新では $a_{j+1}+1=(3a_j+3)/2$。これを繰り返すと (1) の式を得る。",
+        "全 $a_0,\\ldots,a_m$ が奇数なら、特に $a_m+1=3^m(a_0+1)/2^m$ が偶数。$3^m$ は奇数なので $2^{m+1}\\mid(a_0+1)$ が必要である。",
+        "逆に $a_0+1=2^{m+1}t$ なら、$0\\le j\\le m$ で $a_j+1=3^j2^{m+1-j}t$ は偶数になる。帰納的に奇数の更新を適用でき、条件は十分でもある。最小値は $t=1$ の場合。",
+        "$a_0+1=2^st$、$t$ が奇数なら、$j<s$ では $a_j+1$ が偶数で $a_j$ は奇数。$j=s$ では $a_s+1=3^st$ が奇数となり $a_s$ は偶数。従って最初の奇数項はちょうど $s$ 個である。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "0": "M"
+        },
+        "next": "Piecewise((x/2,Eq(Mod(x,2),0)),((3*x+1)/2,True))",
+        "start": 0,
+        "samples": 10,
+        "odd_prefix_length": "s",
+        "parameter_cases": [
+          {
+            "M": "1",
+            "s": "1"
+          },
+          {
+            "M": "2",
+            "s": "0"
+          },
+          {
+            "M": "3",
+            "s": "2"
+          },
+          {
+            "M": "7",
+            "s": "3"
+          },
+          {
+            "M": "15",
+            "s": "4"
+          },
+          {
+            "M": "19",
+            "s": "2"
+          },
+          {
+            "M": "31",
+            "s": "5"
+          }
+        ],
+        "claims": [
+          "a(n)>0",
+          "Eq(floor(a(n)),a(n))",
+          "Or(n>=s,Eq(a(n)+1,(3/2)**n*(M+1)))"
+        ]
+      }
+    },
+    {
+      "id": "L6-A01",
+      "level": 6,
+      "category": "advanced_extensions",
+      "title": "五階の漸化式を母関数にまとめる",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/04_数列をまとめて見る.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/04_%E6%95%B0%E5%88%97%E3%82%92%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E8%A6%8B%E3%82%8B.tex",
+        "location": "本文：分母に現れる漸化式",
+        "adaptation": "五階の線形漸化式へ拡張した新作",
+        "sha256": "b0f97b09c5d2b8f2feda32cd5adda6e2831ef942a50e05755759014e55b56f48"
+      },
+      "statement": "\\[\na_0=a_1=a_2=a_3=0,\\quad a_4=1,\\qquad a_{n+5}=a_{n+4}+a_n\\quad(n\\ge0).\n\\]\n(1) 母関数 $G(t)=\\sum_{n\\ge0}a_nt^n$ を求めよ。\n\n(2) $a_0$ から $a_9$ までを求めよ。\n\n(3) $n\\ge4$ で $a_n$ が非減少であることを示し、$a_{5k+4}\\ge2^k$（$k\\ge0$）を導け。根の公式による一般項は求めなくてよい。",
+      "hint": "母関数の分子は五つの初期値から決まる。増大の評価では五回分の更新を比較する。",
+      "answer": "\\[G(t)=\\frac{t^4}{1-t-t^5}.\\]\n\\[(a_0,\\ldots,a_9)=(0,0,0,0,1,1,1,1,1,2).\\]\n\\[a_{5k+4}\\ge2^k\\quad(k\\ge0).\\]",
+      "solution": [
+        "漸化式に $t^{n+5}$ を掛けて足すと $G(t)-t^4=tG(t)+t^5G(t)$。従って $(1-t-t^5)G(t)=t^4$ となる。",
+        "初期値から順に更新して (2) の値を得る。非負の二項の和で次が決まるため全項が非負。",
+        "$n\\ge4$ で $a_{n+1}-a_n=a_{n-4}\\ge0$ なので、この範囲で非減少である。従って $n\\ge4$ では $a_{n+4}\\ge a_n$ から $a_{n+5}\\ge2a_n$。",
+        "$a_4=1$ を出発点として五つずつ進む帰納法により $a_{5k+4}\\ge2^k$。特に数列は非有界である。"
+      ],
+      "verification": {
+        "mode": "recursive",
+        "order": 5,
+        "step": "a(n+4)+a(n)",
+        "residual": "a(n+5)-a(n+4)-a(n)",
+        "initials": {
+          "0": "0",
+          "1": "0",
+          "2": "0",
+          "3": "0",
+          "4": "1"
+        },
+        "start": 0,
+        "samples": 28,
+        "generating_function": "t**4/(1-t-t**5)",
+        "series_terms": 24,
+        "special_values": {
+          "5": "1",
+          "6": "1",
+          "7": "1",
+          "8": "1",
+          "9": "2"
+        },
+        "claims_start": 4,
+        "claims": [
+          "a(n+1)>=a(n)",
+          "a(n+5)>=2*a(n)",
+          "a(5*n+4)>=2**n"
+        ]
+      }
+    },
+    {
+      "id": "L6-A02",
+      "level": 6,
+      "category": "advanced_extensions",
+      "title": "参照先が変わる漸化式の増大を評価する",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/04_数列をまとめて見る.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/04_%E6%95%B0%E5%88%97%E3%82%92%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E8%A6%8B%E3%82%8B.tex",
+        "location": "本文：長期的な増え方・一般項を使わない増大評価",
+        "adaptation": "添字の半減と増大評価を組み合わせた新作",
+        "sha256": "b0f97b09c5d2b8f2feda32cd5adda6e2831ef942a50e05755759014e55b56f48"
+      },
+      "statement": "\\[a_0=1,\\qquad a_{n+1}=a_n+a_{\\lfloor n/2\\rfloor}\\quad(n\\ge0).\\]\n(1) 初期値から各項が一意に定まることを説明し、$a_0$ から $a_8$ までを求めよ。\n\n(2) 全項が正の整数で、数列が狭義単調増加であることを示せ。\n\n(3) $m\\ge0$ に対し $a_{2^m}\\ge2^{\\lfloor m^2/4\\rfloor}$ を示せ。\n\n(4) 任意の正の整数 $d$ に対し $a_n/n^d\\to+\\infty$ を示せ。一般項の閉じた表示は求めなくてよい。",
+      "hint": "区間 $N\\le j<2N$ の階差をまとめ、$a_{2N}\\ge N a_{\\lfloor N/2\\rfloor}$ を使う。",
+      "answer": "\\[(a_0,\\ldots,a_8)=(1,2,3,5,7,10,13,18,23).\\]\n全項は正の整数で、狭義単調増加する。\n\\[a_{2^m}\\ge2^{\\lfloor m^2/4\\rfloor},\\qquad\\lim_{n\\to\\infty}\\frac{a_n}{n^d}=+\\infty\\quad(d=1,2,\\ldots).\\]",
+      "solution": [
+        "$0\\le\\lfloor n/2\\rfloor\\le n$ なので、第 $n+1$ 項は既に定まった項だけを参照する。初期値と更新から正の整数性が保たれ、$a_{n+1}-a_n=a_{\\lfloor n/2\\rfloor}>0$。順に計算すれば (1) の値を得る。",
+        "単調性により、正整数 $N$ に対して\n\\[a_{2N}-a_N=\\sum_{j=N}^{2N-1}a_{\\lfloor j/2\\rfloor}\\ge N a_{\\lfloor N/2\\rfloor}.\\]\n特に $m\\ge2$、$N=2^{m-1}$ とすれば $a_{2^m}\\ge2^{m-1}a_{2^{m-2}}$。",
+        "$m=0,1$ で (3) は $a_1=2\\ge1$、$a_2=3\\ge1$。$\\lfloor m^2/4\\rfloor=(m-1)+\\lfloor(m-2)^2/4\\rfloor$ を使い、偶奇それぞれの帰納法で (3) を得る。",
+        "$2^m\\le n<2^{m+1}$ とする。単調性と (3) より $a_n/n^d\\ge2^{\\lfloor m^2/4\\rfloor-d(m+1)}$。固定した $d$ に対し指数は $+\\infty$ に向かうので、全添字での極限を得る。"
+      ],
+      "verification": {
+        "mode": "recursive",
+        "order": 1,
+        "step": "a(n)+a(floor(n/2))",
+        "residual": "a(n+1)-a(n)-a(floor(n/2))",
+        "initials": {
+          "0": "1"
+        },
+        "start": 0,
+        "samples": 32,
+        "additional_indices": [
+          64,
+          128,
+          256
+        ],
+        "special_values": {
+          "1": "2",
+          "2": "3",
+          "3": "5",
+          "4": "7",
+          "5": "10",
+          "6": "13",
+          "7": "18",
+          "8": "23"
+        },
+        "claims_start": 1,
+        "claims": [
+          "a(n+1)>a(n)",
+          "Eq(floor(a(n)),a(n))",
+          "a(n)>=2**floor(floor(log(n,2))**2/4)"
+        ]
+      }
+    },
+    {
+      "id": "L6-A03",
+      "level": 6,
+      "category": "advanced_extensions",
+      "title": "パラメーター付き二次反復の収束範囲",
+      "authorship": "hand_authored",
+      "source": {
+        "repository": "mas256/zenkashiki-no-chotaikei-publishing",
+        "path": "発展-new/第4章 解法の背景と広がり/02_漸化式と行列/漸化式と行列.tex",
+        "url": "https://github.com/mas256/zenkashiki-no-chotaikei-publishing/blob/68cb7492ae568e196257c606f1333c227643037b/%E7%99%BA%E5%B1%95-new/%E7%AC%AC4%E7%AB%A0%20%E8%A7%A3%E6%B3%95%E3%81%AE%E8%83%8C%E6%99%AF%E3%81%A8%E5%BA%83%E3%81%8C%E3%82%8A/02_%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%A8%E8%A1%8C%E5%88%97/%E6%BC%B8%E5%8C%96%E5%BC%8F%E3%81%A8%E8%A1%8C%E5%88%97.tex",
+        "location": "本文：不動点付近の線形化／三角関数型の二次反復",
+        "adaptation": "パラメーターの範囲と単調性を問う新作",
+        "sha256": "1de790274b830203985d602b82a5011a46b320646eefc4f2e8883f278796d9b0"
+      },
+      "statement": "$0\\le r\\le4$、$0\\le c\\le1$ とし、\n\\[a_0=c,\\qquad a_{n+1}=r a_n(1-a_n)\\quad(n\\ge0)\\]\nと定める。\n\n(1) 全項が $[0,1]$ に含まれることを示せ。\n\n(2) $[0,1]$ に属する不動点を $r$ によって場合分けして求めよ。\n\n(3) $0\\le r\\le1$ のとき $a_n\\to0$ を示せ。\n\n(4) $1<r\\le2$ とし、$s=1-1/r$、$0<c<s$ とする。このとき $a_n$ が単調増加して $s$ に収束することを示せ。",
+      "hint": "$0\\le x(1-x)\\le1/4$。不動点との差と一回の増分を因数分解し、必要な区間が保たれることを示す。",
+      "answer": "(1) $0\\le a_n\\le1$。\n\n(2) $0\\le r\\le1$ では $0$ のみ、$1<r\\le4$ では $0$ と $1-1/r$。\n\n(3) 極限は $0$。\n\n(4) $0<a_n<s$ が保たれ、$a_n\\uparrow s$。",
+      "solution": [
+        "$x\\in[0,1]$ なら $0\\le r x(1-x)\\le r/4\\le1$。初項から帰納的に区間が保たれる。",
+        "不動点の式は $x=r x(1-x)$。$r=0$ では $x=0$。$r>0$ では $x=0$ または $x=1-1/r$ だが、後者が $[0,1]$ に入り $0$ と異なるのは $r>1$ のときである。",
+        "$0\\le r\\le1$ なら $0\\le a_{n+1}\\le a_n$。非負の単調減少列なので極限 $L\\ge0$ があり、$L=rL(1-L)$。$r<1$ で $L>0$ なら $1=r(1-L)<1$ と矛盾し、$r=1$ でも $L^2=0$。よって $L=0$。",
+        "$1<r\\le2$ では $0<s\\le1/2$。$0<x<s$ に対して $f(x)-x=r x(s-x)>0$、$f(s)-f(x)=r(s-x)(1-s-x)>0$。従って $x<f(x)<s$ が成り立ち、$0<a_n<s$ を保って単調増加する。",
+        "極限 $L$ は $c\\le L\\le s$ で不動点である。$c>0$ なので $L=0$ は除かれ、$L=s$。ここでは $r>2$ の収束分類は問わない。"
+      ],
+      "verification": {
+        "mode": "iterate",
+        "initials": {
+          "0": "c"
+        },
+        "next": "r*x*(1-x)",
+        "start": 0,
+        "samples": 8,
+        "parameter_cases": [
+          {
+            "r": "0",
+            "c": "1/3"
+          },
+          {
+            "r": "1/2",
+            "c": "1"
+          },
+          {
+            "r": "1",
+            "c": "1/2"
+          },
+          {
+            "r": "3/2",
+            "c": "1/4"
+          },
+          {
+            "r": "2",
+            "c": "1/4"
+          },
+          {
+            "r": "4",
+            "c": "1/3"
+          },
+          {
+            "r": "4",
+            "c": "0"
+          },
+          {
+            "r": "4",
+            "c": "1"
+          }
+        ],
+        "claims": [
+          "a(n)>=0",
+          "a(n)<=1",
+          "Or(r>1,a(n+1)<=a(n))"
+        ],
+        "identities": [
+          "r*x*(1-x)-x-r*x*(1-1/r-x)",
+          "r*(1-1/r)*(1/r)-r*x*(1-x)-r*(1-1/r-x)*(1/r-x)"
+        ]
+      }
+    }
+  ],
+  "textbook_revision": "68cb7492ae568e196257c606f1333c227643037b",
+  "updated": "2026-10-15"
+}

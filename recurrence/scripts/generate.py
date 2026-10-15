@@ -36,11 +36,16 @@ FAMILIES.update(arithmetic='等差数列',polynomial_difference='多項式の階
     coupled_scaled='正規化する連立',coupled_forced='付加項のある連立',
     pure_sum='純総和',pure_sum_scaled='正規化する純総和',sum_relation='総和と一般項の関係')
 FAMILIES.update(mobius='1次分数型',factorial_ratio='総積で解く階比型',forced_second='定数項を含む3項間',arithmetic_difference='等差と階差の組合せ')
+FAMILIES.update(logarithmic='対数をとる基本型', shifted_logarithmic='平行移動して対数をとる型',
+                exponential_forcing='指数の付加項をもつ一次型')
 SCALED={'scaled_constant','shifted_scaled','scaled_affine','reciprocal_scaled'}
 
 
 def compile_recipe(family, parameters, profile='gap_2', config=None):
     config=config or load_config()
+    from elementary import FAMILIES as ELEMENTARY, recipe as elementary_recipe
+    if family in ELEMENTARY:
+        return problem_from_recipe(family,elementary_recipe(family,parameters,profile,config),profile,config)
     from level_extensions import FAMILIES as EXTENSIONS,recipe as extension_recipe
     if family in EXTENSIONS:
         return problem_from_recipe(family,extension_recipe(family,parameters,profile,config),profile,config)
@@ -135,11 +140,14 @@ def problem_from_recipe(family,recipe,profile,config):
                          'definitions_tex':r'S_n=\sum_{k=1}^{n}a_k' if ir.get('shape') in {'pure_sum','sum_relation'} else None,
                          'condition':'n は 1 以上の整数とする。数列の一般項 a_n を求めよ。'},
             'answer_tex':answer,'routes':routes,'scores':scores,'quality':quality,
-            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'}|VARIETY_FAMILIES|{'mobius','factorial_ratio','forced_second','arithmetic_difference'} else None,
+            'generation':{'profile':profile if family in SCALED|{'ratio_power','scaled_second_order','difference_scaled','weighted_sum','multiplicative_second'}|VARIETY_FAMILIES|{'mobius','factorial_ratio','forced_second','arithmetic_difference','logarithmic','shifted_logarithmic','exponential_forcing'} else None,
                           'transform_counts':dict(Counter(b['kind'] for b in recipe['blocks']))}}
 
 
 def proofs(problem):
+    if problem['ir'].get('shape') in {'power_first', 'exponential_first'}:
+        from elementary_proofs import elementary_proofs
+        return elementary_proofs(problem)
     if problem['ir'].get('shape') in {'mobius','factorial_ratio'}:
         from level_extensions import proofs as extension_proofs
         return extension_proofs(problem)
@@ -215,7 +223,9 @@ def proofs(problem):
 def validate(problem):
     ir=problem['ir']
     assert problem['scores']['level'] in range(1,6)
-    for n in range(24):
+    power_first = ir.get('shape') == 'power_first'
+    count = 8 if power_first else 24
+    for n in range(count):
         xs={i:evaluate(ir['formula'],n+i) for i in range(-n,3)}
         if ir.get('shape')=='system':
             xs.update({('b',i):evaluate(ir['b_formula'],n+i) for i in range(3)})
@@ -235,7 +245,10 @@ def validate(problem):
         elif ir['reciprocal']:
             assert xs[0]>0
             assert evaluate(add(ir['Q'],mul(ir['R'],{'op':'term','offset':0})),n,xs)!=0
-    return 24
+    if power_first:
+        from elementary import validate_power_modular
+        validate_power_modular(problem)
+    return count
 
 
 def summarize(problems):
@@ -287,6 +300,8 @@ def comparison_report(problems,config,counters,rejections):
 
 
 def family_profiles(family,config):
+    if family == 'exponential_forcing': return ['distinct', 'resonant']
+    if family in {'logarithmic','shifted_logarithmic'}: return ['square','cube']
     if family=='factorial_ratio':
         from level_extensions import FACTOR_PROFILES
         return list(FACTOR_PROFILES)
@@ -321,6 +336,13 @@ def main():
         profiles=family_profiles(family,config)
         candidates=[]
         family_parameters=parameters
+        if family in {'logarithmic','shifted_logarithmic'}:
+            shifts=(0,) if family=='logarithmic' else (-1,1)
+            # Each profile has its own degree; avoid generating the same
+            # exercise under two names and keep all exponents natural.
+            family_parameters=list(itertools.product((2,3),(1,2,3),(Fraction(1,2),1,2,3,4),shifts))
+        if family=='exponential_forcing':
+            family_parameters=list(itertools.product((2,3,4),(1,2,3),(1,2,3,4),(2,3,4)))
         if family=='geometric':
             family_parameters=list(itertools.product((-2,-1,Fraction(1,2),Fraction(2,3),2,3),(1,),(1,2,3,4,5,6,8,9),(3,)))
         if family=='arithmetic':
@@ -329,6 +351,8 @@ def main():
             family_parameters=list(itertools.product((2,3),(1,2,3),(1,2,3,4,5,6,8,9),(-2,-1,1,2,3,4)))
         for profile in profiles:
             for r,c,d,s in family_parameters:
+                if family in {'logarithmic','shifted_logarithmic'} and r!=(2 if profile=='square' else 3):
+                    continue
                 counters['attempted']+=1
                 try: p=compile_recipe(family,{'r':r,'c':c,'d':d,'s':s},profile,config)
                 except RuleViolation as e:
@@ -360,7 +384,7 @@ def main():
     added_ids=assign_ids(problems,registry,args.update_id_registry)
     for p in problems:
         validate(p)
-        p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] or p['ir'].get('shape')=='power_second' else [])
+        p['lean_theorems']=[p['id']+'_valid',p['id']+'_unique']+([p['id']+'_domain'] if p['ir']['reciprocal'] or p['ir'].get('shape') in {'power_second','power_first'} else [])
         p['lean_source']='import Recurrence.Theory\n\nnamespace Recurrence\n'+proofs(p)+'end Recurrence\n'
     if args.update_id_registry:
         REGISTRY_PATH.write_text(json.dumps(registry,indent=2)+'\n')
@@ -368,14 +392,16 @@ def main():
     (ROOT/'lean/Recurrence/Generated.lean').write_text(source,encoding='utf-8')
     report=comparison_report(problems,config,counters,rejections)
     (BUILD/'quality-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':'0.7.0',
+    exact_cases=sum(8 if p['ir'].get('shape')=='power_first' else 24 for p in problems)
+    modular_cases=sum(72 for p in problems if p['ir'].get('shape')=='power_first')
+    payload={'schema_version':'0.2','score_version':config['version'],'generator_version':config['version'],
              'families':{k:v for k,v in FAMILIES.items() if config['quotas'].get(k,0)},'problems':problems,
              'generation_config':config,'function_catalog':profile_catalog(config),'selection_weights':config['selection'].get('family_weights',{}),
              'comparison':{k:report[k] for k in ('before','after','candidate_counts','rejection_reasons','baseline_rejected_count','diversity','level_diversity')},
-             'checks':{'exact_arithmetic_cases':len(problems)*24},
+             'checks':{'exact_arithmetic_cases':exact_cases,'modular_arithmetic_cases':modular_cases},
              'proof_source_sha256':hashlib.sha256(source.encode()).hexdigest()}
     (BUILD/'candidates.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
-    print(f"Generated {len(problems)} problems / {len(payload['families'])} families; {len(problems)*24} exact term checks passed.")
+    print(f"Generated {len(problems)} problems / {len(payload['families'])} families; {exact_cases} exact term checks and {modular_cases} modular checks passed.")
     print('Comparison:',json.dumps({k:report[k] for k in ('before','after','baseline_rejected_count')},ensure_ascii=False))
     print('Candidate screening:',dict(counters),'reasons:',dict(rejections))
     print('Distinct coefficient patterns:',report['diversity']['before']['coefficient_patterns'],'->',report['diversity']['after']['coefficient_patterns'])

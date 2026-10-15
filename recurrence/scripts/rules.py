@@ -82,6 +82,20 @@ def normalize_recipe(recipe, config=None):
             assert block[key]['op']=='rational'
         if kind=='power_sequence' and evaluate(block['base'],0) not in {2,3}:
             raise RuleViolation('unregistered_power_base')
+        if kind == 'power_first_encode':
+            assert block['degree']['op'] == 'nat_constant'
+            assert isinstance(block['degree']['value'], int)
+            assert all(block[k]['op'] == 'rational' for k in ('coefficient', 'shift'))
+            if block['degree']['value'] not in {2, 3}:
+                raise RuleViolation('unregistered_power_degree')
+            if evaluate(block['coefficient'], 0) <= 0:
+                raise RuleViolation('nonpositive_power_coefficient')
+        if kind == 'exponential_force':
+            assert all(block[k]['op'] == 'rational' for k in ('ratio', 'base', 'coefficient'))
+            if evaluate(block['ratio'], 0) <= 0 or evaluate(block['base'], 0) <= 1:
+                raise RuleViolation('invalid_exponential_forcing_base')
+            if evaluate(block['coefficient'], 0) == 0:
+                raise RuleViolation('zero_exponential_forcing')
         normalized.append(block)
     assert previous == result["output"], "Dangling output"
     counts = Counter(b["kind"] for b in normalized)

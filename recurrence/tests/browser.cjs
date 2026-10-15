@@ -1,17 +1,18 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_ORIGIN || 'http://127.0.0.1:8787') + '/recurrence/';
 
 (async () => {
-  const {textbookText,equashareSource} = await import('../model.mjs');
-  const browser = await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
-  const origin=process.env.RECURRENCE_TEST_ORIGIN || 'http://127.0.0.1:8787';
+  const {textbookText, mathTextParts, equashareSource} = await import('../model.mjs');
+  const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
   const bank=JSON.parse(fs.readFileSync('recurrence/build/problems.json','utf8'));
+  const authored=JSON.parse(fs.readFileSync('recurrence/authored/level6.json','utf8'));
   const first=bank.problems.find(p=>p.family==='shifted_scaled');
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(origin+'/recurrence/?problem='+first.id);
+  await page.goto(baseURL+'?problem='+first.id);
   await page.locator('#bank-status').filter({hasText:'Lean検証済み'}).waitFor();
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
   assert.equal(await page.locator('#answer').isVisible(),false);
@@ -49,7 +50,7 @@ const fs = require('node:fs');
   const editor=await openInEquashare(first);
   // Render every exported problem using the distributed Equashare parser, including
   // cases environments, partial-sum definitions, fractions and positivity conditions.
-  for (const problem of bank.problems) {
+  for (const problem of [...bank.problems, ...authored.problems]) {
     await checkEquasharePreview(editor,problem);
   }
   await editor.close();
@@ -112,7 +113,7 @@ const fs = require('node:fs');
   }
   const multiple=bank.problems.find(p=>p.routes.length>1);
   assert.ok(multiple,'The bank must exercise alternative-method comparisons.');
-  await page.goto(origin+'/recurrence/?problem='+multiple.id);
+  await page.goto(baseURL+'?problem='+multiple.id);
   await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('.alternate').count(),Math.min(2,multiple.routes.length-1));
@@ -121,8 +122,10 @@ const fs = require('node:fs');
     assert.ok(!(await alternate.textContent()).includes('スコア')); 
     assert.ok((await alternate.textContent()).includes('方針：'));
   }
-  const formulas=bank.problems.flatMap(p=>[...p.statement.initials_tex,p.statement.recurrence_tex,p.answer_tex,
-    ...p.routes.flatMap(r=>r.steps.flatMap(s=>[...s.matchAll(/\\\((.*?)\\\)/gs)].map(m=>m[1]))) ]);
+  const formulas=[...new Set([...bank.problems.flatMap(p=>[...p.statement.initials_tex,p.statement.recurrence_tex,p.answer_tex,
+    ...p.routes.flatMap(r=>r.steps.flatMap(s=>[...s.matchAll(/\\\((.*?)\\\)/gs)].map(m=>m[1]))) ]),
+    ...authored.problems.flatMap(p => [p.statement,p.hint,p.answer,...p.solution]
+      .flatMap(text => mathTextParts(text).filter(part => part.type !== 'text').map(part => part.text)))])];
   const renderingErrors=await page.evaluate(async formulas=>{
     const errors=[];
     for(const tex of formulas) {
@@ -146,7 +149,7 @@ const fs = require('node:fs');
   }
   await page.setViewportSize({width:375,height:900});
   const widest=bank.problems.reduce((a,b)=>a.quality.metrics.nodes>b.quality.metrics.nodes?a:b);
-  await page.goto(origin+'/recurrence/?problem='+widest.id);
+  await page.goto(baseURL+'?problem='+widest.id);
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   await page.screenshot({path:'recurrence/build/mobile.png',fullPage:true});
@@ -159,7 +162,7 @@ const fs = require('node:fs');
   for (const family of Object.keys(bank.families)) {
     const examples=bank.problems.filter(p=>p.family===family);
     const longest=examples.reduce((a,b)=>a.routes[0].steps.join('').length>b.routes[0].steps.join('').length?a:b);
-    await page.goto(origin+'/recurrence/?problem='+longest.id);
+    await page.goto(baseURL+'?problem='+longest.id);
     await page.locator('#answer-button').waitFor({state:'visible'});
     await page.waitForFunction(()=>!document.querySelector('#answer-button').disabled);
     await page.locator('#answer-button').click();
@@ -167,7 +170,120 @@ const fs = require('node:fs');
     assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(),0,family);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile '+family);
   }
+  await checkAuthored(page, authored, openInEquashare);
+  await checkBatch(page);
   assert.deepEqual(errors,[]);
-  console.log(`Browser checks passed: ${formulas.length} formulas, ${bank.problems.length} Equashare problems, every family, hints, filters, exports, comparison and mobile layout.`);
+  console.log(`Browser checks passed: ${formulas.length} formulas, ${bank.problems.length + authored.problems.length} Equashare problems, every family, hints, filters, exports, comparison, mobile layout and 14-question batches.`);
   await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});
+
+async function checkAuthored(page, authored, openInEquashare) {
+  await page.locator('#family').selectOption('all');
+  await page.locator('#level-six').click();
+  assert.ok((await page.locator('#selection-count').textContent()).includes('60 問'));
+  await page.locator('#generate').click();
+  assert.equal(await page.locator('#problem-level').textContent(), 'Lv.6');
+  assert.ok(!(await page.locator('#bank-status').textContent()).includes('Lean検証済み'));
+  assert.equal(await page.locator('#recipe-details').isVisible(), false);
+  assert.equal(await page.locator('#authored-details').isVisible(), true);
+  for (const category of authored.categories) {
+    await page.locator('#family').selectOption('authored:' + category.id);
+    await page.locator('#generate').click();
+    const id = new URL(page.url()).searchParams.get('problem');
+    assert.equal(authored.problems.find(p => p.id === id).category, category.id);
+    await page.locator('#hint-button').click();
+    assert.equal(await page.locator('.hint').count(), 1);
+    await page.locator('#answer-button').click();
+    await page.waitForFunction(() => document.querySelector('.authored-solution mjx-container'));
+    assert.equal(await page.locator('#single-answer').isVisible(), false);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), category.id);
+    assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(), 0);
+  }
+  const shared = page.url();
+  const event = page.waitForEvent('download');
+  await page.locator('#download-tex').click();
+  const download = await event;
+  const tex = fs.readFileSync(await download.path(), 'utf8');
+  assert.ok(tex.includes('（Lv6）') && tex.includes('方針・解答・解法'));
+  const id = new URL(shared).searchParams.get('problem');
+  const editor = await openInEquashare(authored.problems.find(p => p.id === id));
+  await editor.close();
+  await page.goto(shared);
+  await page.waitForFunction(() => document.querySelector('#problem-level').textContent === 'Lv.6');
+  await page.waitForFunction(() => document.querySelector('#problem-content mjx-container'));
+  assert.equal(await page.locator('#problem-id').textContent(), id);
+  assert.equal(await page.locator('#answer').isVisible(), false);
+  await page.screenshot({path:'recurrence/build/level6-mobile.png',fullPage:true});
+}
+
+async function checkBatch(page) {
+  await page.locator('#family').selectOption('reciprocal_forcing');
+  await page.locator('[data-level="1"]').click();
+  assert.equal(await page.locator('#generate').isDisabled(), true);
+  await page.waitForFunction(() => !document.querySelector('#generate-batch').disabled);
+  await page.locator('#generate-batch').click();
+  await page.waitForFunction(() => document.querySelectorAll('.batch-question mjx-container').length >= 26);
+  const questions = page.locator('.batch-question');
+  assert.equal(await questions.count(), 14);
+  assert.deepEqual(await questions.evaluateAll(cards => cards.map(card => Number(card.dataset.level))),
+    [1,1,2,2,3,3,3,4,4,4,5,5,6,6]);
+  const ids = await questions.evaluateAll(cards => cards.map(card => card.dataset.problemId));
+  assert.equal(new Set(ids).size, 14);
+  assert.equal(await page.locator('#answer').isVisible(), false);
+  assert.equal(await page.locator('#recipe-details').isVisible(), false);
+  assert.equal(await page.locator('#open-equashare').isDisabled(), true);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  await page.screenshot({path:'recurrence/build/batch-mobile.png',fullPage:true});
+  const shared = page.url();
+  let event = page.waitForEvent('download');
+  await page.locator('#download-tex').click();
+  let download = await event;
+  let tex = fs.readFileSync(await download.path(),'utf8');
+  assert.equal((tex.match(/\\section\*\{問題 /g) ?? []).length, 14);
+  assert.ok(!tex.includes('方針・解答・解法'));
+  assert.equal(download.suggestedFilename(), 'recurrence-batch-14.tex');
+  await page.locator('#hint-button').click();
+  assert.equal(await page.locator('.hint').count(), 14);
+  await page.locator('#answer-button').click();
+  await page.waitForFunction(() => document.querySelectorAll('.batch-solution mjx-container').length >= 14);
+  assert.equal(await page.locator('.batch-solution').count(), 14);
+  assert.equal(await page.locator('#single-answer').isVisible(), false);
+  assert.deepEqual(await page.locator('.batch-solution').evaluateAll(cards => cards.map(card => card.dataset.problemId)), ids);
+  assert.equal(await page.locator('.batch-solution .solution-note a').count(), 2);
+  assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(), 0);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  event = page.waitForEvent('download');
+  await page.locator('#download-tex').click();
+  download = await event;
+  tex = fs.readFileSync(await download.path(),'utf8');
+  assert.equal((tex.match(/\\section\*\{問題 /g) ?? []).length, 28);
+  await page.locator('#answer-button').click();
+  assert.equal(await page.locator('#answer').isVisible(), false);
+  await page.emulateMedia({media:'print'});
+  assert.equal(await page.locator('.controls').isVisible(), false);
+  assert.equal(await page.locator('.batch-question:visible').count(), 14);
+  await page.emulateMedia({media:'screen'});
+  await page.locator('#generate-batch').click();
+  const nextIds = await questions.evaluateAll(cards => cards.map(card => card.dataset.problemId));
+  assert.ok(nextIds.every(id => !ids.includes(id)));
+  assert.equal(await page.locator('.hint').count(), 0);
+  assert.equal(await page.locator('#answer').isVisible(), false);
+  await page.goto(shared);
+  await page.waitForFunction(() => document.querySelectorAll('.batch-question').length === 14);
+  assert.deepEqual(await questions.evaluateAll(cards => cards.map(card => card.dataset.problemId)), ids);
+  await page.locator('#generate').click();
+  assert.equal(await questions.count(), 0);
+  assert.equal(await page.locator('#recipe-details').isVisible(), true);
+  await page.locator('#answer-button').click();
+  assert.equal(await page.locator('#single-answer').isVisible(), true);
+  assert.equal(await page.locator('#batch-answers').isVisible(), false);
+  // An unavailable fixed bank must not yield a partial batch or break single practice.
+  await page.route('**/data/level6.json', route => route.fulfill({status:503,body:''}));
+  await page.goto(baseURL+'?batch=missing');
+  await page.waitForFunction(() => document.querySelector('#batch-status').textContent.includes('取得できません'));
+  await page.waitForFunction(() => !document.querySelector('#generate').disabled);
+  assert.equal(await page.locator('#generate-batch').isDisabled(), true);
+  assert.equal(await questions.count(), 0);
+  await page.locator('#generate').click();
+  assert.equal(await page.locator('#problem-title').textContent(), '問題');
+}

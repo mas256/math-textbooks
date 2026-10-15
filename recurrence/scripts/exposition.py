@@ -78,6 +78,8 @@ def scalar_exposition(ir,route,variable='a'):
 
 def explain_route(ir,route):
     cert=route['certificate'];kind=cert['kind']
+    if kind in {'power-first-log', 'exponential-normalization'}:
+        return route['steps']
     if kind in {'mobius-shift','factorial-product','forced-second','arithmetic-difference'}:
         from level_extensions import exposition
         return exposition(ir,route)

@@ -1,6 +1,35 @@
-import Mathlib
+import Mathlib.Data.Rat.Lemmas
+import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
 
 namespace Recurrence
+
+-- Natural exponents for logarithmic first-order recurrences. The closed-form
+-- identity below matches the evaluated fraction displayed to the learner.
+def geometricSum (q : ℕ) : ℕ → ℕ
+  | 0 => 0
+  | n + 1 => geometricSum q n * q + 1
+
+theorem geometricSum_succ (q n : ℕ) :
+    geometricSum q (n + 1) = geometricSum q n * q + 1 := rfl
+
+theorem geometricSum_closed (q n : ℕ) (hq : 2 ≤ q) :
+    (geometricSum q n : ℚ) = ((q : ℚ) ^ n - 1) / ((q : ℚ) - 1) := by
+  have hq' : (2 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq
+  have hd : (q : ℚ) - 1 ≠ 0 := by linarith
+  induction n with
+  | zero => simp [geometricSum]
+  | succ n ih =>
+    rw [geometricSum_succ]
+    push_cast
+    rw [ih, pow_succ]
+    field_simp [hd] <;> ring
 
 -- Internal index 0 denotes the school-mathematics term a₁.
 structure FirstCertificate (f : ℕ → ℚ) (initial : ℚ)

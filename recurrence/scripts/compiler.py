@@ -8,6 +8,9 @@ def compile_blocks(recipe, config=None):
     config = config or load_config()
     recipe = normalize_recipe(recipe, config)
     assert recipe["schema_version"] == "0.2"
+    if any(b['kind'] in {'power_first_encode', 'exponential_force'} for b in recipe['blocks']):
+        from elementary import compile_elementary
+        return compile_elementary(recipe)
     if any(b["kind"] in {"mobius_encode","factorial_product","second_difference"} for b in recipe["blocks"]):
         from level_extensions import compile_extension
         return compile_extension(recipe)

@@ -106,6 +106,14 @@ def educational_cost(ir,route):
     shape=ir.get('shape');cert=route['certificate'];kind=cert['kind']
     base=route['parts']['B']+route['parts']['R']+route['parts']['T']
     def result(cost,reason):return cost,reason
+    if shape == 'power_first':
+        shifted = evaluate(ir['power_shift'], 0) != 0
+        return result(14 if shifted else 9, '平行移動後に対数をとり等比・定数項を処理する' if shifted
+                      else '正値を確認して対数をとり一次の漸化式を解く')
+    if shape == 'exponential_first':
+        return result(6 if cert['resonant'] else 9,
+                      '指数で割り等差数列に帰着する' if cert['resonant']
+                      else '指数で割り定数項をもつ一次の漸化式に帰着する')
     if shape=='mobius':return result(14,'シンプルな1次分数を不動点・逆数で解く')
     if shape=='factorial_ratio':
         offsets=cert['offsets']
@@ -156,6 +164,7 @@ def educational_cost(ir,route):
 
 def num_one():
     return {'op':'rational','num':1,'den':1}
+
 
 def score_routes(ir, routes):
     metrics=statement_metrics(ir)

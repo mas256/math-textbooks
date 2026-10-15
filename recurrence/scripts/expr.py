@@ -75,6 +75,12 @@ def nat_const(value):
     return {"op": "nat_constant", "value": value}
 
 
+def geometric_sum(ratio, length):
+    """Natural 1+q+...+q^(k-1), displayed in its evaluated closed form."""
+    assert isinstance(ratio, int) and ratio >= 2
+    return {'op': 'geometric_sum', 'args': [nat_const(ratio), length]}
+
+
 def triangular():
     return {"op": "triangular"}  # k(k+1)/2 = n(n-1)/2
 
@@ -107,6 +113,9 @@ def evaluate(expr, k, terms=None):
     if op == "nat_index": return k + expr["offset"]
     if op == "nat_constant": return expr["value"]
     if op == "triangular": return k * (k + 1) // 2
+    if op == 'geometric_sum':
+        q, length = [int(evaluate(x, k, terms)) for x in expr['args']]
+        return (q ** length - 1) // (q - 1)
     if op == "term": return terms[(expr['variable'],expr['offset'])] if 'variable' in expr else terms[expr["offset"]]
     if op == 'sum_term': return terms[('S',expr['offset'])]
     if op == 'prefix_sum':
@@ -149,6 +158,10 @@ def latex(expr):
         return rf"\sum_{{k=1}}^{{n}}{body}"
     if op == 'log': return rf"\log_{{{latex(expr['args'][0])}}}\left({latex(expr['args'][1])}\right)"
     args = expr["args"]
+    if op == 'geometric_sum':
+        q = args[0]['value']
+        numerator = latex(power(num(q), args[1])) + '-1'
+        return numerator if q == 2 else rf'\frac{{{numerator}}}{{{q-1}}}'
     if op == "factorial": return r"\left("+latex(args[0])+r"\right)!"
     if op == "add":
         # Simplify linear natural-index expressions for display; keep their
@@ -184,7 +197,7 @@ def latex(expr):
         if args[1] in (nat_const(0), num(0)): return "1"
         if args[1] in (nat_const(1), num(1)): return latex(args[0])
         base = latex(args[0])
-        if args[0]["op"] not in {"rational", "index"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
+        if args[0]["op"] not in {"rational", "index", "nat_constant"} or args[0].get("num", 1) < 0 or args[0].get("den", 1) > 1:
             base = r"\left(" + base + r"\right)"
         return base + "^{" + latex(args[1]) + "}"
     if op == "choose":
@@ -214,6 +227,7 @@ def lean(expr, sequence="f"):
         body=re.sub(r'\bn\b','k',lean(expr['args'][0],sequence))
         return f'(∑ k ∈ Finset.range (n + 1), {body})'
     a = [lean(x, sequence) for x in expr["args"]]
+    if op == 'geometric_sum': return f'(geometricSum {a[0]} {a[1]})'
     if op == "choose": return f"({a[0]}).choose {a[1]}"
     symbol = {"add": " + ", "mul": " * ", "div": " / ", "pow": " ^ "}[op]
     return "(" + symbol.join(a) + ")"

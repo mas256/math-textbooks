@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "seed": 20261008,
   "max_transforms": {
     "add_constant": 1,
@@ -19,7 +19,9 @@
     "difference_polynomial": 1,
     "mobius_encode": 1,
     "factorial_product": 1,
-    "second_difference": 1
+    "second_difference": 1,
+    "power_first_encode": 1,
+    "exponential_force": 1
   },
   "max_blocks": 4,
   "selection": {
@@ -80,7 +82,10 @@
     "mobius": 24,
     "factorial_ratio": 21,
     "forced_second": 12,
-    "arithmetic_difference": 8
+    "arithmetic_difference": 8,
+    "logarithmic": 12,
+    "shifted_logarithmic": 12,
+    "exponential_forcing": 12
   },
   "difficulty_mix": {
     "3": {

@@ -7,6 +7,10 @@ from identity import fingerprint, identity_key
 
 def parameter_key(problem):
     ir,certificate = problem['ir'],problem['routes'][0]['certificate']
+    if ir.get('shape') == 'power_first':
+        return 'power:' + str(ir['power_degree']['value']) + ':' + str(evaluate(ir['power_coefficient'], 0))
+    if ir.get('shape') == 'exponential_first':
+        return 'exponential:' + str(evaluate(ir['Q'], 0)) + ':' + str(evaluate(ir['forcing_base'], 0))
     if ir.get('shape')=='mobius': return 'fraction:'+','.join(str(evaluate(x,0)) for x in ir['mobius_coefficients'])
     if ir.get('shape')=='factorial_ratio': return 'factor:'+problem['generation']['profile']
     if certificate['kind']=='arithmetic-difference': return 'increment:'+str(evaluate(certificate['increment'],0))

@@ -1,9 +1,13 @@
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, problemInstruction, equashareSource } from './model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText,
+  chooseBatch, batchFromIds, validateAuthoredBank, problemLevel, mathTextParts, batchTexDocument,
+  problemInstruction, equashareSource } from './model.mjs';
 
 const $ = id => document.getElementById(id);
-const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
+const state = { bank: null, manifest: null, authored: null, level: 2, family: 'all', current: null,
+  batch: null, seen: new Set(), batchSeen: new Map(), hints: 0 };
 const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '等差・等比数列と、基本的な階差の和を確認します。',
-  2: '総和を含む基本形と、単項式の積による階比を扱います。', 3: '連立、一般の階比、基本的な3項間漸化式を扱います。', 4: '一次分数、定数項付き3項間、難しい階比、等差と階差の組合せを扱います。', 5: '正規化・総和・階差・対数など、複数の変形を組み合わせる発展問題です。'};
+  2: '総和の基本形、単項式の階比、指数で割ると等差になる型を扱います。', 3: '連立、一般の階比、基本的な3項間、対数型、指数の付加項を扱います。', 4: '一次分数、定数項付き3項間、平行移動して対数をとる型、難しい階比を扱います。', 5: '正規化・総和・階差・対数など、複数の変形を組み合わせる発展問題です。',
+  6: 'ガウス型・隣接4項間・非隣接型・ニュートン法など、事前作成した難問を扱います。'};
 let mathQueue = Promise.resolve();
 
 function showScrollHints() {
@@ -32,6 +36,43 @@ function mathBlock(tex, className = 'math-block') {
   return el('div', '\\[' + tex + '\\]', className);
 }
 
+function mathProse(text) {
+  const box = el('div', undefined, 'math-prose');
+  let paragraph = null;
+  const append = node => {
+    if (!paragraph) { paragraph = el('p'); box.append(paragraph); }
+    paragraph.append(node);
+  };
+  for (const part of mathTextParts(text)) {
+    if (part.type === 'display') {
+      box.append(mathBlock(part.text)); paragraph = null;
+    } else if (part.type === 'inline') {
+      append(document.createTextNode('\\(' + part.text + '\\)'));
+    } else {
+      part.text.split(/\n\s*\n/g).forEach((text, i) => {
+        if (i) paragraph = null;
+        if (text.trim() || paragraph) append(document.createTextNode(text.replaceAll('\n', ' ')));
+      });
+    }
+  }
+  return box;
+}
+
+function problemStatement(p) {
+  if (p.level === 6) return mathProse(p.statement);
+  const box = el('div');
+  box.append(el('p', problemInstruction(p)), mathBlock(p.statement.initials_tex.join(',\\quad ')),
+    mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '') + p.statement.recurrence_tex),
+    el('p', 'n は 1 以上の整数とする。', 'question-line'));
+  return box;
+}
+
+function batchHeading(p, index, tag = 'h3') {
+  const heading = el('div', undefined, 'batch-question-heading');
+  heading.append(el(tag, `問題 ${index + 1}`), el('span', `Lv.${problemLevel(p)}`, 'pill'), el('span', p.id.toUpperCase(), 'problem-id'));
+  return heading;
+}
+
 function typeset(nodes) {
   mathQueue = mathQueue.then(async () => {
     for (let attempt = 0; !window.MathJax?.startup?.promise && attempt < 150; attempt++) {
@@ -52,18 +93,18 @@ function clearMath() {
 
 function updatePool() {
   if (!state.bank) return;
-  const pool = poolFor(state.bank, state.level, state.family);
+  const pool = poolFor(state.bank, state.level, state.family, state.authored);
   $('selection-count').textContent = pool.length ? `${pool.length} 問から出題できます` : 'この組合せの問題はまだありません';
   $('generate').disabled = !pool.length;
   $('level-help').textContent = levelText[state.level];
-  for (const button of document.querySelectorAll('[data-level]')) {
+  for (const button of document.querySelectorAll('button[data-level]')) {
     button.setAttribute('aria-pressed', String(Number(button.dataset.level) === state.level));
   }
   $('all-levels').setAttribute('aria-pressed', String(state.level === 0));
 }
 
 function renderRecipe(p) {
-  const names = {mobius_encode:'一次分数へ',factorial_product:'階比の総積',second_difference:'等差と階差の組合せ',constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
+  const names = {power_first_encode:'累乗の更新へ',exponential_force:'指数の付加項',mobius_encode:'一次分数へ',factorial_product:'階比の総積',second_difference:'等差と階差の組合せ',constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
     index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ',
     repeated_factor:'一次式を掛けて重解へ', difference_lift:'階差を元の数列へ', sum_encode:'総和を含む式へ', cumulative_sum:'差を足して一段戻す', power_sequence:'指数の数列を元の数列へ',pair_mix:'独立した数列を連立へ',partial_sum_encode:'部分和の数列として与える',sum_relation_encode:'総和と一般項の関係へ',difference_polynomial:'多項式を階差にする'};
   const list = $('block-list');
@@ -150,15 +191,9 @@ function renderGenerationSummary() {
     el('p', '指数係数の指数：' + increments + '。和が閉じた式になる候補を使います。'));
 }
 
-function renderProblem(p, updateUrl = true) {
+function resetExercise() {
   clearMath();
-  state.current = p; state.hints = 0;
-  $('problem-level').textContent = `Lv.${p.scores.level}`;
-  $('problem-id').textContent = p.id.toUpperCase();
-  const content = $('problem-content');
-  content.replaceChildren(el('p', problemInstruction(p)),
-    mathBlock(p.statement.initials_tex.join(',\\quad ')), mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '')+p.statement.recurrence_tex),
-    el('p', 'n は 1 以上の整数とする。', 'question-line'));
+  state.hints = 0;
   $('hints').replaceChildren();
   $('answer').hidden = true;
   $('answer-button').setAttribute('aria-expanded', 'false');
@@ -166,10 +201,38 @@ function renderProblem(p, updateUrl = true) {
   $('hint-button').disabled = false;
   $('hint-button').replaceChildren(document.createTextNode('ヒントを見る '), el('span', '＋'));
   $('recipe-details').open = false;
-  $('recipe-details').hidden = false;
+  $('authored-details').open = false;
+  $('authored-details').hidden = true;
   $('action-status').textContent = '';
-  renderRecipe(p);
   for (const id of ['hint-button','answer-button','copy-link','download-tex','open-equashare','print-problem']) $(id).disabled = false;
+}
+
+function updateBankStatus() {
+  if (state.batch) {
+    $('bank-status').textContent = `生成${state.bank.problems.length}問＋固定${state.authored.problems.length}問から出題`;
+  } else if (state.current?.level === 6) {
+    $('bank-status').textContent = `固定${state.authored.problems.length}問・${state.authored.categories.length}分野 / 解説付き`;
+  } else {
+    $('bank-status').textContent = `${state.manifest.count} 問・${Object.keys(state.bank.families).length}系統 / Lean検証済み`;
+  }
+}
+
+function renderProblem(p, updateUrl = true) {
+  resetExercise();
+  state.current = p; state.batch = null;
+  updateBankStatus();
+  $('problem-title').textContent = '問題';
+  $('problem-level').textContent = `Lv.${problemLevel(p)}`;
+  $('problem-id').textContent = p.id.toUpperCase();
+  const content = $('problem-content');
+  content.replaceChildren(...problemStatement(p).childNodes);
+  $('recipe-details').hidden = p.level === 6;
+  if (p.level === 6) {
+    $('authored-details').hidden = false;
+    const source = el('a', '出典：' + p.source.location);
+    source.href = p.source.url; source.target = '_blank'; source.rel = 'noopener noreferrer';
+    $('authored-info').replaceChildren(el('p', p.title), source);
+  } else renderRecipe(p);
   if (updateUrl) {
     const url = new URL(location.href); url.search = ''; url.searchParams.set('problem', p.id);
     history.replaceState(null, '', url);
@@ -177,28 +240,92 @@ function renderProblem(p, updateUrl = true) {
   typeset([content]);
 }
 
+function renderBatch(problems, updateUrl = true) {
+  resetExercise();
+  state.batch = problems; state.current = null;
+  updateBankStatus();
+  $('problem-title').textContent = 'まとめて演習';
+  $('problem-level').textContent = 'Lv.1〜6';
+  $('problem-id').textContent = '全14問';
+  $('hint-button').replaceChildren(document.createTextNode('まとめてヒントを見る '), el('span', '＋'));
+  $('answer-button').replaceChildren(document.createTextNode('まとめて解答を見る '), el('span', '↓'));
+  $('recipe-details').hidden = true;
+  $('open-equashare').disabled = true;
+  $('action-status').textContent = '14問を出題しました';
+  const content = $('problem-content');
+  content.replaceChildren(...problems.map((p, i) => {
+    const card = el('section', undefined, 'batch-question');
+    card.dataset.level = problemLevel(p); card.dataset.problemId = p.id;
+    card.append(batchHeading(p, i), problemStatement(p));
+    return card;
+  }));
+  if (updateUrl) {
+    const url = new URL(location.href); url.search = '';
+    url.searchParams.set('batch', problems.map(p => p.id).join(','));
+    history.replaceState(null, '', url);
+  }
+  typeset([content]);
+}
+
+function renderBatchAnswers(problems = state.batch, headings = true) {
+  const answers = $('batch-answers');
+  answers.replaceChildren(...problems.map((p, i) => {
+    const card = el('section', undefined, headings ? 'batch-solution' : 'authored-solution');
+    card.dataset.problemId = p.id;
+    if (headings) card.append(batchHeading(p, i, 'h4'));
+    const authored = p.level === 6;
+    const hint = el('div', undefined, 'method-observation');
+    hint.append(el('strong', '方針'), mathProse(authored ? p.hint : textbookText(p.routes[0].hint)));
+    const answer = el('div', undefined, 'answer-formula');
+    answer.append(authored ? mathProse(p.answer) : mathBlock(p.answer_tex));
+    const steps = el('ol', undefined, 'solution-steps');
+    for (const step of authored ? p.solution : p.routes[0].steps) {
+      const item = el('li'); item.append(mathProse(authored ? step : textbookText(step))); steps.append(item);
+    }
+    card.append(el('p', authored ? p.title : p.routes[0].title, 'method-title'), hint, answer, steps);
+    if (authored) {
+      const source = el('p', undefined, 'solution-note');
+      const link = el('a', '出典：' + p.source.location);
+      link.href = p.source.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      source.append(link); card.append(source);
+    } else {
+      card.append(el('p', '問題の型：' + p.family_label, 'solution-note'));
+    }
+    return card;
+  }));
+}
+
 function showHint() {
-  const p = state.current;
-  if (!p) return;
+  if (!state.current && !state.batch) return;
   if (state.hints) return;
-  const hint = el('div', undefined, 'hint');
-  hint.append(el('strong', '方針'), el('span', textbookText(p.routes[0].hint)));
-  $('hints').append(hint);
+  const hints = (state.batch || [state.current]).map((p, i) => {
+    const hint = el('div', undefined, 'hint');
+    hint.append(el('strong', state.batch ? `問題 ${i + 1} の方針` : '方針'),
+      p.level === 6 ? mathProse(p.hint) : el('span', textbookText(p.routes[0].hint)));
+    return hint;
+  });
+  $('hints').append(...hints);
   state.hints = 1;
   $('hint-button').disabled = true;
   $('hint-button').replaceChildren(document.createTextNode('方針を表示しました'), el('span', '＋'));
-  typeset([hint]);
+  typeset(hints);
 }
 
 function toggleAnswer() {
   const p = state.current;
-  if (!p) return;
+  if (!p && !state.batch) return;
   const open = $('answer').hidden;
   $('answer').hidden = !open;
   $('answer-button').setAttribute('aria-expanded', String(open));
-  $('answer-button').replaceChildren(document.createTextNode(open ? '解答を閉じる ' : '解答を見る '), el('span', open ? '↑' : '↓'));
+  $('answer-button').replaceChildren(document.createTextNode((state.batch ? 'まとめて' : '') + (open ? '解答を閉じる ' : '解答を見る ')), el('span', open ? '↑' : '↓'));
   if (!open) return;
   if (window.MathJax?.typesetClear) window.MathJax.typesetClear([$('answer')]);
+  const fixed = p?.level === 6;
+  $('single-answer').hidden = Boolean(state.batch) || fixed;
+  $('batch-answers').hidden = !state.batch && !fixed;
+  if (state.batch || fixed) {
+    renderBatchAnswers(state.batch || [p], Boolean(state.batch)); typeset([$('answer')]); return;
+  }
   $('method-title').textContent = p.routes[0].title;
   $('method-observation').textContent = '方針：' + textbookText(p.routes[0].hint);
   $('method-choice').hidden = true;
@@ -219,15 +346,40 @@ function toggleAnswer() {
 }
 
 function download(text, extension, mime = 'text/plain;charset=utf-8') {
-  if (!state.current) return;
+  if (!state.current && !state.batch) return;
   const link = el('a');
   const url = URL.createObjectURL(new Blob([text], {type:mime}));
-  link.href = url; link.download = `recurrence-${state.current.id}.${extension}`;
+  link.href = url; link.download = `recurrence-${state.batch ? 'batch-14' : state.current.id}.${extension}`;
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function updateBatchAvailability() {
+  if (!state.bank || !state.authored) return;
+  $('generate-batch').disabled = false;
+  $('batch-status').textContent = `難易度6は固定問題${state.authored.problems.length}問から選びます。`;
+}
+
+async function loadAuthored() {
+  try {
+    const response = await fetch('./data/level6.json', {cache:'no-store'});
+    if (!response.ok) throw new Error('難易度6の固定問題を取得できませんでした。');
+    state.authored = validateAuthoredBank(await response.json());
+    $('level-six').disabled = false;
+    const group = el('optgroup'); group.label = '難易度6（固定問題）';
+    for (const category of state.authored.categories) {
+      const option = el('option', category.label); option.value = 'authored:' + category.id; group.append(option);
+    }
+    $('family').append(group);
+    updatePool();
+    updateBatchAvailability();
+  } catch (error) {
+    $('batch-status').textContent = error.message + ' まとめて出題するには再読み込みしてください。';
+  }
+}
+
 async function load() {
+  const authoredLoaded = loadAuthored();
   try {
     const responses = await Promise.all(['manifest.json', 'problems.json'].map(path => fetch('./data/' + path, {cache:'no-store'})));
     for (const r of responses) if (!r.ok) throw new Error('問題データを取得できませんでした。');
@@ -244,33 +396,58 @@ async function load() {
     $('family').disabled = false;
     $('bank-status').textContent = `${manifest.count} 問・${Object.keys(state.bank.families).length}系統 / Lean検証済み`;
     renderGenerationSummary();
-    const requested = new URL(location.href).searchParams.get('problem');
-    const shared = state.bank.problems.find(p => p.id === requested);
-    if (shared) state.level = shared.scores.level;
+    const params = new URL(location.href).searchParams;
+    const requested = params.get('problem');
+    const requestedBatch = params.get('batch');
+    // Single-question practice remains available while the fixed bank loads.
+    if (requestedBatch || requested?.startsWith('L6-')) await authoredLoaded;
+    const shared = [...state.bank.problems, ...(state.authored?.problems ?? [])].find(p => p.id === requested);
+    if (shared) state.level = problemLevel(shared);
     updatePool();
-    const first = shared || chooseProblem(poolFor(state.bank, state.level, state.family), state.seen, Math.random, state.bank.selection_weights);
+    const first = shared || chooseProblem(poolFor(state.bank, state.level, state.family, state.authored), state.seen, Math.random, state.bank.selection_weights);
     if (shared) state.seen.add(shared.id);
-    renderProblem(first);
+    let restored = false;
+    if (requestedBatch && state.authored) {
+      try {
+        const problems = batchFromIds(state.bank, state.authored, requestedBatch.split(','));
+        for (const p of problems) {
+          const level = problemLevel(p);
+          if (!state.batchSeen.has(level)) state.batchSeen.set(level, new Set());
+          state.batchSeen.get(level).add(p.id);
+        }
+        renderBatch(problems); restored = true;
+      } catch { /* Fall back to a single problem if the shared batch is invalid. */ }
+    }
+    if (!restored) renderProblem(first);
     if (requested && !shared) $('action-status').textContent = '指定された問題がないため、別の問題を表示しました。';
+    if (requestedBatch && !restored) $('action-status').textContent = '指定されたまとめ問題を復元できないため、1問を表示しました。';
+    updateBatchAvailability();
     document.querySelector('.exercise').setAttribute('aria-busy','false');
   } catch (error) {
+    state.bank = null;
+    $('generate-batch').disabled = true;
     $('bank-status').textContent = '問題を読み込めません';
     $('load-error').textContent = error.message + ' 時間をおいて再読み込みしてください。';
     $('load-error').hidden = false;
     $('selection-count').textContent = '出題できる問題がありません';
+    $('batch-status').textContent = '難易度1〜5の問題を読み込めないため、まとめて出題できません。';
     $('problem-content').replaceChildren();
     document.querySelector('.exercise').setAttribute('aria-busy','false');
   }
 }
 
-document.querySelectorAll('[data-level]').forEach(button => button.addEventListener('click', () => {
+document.querySelectorAll('button[data-level]').forEach(button => button.addEventListener('click', () => {
   state.level = Number(button.dataset.level); updatePool();
 }));
 $('all-levels').addEventListener('click', () => { state.level = 0; updatePool(); });
 $('family').addEventListener('change', () => { state.family = $('family').value; updatePool(); });
 $('generate').addEventListener('click', () => {
-  const p = chooseProblem(poolFor(state.bank, state.level, state.family), state.seen, Math.random, state.bank.selection_weights);
+  const p = chooseProblem(poolFor(state.bank, state.level, state.family, state.authored), state.seen, Math.random, state.bank.selection_weights);
   if (p) renderProblem(p);
+});
+$('generate-batch').addEventListener('click', () => {
+  try { renderBatch(chooseBatch(state.bank, state.authored, state.batchSeen)); }
+  catch (error) { $('batch-status').textContent = error.message; }
 });
 $('hint-button').addEventListener('click', showHint);
 $('answer-button').addEventListener('click', toggleAnswer);
@@ -278,7 +455,8 @@ $('copy-link').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(location.href); $('action-status').textContent = 'リンクをコピーしました'; }
   catch { $('action-status').textContent = 'アドレスバーのURLをコピーしてください'; }
 });
-$('download-tex').addEventListener('click', () => download(texDocument(state.current, !$('answer').hidden), 'tex'));
+$('download-tex').addEventListener('click', () => download(state.batch
+  ? batchTexDocument(state.batch, !$('answer').hidden) : texDocument(state.current, !$('answer').hidden), 'tex'));
 $('open-equashare').addEventListener('click', () => {
   if (!state.current) return;
   const url = new URL('../equashare/', location.href);

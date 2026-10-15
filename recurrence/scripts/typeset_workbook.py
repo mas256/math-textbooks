@@ -20,6 +20,7 @@ def symbolic(e):
  if op=='div':return symbolic(a[0])/symbolic(a[1])
  if op=='factorial':return sp.factorial(symbolic(a[0]))
  if op=='pow':return symbolic(a[0])**symbolic(a[1])
+ if op=='geometric_sum':return (symbolic(a[0])**symbolic(a[1])-1)/(symbolic(a[0])-1)
  raise ValueError(op)
 def clean(e):
  original=symbolic(e)
@@ -28,7 +29,11 @@ def clean(e):
  choices=[z,sp.factor(z),sp.factor_terms(sp.collect(sp.expand(z),bases))]
  z=min(choices,key=lambda x:len(sp.latex(x)))
  if z.is_Pow:z=z.func(z.base,sp.factor(z.exp))
- for k in range(24):assert z.subs(n,k+1)==sp.Rational(evaluate(e,k)),(e,k,z)
+ # Logarithmic recurrences grow doubly exponentially. Match the generator's
+ # eight exact samples rather than allocating enormous integers at n=24.
+ def rapid_power(node):
+  return node['op']=='geometric_sum' or (node['op']=='pow' and node['args'][0]['op']=='nat_constant' and node['args'][1]['op']=='nat_index') or any(rapid_power(a) for a in node.get('args',[]))
+ for k in range(8 if rapid_power(e) else 24):assert z.subs(n,k+1)==sp.Rational(evaluate(e,k)),(e,k,z)
  return sp.latex(z,fold_frac_powers=False)
 def mathfmt(s):
  # Fractions inside fractions use the taller continued-fraction form.

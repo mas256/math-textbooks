@@ -266,6 +266,9 @@ def check_derivation(ir, route, n):
 
     These are finite checks, separate from the final Lean theorem.
     """
+    if ir.get('shape') == 'power_first':
+        from elementary import check_power_derivation
+        return check_power_derivation(ir, route, n)
     sequences = {'a':ir['formula']}
     assert route['derivation'], 'No intermediate relations recorded'
     for step in route['derivation']:
@@ -284,6 +287,9 @@ def check_derivation(ir, route, n):
 
 
 def find_routes(ir, config):
+    if ir.get('shape') in {'power_first', 'exponential_first'}:
+        from elementary import elementary_routes
+        return elementary_routes(ir)
     if ir.get("shape") in {"mobius","factorial_ratio"} or ir.get("F2",num(0))!=num(0):
         from level_extensions import routes
         return routes(ir,config)
