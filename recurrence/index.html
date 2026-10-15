@@ -65,9 +65,11 @@
         <div class="error-message" id="load-error" role="alert" hidden></div>
         <div id="problem-content" class="problem-content"><p class="muted">検証済みの問題を準備しています。</p></div>
         <div class="math-warning" id="math-warning" role="status" hidden>数式の描画を読み込めませんでした。TeX表示で内容を確認できます。<button type="button" id="retry-math">数式を再読み込み</button></div>
-        <div class="problem-actions">
-          <button class="secondary-button" type="button" id="hint-button" disabled>ヒントを見る <span aria-hidden="true">＋</span></button>
-          <button class="secondary-button strong" type="button" id="answer-button" disabled aria-expanded="false" aria-controls="answer">解答を見る <span aria-hidden="true">↓</span></button>
+        <div class="problem-actions question-actions" id="single-actions" role="group" aria-label="この問題の操作">
+          <button class="secondary-button" type="button" id="hint-button" disabled aria-controls="hints">ヒント</button>
+          <button class="secondary-button" type="button" id="answer-button" disabled aria-expanded="false" aria-controls="answer">答え</button>
+          <button class="secondary-button" type="button" id="open-equashare" disabled title="この問題をEquashareで開く（新しいタブ）">Equashare</button>
+          <button class="secondary-button" type="button" id="download-tex" disabled title="この問題のTeXを保存（答えを開いている場合は解答も含む）">TeX</button>
         </div>
         <div id="hints" class="hints" aria-live="polite"></div>
 
@@ -87,8 +89,6 @@
 
         <div class="export-bar">
           <button type="button" id="copy-link" disabled>この問題のリンクをコピー</button>
-          <button type="button" id="download-tex" disabled>TeXを保存</button>
-          <button type="button" id="open-equashare" disabled>Equashareで開く</button>
           <button type="button" id="print-problem" disabled>印刷</button>
           <span id="action-status" role="status"></span>
         </div>

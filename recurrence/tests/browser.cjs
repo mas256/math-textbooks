@@ -17,7 +17,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
   assert.equal(await page.locator('#answer').isVisible(),false);
   assert.equal(await page.locator('#problem-content').textContent().then(t=>t.includes('階比型')),false);
-  assert.equal(await page.locator('#download-tex + #open-equashare').count(),1);
+  assert.equal(await page.locator('#single-actions button').count(),4);
   async function checkEquasharePreview(editor,problem) {
     await editor.evaluate(source=>new Promise((resolve,reject)=>{
       const preview=document.querySelector('#preview');
@@ -35,9 +35,9 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
     assert.equal(await editor.locator('#status').textContent(),'','Equashare '+problem.id);
     assert.equal(await editor.locator('#preview [data-mml-node="merror"],#preview [data-mjx-error]').count(),0,problem.id);
   }
-  async function openInEquashare(problem) {
+  async function openInEquashare(problem, button = page.locator('#open-equashare')) {
     const popup=page.waitForEvent('popup');
-    await page.locator('#open-equashare').click();
+    await button.click();
     const editor=await popup;
     editor.on('pageerror',e=>errors.push(e.message));
     await editor.waitForFunction(source=>document.querySelector('#input')?.value===source,equashareSource(problem));
@@ -171,7 +171,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile '+family);
   }
   await checkAuthored(page, authored, openInEquashare);
-  await checkBatch(page);
+  await checkBatch(page, [...bank.problems, ...authored.problems], openInEquashare);
   assert.deepEqual(errors,[]);
   console.log(`Browser checks passed: ${formulas.length} formulas, ${bank.problems.length + authored.problems.length} Equashare problems, every family, hints, filters, exports, comparison, mobile layout and 14-question batches.`);
   await browser.close();
@@ -216,7 +216,8 @@ async function checkAuthored(page, authored, openInEquashare) {
   await page.screenshot({path:'recurrence/build/level6-mobile.png',fullPage:true});
 }
 
-async function checkBatch(page) {
+async function checkBatch(page, problems, openInEquashare) {
+  const {texDocument} = await import('../model.mjs');
   await page.locator('#family').selectOption('reciprocal_forcing');
   await page.locator('[data-level="1"]').click();
   assert.equal(await page.locator('#generate').isDisabled(), true);
@@ -231,49 +232,85 @@ async function checkBatch(page) {
   assert.equal(new Set(ids).size, 14);
   assert.equal(await page.locator('#answer').isVisible(), false);
   assert.equal(await page.locator('#recipe-details').isVisible(), false);
-  assert.equal(await page.locator('#open-equashare').isDisabled(), true);
+  assert.equal(await page.locator('#single-actions').isVisible(), false);
+  assert.equal(await questions.locator('.question-actions button').count(), 56);
+  assert.equal(await questions.locator('.question-hint:visible,.question-answer:visible').count(), 0);
+  const first = questions.nth(0), second = questions.nth(1), fixed = questions.nth(13);
+  const button = (card, action) => card.locator(`[data-action="${action}"]`);
+  assert.deepEqual(await first.locator('.question-actions button').allTextContents(), ['ヒント','答え','Equashare','TeX']);
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   await page.screenshot({path:'recurrence/build/batch-mobile.png',fullPage:true});
   const shared = page.url();
-  let event = page.waitForEvent('download');
-  await page.locator('#download-tex').click();
-  let download = await event;
-  let tex = fs.readFileSync(await download.path(),'utf8');
-  assert.equal((tex.match(/\\section\*\{問題 /g) ?? []).length, 14);
-  assert.ok(!tex.includes('方針・解答・解法'));
-  assert.equal(download.suggestedFilename(), 'recurrence-batch-14.tex');
-  await page.locator('#hint-button').click();
-  assert.equal(await page.locator('.hint').count(), 14);
-  await page.locator('#answer-button').click();
-  await page.waitForFunction(() => document.querySelectorAll('.batch-solution mjx-container').length >= 14);
-  assert.equal(await page.locator('.batch-solution').count(), 14);
-  assert.equal(await page.locator('#single-answer').isVisible(), false);
-  assert.deepEqual(await page.locator('.batch-solution').evaluateAll(cards => cards.map(card => card.dataset.problemId)), ids);
-  assert.equal(await page.locator('.batch-solution .solution-note a').count(), 2);
+  async function checkDownload(card, index, withAnswer) {
+    const event = page.waitForEvent('download');
+    await button(card, 'tex').click();
+    const download = await event;
+    const tex = fs.readFileSync(await download.path(), 'utf8');
+    assert.equal(download.suggestedFilename(), `recurrence-${ids[index]}.tex`);
+    assert.equal(tex, texDocument(problems.find(p => p.id === ids[index]), withAnswer));
+  }
+  await checkDownload(first, 0, false);
+  await button(first, 'hint').click();
+  assert.equal(await first.locator('.question-hint').isVisible(), true);
+  assert.equal(await questions.locator('.question-hint:visible').count(), 1);
+  assert.equal(await questions.locator('.question-answer:visible').count(), 0);
+  assert.equal(await button(first, 'hint').getAttribute('aria-expanded'), 'true');
+  await button(second, 'answer').click();
+  await second.locator('.question-answer mjx-container').first().waitFor();
+  assert.equal(await first.locator('.question-answer').isVisible(), false);
+  assert.equal(await first.locator('.question-hint').isVisible(), true);
+  assert.equal(await questions.locator('.question-answer:visible').count(), 1);
+  // Another question's open answer must not leak into this question's TeX.
+  await checkDownload(first, 0, false);
+  await checkDownload(second, 1, true);
+  let editor = await openInEquashare(problems.find(p => p.id === ids[1]), button(second, 'equashare'));
+  await editor.close();
+  await button(fixed, 'answer').click();
+  await fixed.locator('.question-answer mjx-container').first().waitFor();
+  assert.equal(await questions.locator('.question-answer:visible').count(), 2);
+  assert.equal(await fixed.locator('.solution-note a').count(), 1);
+  await checkDownload(fixed, 13, true);
+  editor = await openInEquashare(problems.find(p => p.id === ids[13]), button(fixed, 'equashare'));
+  await editor.close();
   assert.equal(await page.locator('mjx-merror,[data-mml-node="merror"]').count(), 0);
-  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
-  event = page.waitForEvent('download');
-  await page.locator('#download-tex').click();
-  download = await event;
-  tex = fs.readFileSync(await download.path(),'utf8');
-  assert.equal((tex.match(/\\section\*\{問題 /g) ?? []).length, 28);
-  await page.locator('#answer-button').click();
-  assert.equal(await page.locator('#answer').isVisible(), false);
+  for (const width of [320,375,1440]) {
+    await page.setViewportSize({width,height:900});
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `batch width ${width}`);
+  }
+  await page.screenshot({path:'recurrence/build/batch-controls-desktop.png',fullPage:true});
+  await page.setViewportSize({width:375,height:900});
+  await page.screenshot({path:'recurrence/build/batch-controls-mobile.png',fullPage:true});
   await page.emulateMedia({media:'print'});
   assert.equal(await page.locator('.controls').isVisible(), false);
   assert.equal(await page.locator('.batch-question:visible').count(), 14);
+  assert.equal(await questions.locator('.question-actions:visible,.question-hint:visible').count(), 0);
+  assert.equal(await questions.locator('.question-answer:visible').count(), 2);
   await page.emulateMedia({media:'screen'});
+  await button(first, 'hint').click();
+  assert.equal(await first.locator('.question-hint').isVisible(), false);
+  await button(second, 'answer').click();
+  assert.equal(await second.locator('.question-answer').isVisible(), false);
+  assert.equal(await fixed.locator('.question-answer').isVisible(), true);
+  assert.equal(await button(second, 'answer').getAttribute('aria-expanded'), 'false');
+  await checkDownload(second, 1, false);
+  await button(second, 'answer').click();
+  await second.locator('.question-answer mjx-container').first().waitFor();
+  await checkDownload(second, 1, true);
   await page.locator('#generate-batch').click();
   const nextIds = await questions.evaluateAll(cards => cards.map(card => card.dataset.problemId));
   assert.ok(nextIds.every(id => !ids.includes(id)));
-  assert.equal(await page.locator('.hint').count(), 0);
+  assert.equal(await questions.locator('.question-hint:visible,.question-answer:visible').count(), 0);
   assert.equal(await page.locator('#answer').isVisible(), false);
   await page.goto(shared);
   await page.waitForFunction(() => document.querySelectorAll('.batch-question').length === 14);
   assert.deepEqual(await questions.evaluateAll(cards => cards.map(card => card.dataset.problemId)), ids);
+  assert.equal(await questions.locator('.question-hint:visible,.question-answer:visible').count(), 0);
   await page.locator('#generate').click();
   assert.equal(await questions.count(), 0);
   assert.equal(await page.locator('#recipe-details').isVisible(), true);
+  assert.equal(await page.locator('#single-actions').isVisible(), true);
+  assert.equal(await page.locator('#open-equashare').isVisible(), true);
+  assert.equal(await page.locator('#download-tex').isVisible(), true);
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('#single-answer').isVisible(), true);
   assert.equal(await page.locator('#batch-answers').isVisible(), false);

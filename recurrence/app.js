@@ -1,5 +1,5 @@
 import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText,
-  chooseBatch, batchFromIds, validateAuthoredBank, problemLevel, mathTextParts, batchTexDocument,
+  chooseBatch, batchFromIds, validateAuthoredBank, problemLevel, mathTextParts,
   problemInstruction, equashareSource } from './model.mjs';
 
 const $ = id => document.getElementById(id);
@@ -197,9 +197,11 @@ function resetExercise() {
   $('hints').replaceChildren();
   $('answer').hidden = true;
   $('answer-button').setAttribute('aria-expanded', 'false');
-  $('answer-button').replaceChildren(document.createTextNode('解答を見る '), el('span', '↓'));
+  $('answer-button').textContent = '答え';
   $('hint-button').disabled = false;
-  $('hint-button').replaceChildren(document.createTextNode('ヒントを見る '), el('span', '＋'));
+  $('hint-button').textContent = 'ヒント';
+  $('single-actions').hidden = false;
+  $('copy-link').textContent = 'この問題のリンクをコピー';
   $('recipe-details').open = false;
   $('authored-details').open = false;
   $('authored-details').hidden = true;
@@ -247,16 +249,15 @@ function renderBatch(problems, updateUrl = true) {
   $('problem-title').textContent = 'まとめて演習';
   $('problem-level').textContent = 'Lv.1〜6';
   $('problem-id').textContent = '全14問';
-  $('hint-button').replaceChildren(document.createTextNode('まとめてヒントを見る '), el('span', '＋'));
-  $('answer-button').replaceChildren(document.createTextNode('まとめて解答を見る '), el('span', '↓'));
+  $('single-actions').hidden = true;
+  $('copy-link').textContent = 'この問題セットのリンクをコピー';
   $('recipe-details').hidden = true;
-  $('open-equashare').disabled = true;
   $('action-status').textContent = '14問を出題しました';
   const content = $('problem-content');
   content.replaceChildren(...problems.map((p, i) => {
     const card = el('section', undefined, 'batch-question');
     card.dataset.level = problemLevel(p); card.dataset.problemId = p.id;
-    card.append(batchHeading(p, i), problemStatement(p));
+    card.append(batchHeading(p, i), problemStatement(p), questionControls(p, i));
     return card;
   }));
   if (updateUrl) {
@@ -267,64 +268,103 @@ function renderBatch(problems, updateUrl = true) {
   typeset([content]);
 }
 
-function renderBatchAnswers(problems = state.batch, headings = true) {
-  const answers = $('batch-answers');
-  answers.replaceChildren(...problems.map((p, i) => {
-    const card = el('section', undefined, headings ? 'batch-solution' : 'authored-solution');
-    card.dataset.problemId = p.id;
-    if (headings) card.append(batchHeading(p, i, 'h4'));
-    const authored = p.level === 6;
-    const hint = el('div', undefined, 'method-observation');
-    hint.append(el('strong', '方針'), mathProse(authored ? p.hint : textbookText(p.routes[0].hint)));
-    const answer = el('div', undefined, 'answer-formula');
-    answer.append(authored ? mathProse(p.answer) : mathBlock(p.answer_tex));
-    const steps = el('ol', undefined, 'solution-steps');
-    for (const step of authored ? p.solution : p.routes[0].steps) {
-      const item = el('li'); item.append(mathProse(authored ? step : textbookText(step))); steps.append(item);
-    }
-    card.append(el('p', authored ? p.title : p.routes[0].title, 'method-title'), hint, answer, steps);
-    if (authored) {
-      const source = el('p', undefined, 'solution-note');
-      const link = el('a', '出典：' + p.source.location);
-      link.href = p.source.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-      source.append(link); card.append(source);
-    } else {
-      card.append(el('p', '問題の型：' + p.family_label, 'solution-note'));
-    }
-    return card;
-  }));
+function questionControls(p, index) {
+  const box = el('div', undefined, 'question-tools');
+  const actions = el('div', undefined, 'question-actions');
+  actions.setAttribute('role', 'group');
+  actions.setAttribute('aria-label', `問題 ${index + 1} の操作`);
+  const hint = el('div', undefined, 'question-hint hint');
+  const answer = el('section', undefined, 'question-answer');
+  hint.id = `question-${p.id}-hint`; answer.id = `question-${p.id}-answer`;
+  hint.hidden = true; answer.hidden = true;
+  const toggle = (label, action, panel, fill) => {
+    const button = el('button', label, 'secondary-button');
+    button.type = 'button'; button.dataset.action = action;
+    button.id = `question-${p.id}-${action}-button`;
+    button.setAttribute('aria-controls', panel.id);
+    button.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-labelledby', button.id);
+    panel.setAttribute('role', 'region');
+    button.addEventListener('click', () => {
+      const open = panel.hidden;
+      if (open && !panel.hasChildNodes()) fill();
+      panel.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+      button.textContent = open ? `${label}を閉じる` : label;
+      if (open) typeset([panel]);
+    });
+    return button;
+  };
+  const hintButton = toggle('ヒント', 'hint', hint, () => hint.append(el('strong', '方針'),
+    mathProse(p.level === 6 ? p.hint : textbookText(p.routes[0].hint))));
+  const answerButton = toggle('答え', 'answer', answer, () => answer.append(solutionCard(p)));
+  const equashareButton = el('button', 'Equashare', 'secondary-button');
+  equashareButton.type = 'button'; equashareButton.dataset.action = 'equashare';
+  equashareButton.title = 'この問題をEquashareで開く（新しいタブ）';
+  equashareButton.addEventListener('click', () => openEquashare(p));
+  const texButton = el('button', 'TeX', 'secondary-button');
+  texButton.type = 'button'; texButton.dataset.action = 'tex';
+  texButton.title = 'この問題のTeXを保存（答えを開いている場合は解答も含む）';
+  texButton.addEventListener('click', () => download(texDocument(p, !answer.hidden), 'tex', undefined, p.id));
+  actions.append(hintButton, answerButton, equashareButton, texButton);
+  box.append(actions, hint, answer);
+  return box;
+}
+
+function solutionCard(p) {
+  const card = el('div', undefined, p.level === 6 ? 'authored-solution' : 'generated-solution');
+  card.dataset.problemId = p.id;
+  const authored = p.level === 6;
+  const hint = el('div', undefined, 'method-observation');
+  hint.append(el('strong', '方針'), mathProse(authored ? p.hint : textbookText(p.routes[0].hint)));
+  const answer = el('div', undefined, 'answer-formula');
+  answer.append(authored ? mathProse(p.answer) : mathBlock(p.answer_tex));
+  const steps = el('ol', undefined, 'solution-steps');
+  for (const step of authored ? p.solution : p.routes[0].steps) {
+    const item = el('li'); item.append(mathProse(authored ? step : textbookText(step))); steps.append(item);
+  }
+  card.append(el('p', authored ? p.title : p.routes[0].title, 'method-title'), hint, answer, steps);
+  if (authored) {
+    const source = el('p', undefined, 'solution-note');
+    const link = el('a', '出典：' + p.source.location);
+    link.href = p.source.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    source.append(link); card.append(source);
+  } else {
+    card.append(el('p', '問題の型：' + p.family_label, 'solution-note'));
+  }
+  return card;
 }
 
 function showHint() {
-  if (!state.current && !state.batch) return;
+  if (!state.current) return;
   if (state.hints) return;
-  const hints = (state.batch || [state.current]).map((p, i) => {
+  const hints = [state.current].map(p => {
     const hint = el('div', undefined, 'hint');
-    hint.append(el('strong', state.batch ? `問題 ${i + 1} の方針` : '方針'),
+    hint.append(el('strong', '方針'),
       p.level === 6 ? mathProse(p.hint) : el('span', textbookText(p.routes[0].hint)));
     return hint;
   });
   $('hints').append(...hints);
   state.hints = 1;
   $('hint-button').disabled = true;
-  $('hint-button').replaceChildren(document.createTextNode('方針を表示しました'), el('span', '＋'));
+  $('hint-button').textContent = 'ヒント表示済み';
   typeset(hints);
 }
 
 function toggleAnswer() {
   const p = state.current;
-  if (!p && !state.batch) return;
+  if (!p) return;
   const open = $('answer').hidden;
   $('answer').hidden = !open;
   $('answer-button').setAttribute('aria-expanded', String(open));
-  $('answer-button').replaceChildren(document.createTextNode((state.batch ? 'まとめて' : '') + (open ? '解答を閉じる ' : '解答を見る ')), el('span', open ? '↑' : '↓'));
+  $('answer-button').textContent = open ? '答えを閉じる' : '答え';
   if (!open) return;
   if (window.MathJax?.typesetClear) window.MathJax.typesetClear([$('answer')]);
-  const fixed = p?.level === 6;
-  $('single-answer').hidden = Boolean(state.batch) || fixed;
-  $('batch-answers').hidden = !state.batch && !fixed;
-  if (state.batch || fixed) {
-    renderBatchAnswers(state.batch || [p], Boolean(state.batch)); typeset([$('answer')]); return;
+  const fixed = p.level === 6;
+  $('single-answer').hidden = fixed;
+  $('batch-answers').hidden = !fixed;
+  if (fixed) {
+    $('batch-answers').replaceChildren(solutionCard(p)); typeset([$('answer')]); return;
   }
   $('method-title').textContent = p.routes[0].title;
   $('method-observation').textContent = '方針：' + textbookText(p.routes[0].hint);
@@ -345,13 +385,20 @@ function toggleAnswer() {
   typeset([$('answer')]);
 }
 
-function download(text, extension, mime = 'text/plain;charset=utf-8') {
+function download(text, extension, mime = 'text/plain;charset=utf-8', problemId = state.current?.id) {
   if (!state.current && !state.batch) return;
   const link = el('a');
   const url = URL.createObjectURL(new Blob([text], {type:mime}));
-  link.href = url; link.download = `recurrence-${state.batch ? 'batch-14' : state.current.id}.${extension}`;
+  link.href = url; link.download = `recurrence-${problemId}.${extension}`;
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function openEquashare(p) {
+  if (!p) return;
+  const url = new URL('../equashare/', location.href);
+  url.searchParams.set('prefill', equashareSource(p));
+  window.open(url.href, '_blank', 'noopener,noreferrer');
 }
 
 function updateBatchAvailability() {
@@ -455,14 +502,10 @@ $('copy-link').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(location.href); $('action-status').textContent = 'リンクをコピーしました'; }
   catch { $('action-status').textContent = 'アドレスバーのURLをコピーしてください'; }
 });
-$('download-tex').addEventListener('click', () => download(state.batch
-  ? batchTexDocument(state.batch, !$('answer').hidden) : texDocument(state.current, !$('answer').hidden), 'tex'));
-$('open-equashare').addEventListener('click', () => {
-  if (!state.current) return;
-  const url = new URL('../equashare/', location.href);
-  url.searchParams.set('prefill', equashareSource(state.current));
-  window.open(url.href, '_blank', 'noopener,noreferrer');
+$('download-tex').addEventListener('click', () => {
+  if (state.current) download(texDocument(state.current, !$('answer').hidden), 'tex');
 });
+$('open-equashare').addEventListener('click', () => openEquashare(state.current));
 $('download-recipe').addEventListener('click', () => download(JSON.stringify(state.current.recipe,null,2), 'json', 'application/json'));
 $('download-lean').addEventListener('click', () => download(state.current.lean_source, 'lean'));
 $('print-problem').addEventListener('click', () => window.print());
