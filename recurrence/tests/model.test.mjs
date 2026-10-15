@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText } from '../model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, equashareSource } from '../model.mjs';
 
 const p = (id, family, level) => ({id,family,scores:{level}});
 const bank = {problems:[p('p001','a',1),p('p002','a',1),p('p003','b',2)]};
@@ -68,6 +68,31 @@ test('route explanations distinguish strict wins, numerical tie breaks and displ
   assert.ok(routeComparison([main,other]).reason.includes('優劣を表す順序ではありません'));
   other.parts={...main.parts};
   assert.ok(routeComparison([main,other]).alternatives[0].includes('各項目のスコアも同じ'));
+});
+
+test('Equashare gets problem-only formulas one per line, without document TeX or math delimiters', () => {
+  const q={id:'p001',scores:{level:2},statement:{initials_tex:['a_1=1'],recurrence_tex:'a_{n+1}=2a_n+1'},
+    answer_tex:'a_n=2^n-1',routes:[{hint:'解答のヒント'}]};
+  assert.equal(equashareSource(q), String.raw`\text{問題 P001（Lv2）}
+\text{次の条件で定められる数列について、一般項を求めよ。}
+a_1=1
+a_{n+1}=2a_n+1
+n\in\mathbb{Z},\quad n\ge1
+`);
+  const source=equashareSource(q);
+  assert.ok(!source.includes(q.answer_tex));
+  assert.ok(!source.includes(q.routes[0].hint));
+  assert.doesNotMatch(source, /\\(?:documentclass|usepackage|fitmath|chapter|section)|\\[()[\]]|\$/);
+  assert.equal(new URLSearchParams({prefill:source}).get('prefill'),source);
+  const system={...q,ir:{shape:'system'},statement:{initials_tex:['a_1=1','b_1=2'],
+    recurrence_tex:String.raw`\begin{cases}a_{n+1}=a_n+b_n\\b_{n+1}=a_n-b_n\end{cases}`}};
+  assert.ok(equashareSource(system).includes('一般項をそれぞれ求めよ。'));
+  assert.ok(equashareSource(system).includes('a_1=1,\\quad b_1=2\n'+system.statement.recurrence_tex+'\n'));
+  const sum={...q,statement:{...q.statement,definitions_tex:String.raw`S_n=\sum_{k=1}^{n}a_k`}};
+  assert.ok(equashareSource(sum).includes(sum.statement.definitions_tex+'\n'+q.statement.initials_tex[0]));
+  for (const positive of [{...q,ir:{shape:'power_second'}},{...q,family:'multiplicative_second'}]) {
+    assert.ok(equashareSource(positive).includes('正の数列'));
+  }
 });
 
 test('fractional family receives the configured weight and exhausted families disappear', () => {

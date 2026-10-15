@@ -1,4 +1,4 @@
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText } from './model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, problemInstruction, equashareSource } from './model.mjs';
 
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, level: 2, family: 'all', current: null, seen: new Set(), hints: 0 };
@@ -156,10 +156,7 @@ function renderProblem(p, updateUrl = true) {
   $('problem-level').textContent = `Lv.${p.scores.level}`;
   $('problem-id').textContent = p.id.toUpperCase();
   const content = $('problem-content');
-  const instruction = p.ir?.shape === 'system' ? '次の条件で定められる2つの数列について、一般項をそれぞれ求めよ。'
-    : p.ir?.shape === 'power_second' || p.family === 'multiplicative_second' ? '次の条件を満たす正の数列について、一般項を求めよ。'
-    : '次の条件で定められる数列について、一般項を求めよ。';
-  content.replaceChildren(el('p', instruction),
+  content.replaceChildren(el('p', problemInstruction(p)),
     mathBlock(p.statement.initials_tex.join(',\\quad ')), mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '')+p.statement.recurrence_tex),
     el('p', 'n は 1 以上の整数とする。', 'question-line'));
   $('hints').replaceChildren();
@@ -172,7 +169,7 @@ function renderProblem(p, updateUrl = true) {
   $('recipe-details').hidden = false;
   $('action-status').textContent = '';
   renderRecipe(p);
-  for (const id of ['hint-button','answer-button','copy-link','download-tex','print-problem']) $(id).disabled = false;
+  for (const id of ['hint-button','answer-button','copy-link','download-tex','open-equashare','print-problem']) $(id).disabled = false;
   if (updateUrl) {
     const url = new URL(location.href); url.search = ''; url.searchParams.set('problem', p.id);
     history.replaceState(null, '', url);
@@ -282,6 +279,12 @@ $('copy-link').addEventListener('click', async () => {
   catch { $('action-status').textContent = 'アドレスバーのURLをコピーしてください'; }
 });
 $('download-tex').addEventListener('click', () => download(texDocument(state.current, !$('answer').hidden), 'tex'));
+$('open-equashare').addEventListener('click', () => {
+  if (!state.current) return;
+  const url = new URL('../equashare/', location.href);
+  url.searchParams.set('prefill', equashareSource(state.current));
+  window.open(url.href, '_blank', 'noopener,noreferrer');
+});
 $('download-recipe').addEventListener('click', () => download(JSON.stringify(state.current.recipe,null,2), 'json', 'application/json'));
 $('download-lean').addEventListener('click', () => download(state.current.lean_source, 'lean'));
 $('print-problem').addEventListener('click', () => window.print());
