@@ -26,7 +26,7 @@ for first in (Fraction(-3), Fraction(1,2), Fraction(4)):
 for degree in range(4):
     forcing = add(mul(num(Fraction(-3,2)),power(index(),nat_const(degree))),num(2))
     for first in (Fraction(-1), Fraction(2,3)):
-        sum_steps(forcing,first)
+        assert r'+\cdots+' in sum_steps(forcing,first)[0]
         formula=prefix_polynomial(forcing,first)
         for k in range(12):
             assert evaluate(formula,k)==first+sum(evaluate(forcing,j) for j in range(k))
@@ -38,6 +38,11 @@ for p in bank['problems']:
         kinds.add(route['certificate']['kind'])
         assert route['steps']
         assert route['title'] and route['hint'], (p['id'],route['certificate'])
+        if route['certificate']['kind']=='forced-second':
+            # Every row of the inner calculation must use the shifted variable,
+            # including a sequence immediately following an aligned row break.
+            assert not re.search(r'(?<![A-Za-z])a_(?:n|\{)', ''.join(route['steps'][3:-1]))
+
         for step in route['steps']:
             assert isinstance(step,str)
             assert step.count(r'\(')==step.count(r'\)'),(p['id'],step)
@@ -72,9 +77,9 @@ print(f'Explanation checks passed: affine cases, power sums, {len(kinds)} route 
 samples={}
 for p in bank['problems']:
     for route in p['routes']:
-        key=(route['certificate']['kind'],p['ir']['reciprocal'])
+        key=(route['certificate']['kind'],p['ir']['reciprocal'],p['family'])
         if key not in samples:
-            samples[key]={'id':p['id'],'kind':key[0],'reciprocal':key[1],
+            samples[key]={'id':p['id'],'kind':key[0],'reciprocal':key[1],'family':key[2],
                           'initials':p['statement']['initials_tex'],
                           'recurrence':p['statement']['recurrence_tex'],'steps':route['steps']}
 for sample in samples.values():

@@ -137,7 +137,7 @@ def second_steps(p,q,first,second,roots,variable='a'):
     u1,v1=second-s*first,second-r*first
     uexpr=mul(num(u1),power(num(r),nat()));vexpr=mul(num(v1),power(num(s),nat()))
     steps += [
-        '2つの根は '+M(N(r+s)+'='+N(p))+ '、'+M(N(r*s)+'='+N(-q))+' を満たす。この関係で与式をまとめ直すと '+E(
+        '2つの根は '+M('('+N(r)+')+('+N(s)+')='+N(p))+ '、'+M('('+N(r)+r')\cdot('+N(s)+')='+N(-q))+' を満たす。この関係で与式をまとめ直すと '+E(
             x+'_{n+2}'+C(-s,x+'_{n+1}')+'&='+N(r)+'('+x+'_{n+1}'+C(-s,x+'_n')+')'
             +r'\\'+x+'_{n+2}'+C(-r,x+'_{n+1}')+'&='+N(s)+'('+x+'_{n+1}'+C(-r,x+'_n')+')')+' となる。',
         '同じ形が隣接して現れたので '+M('u_n='+x+'_{n+1}'+C(-s,x+'_n'))+'、'+M('v_n='+x+'_{n+1}'+C(-r,x+'_n'))+' とおく。すると '+M('u_{n+1}='+coefficient_tex(r,'u_n'))+'、'+M('v_{n+1}='+coefficient_tex(s,'v_n'))+' という2つの等比数列に分かれる。',
@@ -163,7 +163,7 @@ def sum_steps(forcing, initial, variable='a'):
     assert polynomial(add(num(initial),total))==polynomial(result)
     return [
         '隣接する項の差を足すと '+E(
-            variable+'_n-'+variable+'_1&=('+variable+'_2-'+variable+'_1)+('+variable+'_3-'+variable+'_2)'+r'\cdots+('+variable+'_n-'+variable+'_{n-1})'
+            variable+'_n-'+variable+'_1&=('+variable+'_2-'+variable+'_1)+('+variable+'_3-'+variable+'_2)'+r'+\cdots+('+variable+'_n-'+variable+'_{n-1})'
             +r'\\&=\sum_{k=1}^{n-1}\left('+at_k(forcing)+r'\right)')+'。途中の項が消え、初項と第 '+M('n')+' 項だけが残る。',
         '必要な和の公式は '+E(r'\\'.join(rows) if rows else r'\sum_{k=1}^{n-1}0=0')+' である。足す範囲が '+M('1')+' から '+M('n-1')+' までであることに注意する。',
         '係数ごとに和を分け、これらの公式を代入すると '+E(
@@ -271,7 +271,7 @@ def extension_steps(ir,route):
         # Simultaneously rename every auxiliary to keep the outer b distinct.
         names={'a':'b','b':'c','c':'d','d':'e'}
         inner=explain_route(base,scalar)
-        inner=[re.sub(r'(?<![A-Za-z\\])([abcd])(?=_(?:n|\{|\d))',lambda m:names[m[1]],s) for s in inner]
+        inner=[re.sub(r'(?<![A-Za-z])([abcd])(?=_(?:n|\{|\d))',lambda m:names[m[1]],s) for s in inner]
         return [
             '定数項を消すため、すべての項が一定の値 '+M(r'\ell')+' になる場合を考える。'+M(coefficient_tex(P,r'\ell')+'='+coefficient_tex(Q+R,r'\ell')+signed(F))+' より '+M(coefficient_tex(P-Q-R,r'\ell')+'='+N(F))+'、したがって '+M(r'\ell='+N(h))+' である。',
             M('b_n=a_n'+signed(-h))+' とおき、'+M('a_n=b_n'+signed(h))+' を3つの項すべてに代入する。一定の数の関係が打ち消し合うので '+M('b_{n+2}='+coefficient_tex(Q/P,'b_{n+1}')+C(R/P,'b_n'))+' となる。',
@@ -301,7 +301,7 @@ def antidifference_steps(ir,route):
     for k in range(degree+1):
         assert (r-1)*coeff.get(k,0)+sum(r*comb(j,k)*coeff.get(j,0) for j in range(k+1,degree+1))==fc.get(k,0)
     return [
-        '3項の係数に '+M('P(n)=Q(n)+R(n)')+' の関係があるので、'+M('b_n=a_{n+1}-a_n')+' とおく。与式を差でまとめると '+M(L(mul(ir['P2'],term(1,variable='b')))+'='+L(mul(num(-1),ir['R2'],term(variable='b'))))+' となる。',
+        '3項の係数に '+M(L(ir['P2'])+'=('+L(ir['Q2'])+')+('+L(ir['R2'])+')')+' の関係があるので、'+M('b_n=a_{n+1}-a_n')+' とおく。与式を差でまとめると '+M(L(mul(ir['P2'],term(1,variable='b')))+'='+L(mul(num(-1),ir['R2'],term(variable='b'))))+' となる。',
         '初項は '+M('b_1='+N(a2)+'-('+N(a1)+')='+N(a2-a1))+'。さらに '+M(r'c_n=\frac{b_n}{'+L(g)+'}')+' とおくと '+M('c_{n+1}='+coefficient_tex(r,'c_n'))+'、'+M('c_1='+N(amplitude))+'。よって '+M('b_n='+L(mul(f,power(num(r),nat()))))+' である。',
         'この階差は「多項式×等比のべき」である。和の途中の項を消すため、'+M('F_n=H(n)'+L(power(num(r),nat())))+' として '+M('F_{n+1}-F_n=b_n')+' となる多項式 '+M('H(n)')+' を探す。',
         'べきをくくると、必要な条件は '+M(N(r)+'H(n+1)-H(n)='+L(f))+'。右辺と同じ次数の '+M('H(n)='+unknown)+' を代入し、次数の高い順に係数を比べると '+E(r'\\'.join(rows))+' となる。',
@@ -405,7 +405,7 @@ def detailed_route(ir,route,original):
         else:
             g=scale(c['profile'])
             if g!=num(1):
-                steps.insert(1,'3つの項を '+M('a_{n+j}=g(n+j)b_{n+j}')+' として代入し、'+M(L(mul(ir['P2'],shift(g,2))))+' で割る。次項と当該項の係数はそれぞれ '+E(
+                steps.insert(1,'ここで '+M('g(n)='+L(g))+' とする。3つの項を '+M('a_{n+j}=g(n+j)b_{n+j}')+' として代入し、'+M(L(mul(ir['P2'],shift(g,2))))+' で割る。次項と当該項の係数はそれぞれ '+E(
                     r'\frac{'+L(mul(ir['Q2'],shift(g)))+'}{'+L(mul(ir['P2'],shift(g,2)))+'}&='+N(p)
                     +r'\\\frac{'+L(mul(ir['R2'],g))+'}{'+L(mul(ir['P2'],shift(g,2)))+'}&='+N(q))+' となり、添字に依存しなくなる。')
     return steps
