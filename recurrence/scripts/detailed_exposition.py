@@ -318,6 +318,8 @@ def detailed_route(ir,route,original):
     if kind in {'mobius-shift','factorial-product','arithmetic-difference','forced-second'}:
         return extension_steps(ir,route)
     if kind=='polynomial-difference':
+        route['title']='階差を足し合わせる'
+        route['hint']='隣接する項の差が添字だけで決まる。初項からの差を足し、和の公式を使う。'
         return ['与式の '+M('a_{n+1}-a_n='+L(c['forcing']))+' は添字の多項式である。各項を直接求める代わりに、初項からの差をまとめて足す。',*sum_steps(c['forcing'],evaluate(ir['initials'][0],0))]
     if kind=='difference-normalization':
         return antidifference_steps(ir,route)

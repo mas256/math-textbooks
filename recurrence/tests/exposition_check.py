@@ -37,6 +37,7 @@ for p in bank['problems']:
     for route in p['routes']:
         kinds.add(route['certificate']['kind'])
         assert route['steps']
+        assert route['title'] and route['hint'], (p['id'],route['certificate'])
         for step in route['steps']:
             assert isinstance(step,str)
             assert step.count(r'\(')==step.count(r'\)'),(p['id'],step)
