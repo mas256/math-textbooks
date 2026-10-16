@@ -18,71 +18,23 @@ def E(tex): return M(r'\begin{aligned}'+tex+r'\end{aligned}')
 
 
 def second_exposition(p,q,first,second,roots,variable='a'):
-    r,s=[evaluate(x,0) for x in roots]
-    poly=r'\lambda^2'+('+' if -p>=0 else '')+coefficient_tex(-p,r'\lambda')+signed(-q)
-    if r==s:
-        slope=second/r-first
-        return [
-            '特性方程式 '+M(poly+'=0')+' は重解 '+M(r'\lambda='+N(r))+' を持つ。そこで、根のべきで割って階差を調べる。',
-            M('c_n='+r'\frac{'+variable+'_n}{'+L(power(num(r),nat()))+'}')+' とおくと、与式より '+M('c_{n+2}-2c_{n+1}+c_n=0')+'、すなわち '+M('c_{n+2}-c_{n+1}=c_{n+1}-c_n')+' を得る。',
-            '初期条件から '+E('c_1&='+N(first)+r'\\c_2&='+N(second/r)+r'\\c_2-c_1&='+N(slope))+' である。したがって、'+M(r'\{c_n\}')+' は初項 '+M(N(first))+'、公差 '+M(N(slope))+' の等差数列である。',
-            'よって '+M('c_n='+N(first)+signed(slope)+'(n-1)')+' を得る。これに '+M(L(power(num(r),nat())))+' を掛ければ、元の数列が求まる。']
-    u1=second-s*first;v1=second-r*first
-    return [
-        '特性方程式は '+M(poly+'=0')+' であり、'+M(r'(\lambda'+signed(-r)+r')(\lambda'+signed(-s)+')=0')+' と因数分解できる。根 '+M(N(r))+ '、'+M(N(s))+' を用いて、与式を隣接する2項の関係にまとめる。',
-        E(variable+'_{n+2}'+C(-s,variable+'_{n+1}')+'&='+N(r)+'('+variable+'_{n+1}'+C(-s,variable+'_n')+')'+r'\\'+variable+'_{n+2}'+C(-r,variable+'_{n+1}')+'&='+N(s)+'('+variable+'_{n+1}'+C(-r,variable+'_n')+')'),
-        'したがって、'+M('u_n='+variable+'_{n+1}'+C(-s,variable+'_n'))+'、'+M('v_n='+variable+'_{n+1}'+C(-r,variable+'_n'))+' は、それぞれ公比 '+M(N(r))+'、'+M(N(s))+' の等比数列である。',
-        '初期条件から '+M('u_1='+N(u1))+ '、'+M('v_1='+N(v1))+' なので、'+E('u_n&='+L(mul(num(u1),power(num(r),nat())))+r'\\v_n&='+L(mul(num(v1),power(num(s),nat()))))+' を得る。',
-        'ここで '+M('u_n-v_n='+coefficient_tex(r-s,variable+'_n'))+' である。2式の差をとり、'+M(N(r-s))+' で割れば '+M(variable+'_n')+' が求まる。']
+    from detailed_exposition import second_steps
+    return second_steps(p,q,first,second,roots,variable)
 
 
 def scalar_exposition(ir,route,variable='a'):
-    cert=route['certificate'];kind=cert['kind']
-    if kind=='polynomial-normalization':
-        r,q,h=[evaluate(cert[k],0) for k in ('ratio','forcing','shift')]
-        profile=cert['profile'];g=num(1) if profile=='identity' else (div(num(1),SCALES[profile[8:]]) if profile.startswith('inverse:') else SCALES[profile])
-        first=evaluate(ir['initials'][0],0);b1=(first-h)/evaluate(g,0)
-        changed=profile!='identity' or h!=0;source='w' if variable in {'u','v'} else 'c' if variable=='b' else 'b'
-        target=source if changed else variable
-        steps=[]
-        if changed:
-            steps.append('左右の係数と付加項を比較し、同じ数列の隣接する項としてまとめられる形を考える。'+M(source+'_n='+sequence_tex(mul(sub(term(),num(h)),g['args'][1]) if g['op']=='div' and g['args'][0]==num(1) else div(sub(term(),num(h)),g),variable))+' とおく。')
-            steps.append('この置換を与式に代入して整理すると、'+E(relation_tex(num(r),num(q),source)+r'\\'+source+'_1&='+N(b1))+' となる。')
-        if r==1:
-            if q:
-                steps.append('したがって、'+M(target+'_{n+1}-'+target+'_n='+N(q))+' であり、'+M(r'\{'+target+r'_n\}')+' は初項 '+M(N(b1))+'、公差 '+M(N(q))+' の等差数列である。')
-                steps.append('等差数列の一般項から '+M(target+'_n='+L(add(num(b1),mul(num(q),sub(index(),num(1))))))+' を得る。')
-            else:
-                steps.append(M(target+'_{n+1}='+target+'_n')+' より各項は初項に等しい。したがって '+M(target+'_n='+N(b1))+' である。')
-        else:
-            fixed=q/(1-r)
-            if q:
-                other='z' if target=='w' else 'w' if variable in {'u','v'} else 'd' if target in {'b','c'} else 'b'
-                steps.append('定数項を消すため、'+M('x='+coefficient_tex(r,'x')+signed(q))+' を満たす数を求めると '+M('x='+N(fixed))+' である。'+M(other+'_n='+target+'_n'+signed(-fixed))+' とおけば、')
-                steps.append(E(other+'_{n+1}&='+coefficient_tex(r,target+'_n')+signed(q-fixed)+r'\\&='+N(r)+'('+target+'_n'+signed(-fixed)+')'+r'\\&='+coefficient_tex(r,other+'_n'))+' となり、'+M(other+'_1='+N(b1-fixed))+' である。')
-                steps.append('よって '+M(other+'_n='+L(mul(num(b1-fixed),power(num(r),nat()))))+' を得る。'+M(target+'_n='+other+'_n'+signed(fixed))+' に戻す。')
-            else:
-                steps.append(M(r'\{'+target+r'_n\}')+' は初項 '+M(N(b1))+'、公比 '+M(N(r))+' の等比数列である。したがって '+M(target+'_n='+L(mul(num(b1),power(num(r),nat()))))+' となる。')
-        if changed: steps.append('最後に '+M(variable+'_n='+sequence_tex(mul(g,term(variable=source)),source)+signed(h))+' に戻して一般項を得る。')
-        return steps
-    if kind=='linear-particular':
-        p=cert['particular'];r=evaluate(cert['ratio'],0);A=polynomial(p).get(1,0);B=polynomial(p).get(0,0)
-        forcing=expand_polynomial(mul(ir['R'],num(1/evaluate(ir['P'],0)))) if not max(polynomial(ir['P']),default=0) else div(ir['R'],ir['P']);first=evaluate(ir['initials'][0],0);amp=first-evaluate(p,0)
-        target='c' if variable=='b' else 'b'
-        return ['付加項が '+M('n')+' の一次式なので、それを打ち消す一次式を考える。特解を '+M('u_n=An+B')+' とおく。',
-            M('u_{n+1}='+coefficient_tex(r,'u_n')+'+'+L(forcing))+' に代入し、'+M('n')+' の係数と定数項を比較すると '+M('A='+N(A)+r',\quad B='+N(B))+' となる。したがって '+M('u_n='+L(p))+' である。',
-            M(target+'_n='+sequence_tex(sub(term(),p),variable))+' とおくと、'+E(target+'_{n+1}&='+coefficient_tex(r,target+'_n')+r'\\'+target+'_1&='+N(first)+'-('+N(evaluate(p,0))+')='+N(amp))+' を得る。',
-            'よって '+M(target+'_n='+L(mul(num(amp),power(num(r),nat()))))+' である。'+M(variable+'_n='+target+'_n+u_n')+' に戻せば一般項が求まる。']
-    return [s.replace('です。','である。').replace('ます。','る。') for s in route['steps']]
+    from detailed_exposition import scalar_steps
+    steps = scalar_steps(ir,route,variable)
+    return steps if steps is not None else route['steps']
 
 
 def explain_route(ir,route):
+    from detailed_exposition import detailed_route
+    return detailed_route(ir,route,_explain_route)
+
+
+def _explain_route(ir,route):
     cert=route['certificate'];kind=cert['kind']
-    if kind in {'power-first-log', 'exponential-normalization'}:
-        return route['steps']
-    if kind in {'mobius-shift','factorial-product','forced-second','arithmetic-difference'}:
-        from level_extensions import exposition
-        return exposition(ir,route)
     if kind=='paired-modes':
         g=cert['scale'];t=evaluate(cert['weight'],0);u,v=cert['u'],cert['v']
         route['title']='和と差で連立を分離する' if t==1 and g==num(1) else '正規化して連立を分離する' if g!=num(1) else '一次結合で連立を分離する'
@@ -136,12 +88,6 @@ def explain_route(ir,route):
             'これを '+M('a_{n+1}')+' について解くと '+M('a_{n+1}='+coefficient_tex(r,'a_n')+'+'+L(R))+' となる。']
         steps+=scalar_exposition({'P':num(1),'Q':num(r),'R':R,'initials':ir['initials']},scalar)
         return steps
-    if kind=='polynomial-difference':
-        f=cert['forcing'];a1=evaluate(ir['initials'][0],0)
-        route['title']='階差を足し合わせる';route['hint']='隣接する項の差がnの多項式になっている。差を初項から順に足す。'
-        return ['与式より '+M('a_{n+1}-a_n='+L(f))+' である。'+M(r'n\ge2')+' のとき、'+M(r'k=1,2,\ldots,n-1')+' について足し合わせると、',
-            E('a_n-a_1&='+r'\sum_{k=1}^{n-1}'+__import__('re').sub(r'(?<![a-zA-Z\\])n(?![a-zA-Z])','k',L(f))),
-            '左辺では途中の項が消える。右辺の和を計算し、初項 '+M('a_1='+N(a1))+' を代入すると '+M('a_n='+L(route['formula']))+' を得る。'+M('n=1')+' のときも初項と一致する。']
     if kind in {'distinct-roots','normalized-second','sum-to-second'}:
         roots=cert['roots'];g=num(1);steps=[];variable='a'
         if kind=='distinct-roots':p,q=[evaluate(ir[k],0) for k in ('p','q')];first,second=[evaluate(x,0) for x in ir['initials']]
@@ -155,8 +101,9 @@ def explain_route(ir,route):
                     'また、'+M('T_1=b_1')+' なので '+M('b_1='+N(first)+r',\quad b_2='+N(second))+' である。']
             else:
                 profile=cert['profile'];g=num(1) if profile=='identity' else (div(num(1),SCALES[profile[8:]]) if profile.startswith('inverse:') else SCALES[profile])
+                if profile=='identity': variable='a'
                 if profile!='identity': steps.append('3つの係数に現れる '+M('n')+'、'+M('n+1')+'、'+M('n+2')+' の対応に着目し、'+M('b_n='+sequence_tex(trace['transform'],'a'))+' とおく。')
-                steps.append('与式に代入して整理すると '+M('b_{n+2}='+coefficient_tex(p,'b_{n+1}')+C(q,'b_n'))+' であり、初期条件は '+M('b_1='+N(first)+r',\quad b_2='+N(second))+' となる。')
+                steps.append('係数をそろえると '+M(variable+'_{n+2}='+coefficient_tex(p,variable+'_{n+1}')+C(q,variable+'_n'))+' であり、初期条件は '+M(variable+'_1='+N(first)+r',\quad '+variable+'_2='+N(second))+' となる。')
         steps+=second_exposition(p,q,first,second,roots,variable)
         if variable=='b':steps.append(M('a_n='+L(mul(g,term(variable='b'))))+' に戻して、元の数列の一般項を得る。')
         return steps
@@ -167,15 +114,10 @@ def explain_route(ir,route):
             '与式の逆数をとると '+M(sequence_tex(mul(ir['P'],term(1)),'v')+'='+sequence_tex(add(mul(ir['Q'],term()),ir['R']),'v'))+' となり、'+M('v_1='+N(evaluate(base['initials'][0],0)))+' である。']
         steps+=scalar_exposition(base,route,'v')
         # Preserve the explicit domain identity computed by the forward solver.
-        steps += [s for s in route['steps'] if '元の分母は' in s][-1:]
-        steps.append(M(r'a_n=\frac1{v_n}')+' に戻せば、元の数列の一般項を得る。')
+        steps += [s for s in route['steps'] if 'v_n>0' in s or '元の分母は' in s]
+        steps.append(M(r'a_n=\frac1{v_n}='+L(route['formula']))+' と戻せば、元の数列の一般項を得る。')
         return steps
-    # Registered product, log and antidifference routes retain their checked data;
-    # avoid imperative fragments and make each last substitution explicit.
-    steps=[s.replace('です。','である。').replace('とおきます。','とおく。').replace('代入します。','代入する。').replace('戻します。','戻す。').replace('とおけます。','とおける。').replace('を得ます。','を得る。').replace('となります。','となる。').replace('消えます。','消える。').replace('まとめられます。','まとめられる。') for s in route['steps']]
-    if kind=='difference-normalization':
-        steps.insert(3,'階差を足し合わせるには、'+M(r'H(n)')+' を '+M('n')+' の多項式とおき、'+M('rH(n+1)-H(n)')+' が階差の多項式部分と一致するように係数を決める。')
-    return steps
+    return route['steps']
 
 
 def shift_expr(e):

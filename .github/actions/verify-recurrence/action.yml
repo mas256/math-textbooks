@@ -13,6 +13,7 @@ runs:
       run: |
         python3 recurrence/scripts/generate.py
         python3 recurrence/tests/math_check.py
+        python3 recurrence/tests/exposition_check.py
         python3 recurrence/tests/elementary_check.py
         node --test recurrence/tests/model.test.mjs recurrence/tests/elementary-model.test.mjs recurrence/tests/batch-model.test.mjs
     - name: Check all hand-authored problems and documents
