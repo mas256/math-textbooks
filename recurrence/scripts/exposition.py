@@ -114,7 +114,7 @@ def _explain_route(ir,route):
             '与式の逆数をとると '+M(sequence_tex(mul(ir['P'],term(1)),'v')+'='+sequence_tex(add(mul(ir['Q'],term()),ir['R']),'v'))+' となり、'+M('v_1='+N(evaluate(base['initials'][0],0)))+' である。']
         steps+=scalar_exposition(base,route,'v')
         # Preserve the explicit domain identity computed by the forward solver.
-        steps += [s for s in route['steps'] if '元の分母は' in s][-1:]
+        steps += [s for s in route['steps'] if 'v_n>0' in s or '元の分母は' in s]
         steps.append(M(r'a_n=\frac1{v_n}='+L(route['formula']))+' と戻せば、元の数列の一般項を得る。')
         return steps
     return route['steps']

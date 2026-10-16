@@ -363,7 +363,7 @@ def detailed_route(ir,route,original):
         # Avoid juxtaposing numeric factors in the displayed prefactor.
         steps[-2]=steps[-2].replace(N(first)+L(power(num(r),nat())),L(mul(num(first),power(num(r),nat()))))
         if reciprocal:
-            steps += [s for s in route['steps'] if '元の分母は' in s][-1:]
+            steps += [s for s in route['steps'] if 'v_n>0' in s or '元の分母は' in s]
             steps.append(M(r'a_n=1/v_n')+' に戻して '+M('a_n='+L(route['formula']))+' を得る。')
         return steps
     steps=original(ir,route)
