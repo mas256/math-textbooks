@@ -96,6 +96,7 @@ def scalar_steps(ir, route, variable='a'):
         target=next(x for x in ('b','c','w') if x!=variable)
         particular=next(x for x in ('u','z') if x!=variable)
         amp=first-evaluate(p,0)
+        assert (1-r)*A==alpha and A+(1-r)*B==beta
         steps=[
             'まず先頭の係数で割って '+M(variable+'_{n+1}='+L(add(mul(num(r),term(variable=variable)),f)))+' とする。付加項が一次式なので、同じ一次式の形の数列を引けば消せると考える。',
             M(particular+'_n=An+B')+' がこの漸化式を満たすように、'+M('A,B')+' を決める。代入して '+M('A(n+1)+B='+N(r)+'(An+B)+'+L(f))+'。',
@@ -116,6 +117,7 @@ def scalar_steps(ir, route, variable='a'):
 def second_steps(p,q,first,second,roots,variable='a'):
     r,s=[evaluate(x,0) for x in roots]
     x=variable
+    assert p==r+s and q==-r*s
     # Use an independent symbol instead of a sequence term in the characteristic equation.
     poly=r'\lambda^2'+C(-p,r'\lambda')+signed(-q)
     steps=[
@@ -127,12 +129,10 @@ def second_steps(p,q,first,second,roots,variable='a'):
         formula=mul(add(num(first),mul(num(slope),nat())),power(num(r),nat()))
         steps += [
             '重解では、単に2つの等比数列を足す方法では独立な式が2本得られない。'+M(c+'_n='+r'\frac{'+x+'_n}{'+L(power(num(r),nat()))+'}')+' とおき、根のべきを取り除く。',
-            '各項を '+M(x+'_{n+j}='+L(power(num(r),nat()))+L(power(num(r),nat_const(1)))+r'^{j}'+c+'_{n+j}')+' と見る代わりに、3項を直接代入して共通因子を割ると '+M(c+'_{n+2}=2'+c+'_{n+1}-'+c+'_n')+' となる。',
+            '与式の3項に '+M(x+'_{n}='+L(power(num(r),nat()))+c+'_n')+'、'+M(x+'_{n+1}='+L(power(num(r),nat(1)))+c+'_{n+1}')+'、'+M(x+'_{n+2}='+L(power(num(r),nat(2)))+c+'_{n+2}')+' を代入する。共通のべきで割ると '+M(c+'_{n+2}=2'+c+'_{n+1}-'+c+'_n')+' となる。',
             'これを移項すると '+M(c+'_{n+2}-'+c+'_{n+1}='+c+'_{n+1}-'+c+'_n')+'。隣接する差が一定、すなわち '+M(r'\{'+c+r'_n\}')+' は等差数列である。',
             '初期値と公差は '+E(c+'_1&='+N(first)+r'\\'+c+r'_2&=\frac{'+N(second)+'}{'+N(r)+'}='+N(second/r)+r'\\'+c+'_2-'+c+'_1&='+N(second/r)+'-('+N(first)+')='+N(slope)),
             'したがって '+M(c+'_n='+L(add(num(first),mul(num(slope),nat()))))+'。根のべきを掛けて戻すと '+M(x+'_n='+L(formula))+' となる。']
-        # State the exponent law without concatenating two numeric factors.
-        steps[3]='与式の3項に '+M(x+'_{n}='+L(power(num(r),nat()))+c+'_n')+'、'+M(x+'_{n+1}='+L(power(num(r),nat(1)))+c+'_{n+1}')+'、'+M(x+'_{n+2}='+L(power(num(r),nat(2)))+c+'_{n+2}')+' を代入する。共通のべきで割ると '+M(c+'_{n+2}=2'+c+'_{n+1}-'+c+'_n')+' となる。'
         return steps
     u1,v1=second-s*first,second-r*first
     uexpr=mul(num(u1),power(num(r),nat()));vexpr=mul(num(v1),power(num(s),nat()))
