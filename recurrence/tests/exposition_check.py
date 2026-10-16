@@ -66,3 +66,15 @@ for n in range(8):a.append(a[-1]+a[n//2])
 assert a==[1,2,3,5,7,10,13,18,23]
 assert 2026==2*3**6+2*3**5+3**4+1
 print(f'Explanation checks passed: affine cases, power sums, {len(kinds)} route kinds, math delimiters and worked arithmetic.')
+
+# Keep representative worked examples in the CI log for mathematical review.
+samples={}
+for p in bank['problems']:
+    for route in p['routes']:
+        key=(route['certificate']['kind'],p['ir']['reciprocal'])
+        if key not in samples:
+            samples[key]={'id':p['id'],'kind':key[0],'reciprocal':key[1],
+                          'initials':p['statement']['initials_tex'],
+                          'recurrence':p['statement']['recurrence_tex'],'steps':route['steps']}
+for sample in samples.values():
+    print('EXPOSITION_SAMPLE '+json.dumps(sample,ensure_ascii=False))

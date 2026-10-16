@@ -35,11 +35,6 @@ def explain_route(ir,route):
 
 def _explain_route(ir,route):
     cert=route['certificate'];kind=cert['kind']
-    if kind in {'power-first-log', 'exponential-normalization'}:
-        return route['steps']
-    if kind in {'mobius-shift','factorial-product','forced-second','arithmetic-difference'}:
-        from level_extensions import exposition
-        return exposition(ir,route)
     if kind=='paired-modes':
         g=cert['scale'];t=evaluate(cert['weight'],0);u,v=cert['u'],cert['v']
         route['title']='和と差で連立を分離する' if t==1 and g==num(1) else '正規化して連立を分離する' if g!=num(1) else '一次結合で連立を分離する'
@@ -93,12 +88,6 @@ def _explain_route(ir,route):
             'これを '+M('a_{n+1}')+' について解くと '+M('a_{n+1}='+coefficient_tex(r,'a_n')+'+'+L(R))+' となる。']
         steps+=scalar_exposition({'P':num(1),'Q':num(r),'R':R,'initials':ir['initials']},scalar)
         return steps
-    if kind=='polynomial-difference':
-        f=cert['forcing'];a1=evaluate(ir['initials'][0],0)
-        route['title']='階差を足し合わせる';route['hint']='隣接する項の差がnの多項式になっている。差を初項から順に足す。'
-        return ['与式より '+M('a_{n+1}-a_n='+L(f))+' である。'+M(r'n\ge2')+' のとき、'+M(r'k=1,2,\ldots,n-1')+' について足し合わせると、',
-            E('a_n-a_1&='+r'\sum_{k=1}^{n-1}'+__import__('re').sub(r'(?<![a-zA-Z\\])n(?![a-zA-Z])','k',L(f))),
-            '左辺では途中の項が消える。右辺の和を計算し、初項 '+M('a_1='+N(a1))+' を代入すると '+M('a_n='+L(route['formula']))+' を得る。'+M('n=1')+' のときも初項と一致する。']
     if kind in {'distinct-roots','normalized-second','sum-to-second'}:
         roots=cert['roots'];g=num(1);steps=[];variable='a'
         if kind=='distinct-roots':p,q=[evaluate(ir[k],0) for k in ('p','q')];first,second=[evaluate(x,0) for x in ir['initials']]
@@ -112,8 +101,9 @@ def _explain_route(ir,route):
                     'また、'+M('T_1=b_1')+' なので '+M('b_1='+N(first)+r',\quad b_2='+N(second))+' である。']
             else:
                 profile=cert['profile'];g=num(1) if profile=='identity' else (div(num(1),SCALES[profile[8:]]) if profile.startswith('inverse:') else SCALES[profile])
+                if profile=='identity': variable='a'
                 if profile!='identity': steps.append('3つの係数に現れる '+M('n')+'、'+M('n+1')+'、'+M('n+2')+' の対応に着目し、'+M('b_n='+sequence_tex(trace['transform'],'a'))+' とおく。')
-                steps.append('与式に代入して整理すると '+M('b_{n+2}='+coefficient_tex(p,'b_{n+1}')+C(q,'b_n'))+' であり、初期条件は '+M('b_1='+N(first)+r',\quad b_2='+N(second))+' となる。')
+                steps.append('係数をそろえると '+M(variable+'_{n+2}='+coefficient_tex(p,variable+'_{n+1}')+C(q,variable+'_n'))+' であり、初期条件は '+M(variable+'_1='+N(first)+r',\quad '+variable+'_2='+N(second))+' となる。')
         steps+=second_exposition(p,q,first,second,roots,variable)
         if variable=='b':steps.append(M('a_n='+L(mul(g,term(variable='b'))))+' に戻して、元の数列の一般項を得る。')
         return steps
@@ -125,14 +115,9 @@ def _explain_route(ir,route):
         steps+=scalar_exposition(base,route,'v')
         # Preserve the explicit domain identity computed by the forward solver.
         steps += [s for s in route['steps'] if '元の分母は' in s][-1:]
-        steps.append(M(r'a_n=\frac1{v_n}')+' に戻せば、元の数列の一般項を得る。')
+        steps.append(M(r'a_n=\frac1{v_n}='+L(route['formula']))+' と戻せば、元の数列の一般項を得る。')
         return steps
-    # Registered product, log and antidifference routes retain their checked data;
-    # avoid imperative fragments and make each last substitution explicit.
-    steps=[s.replace('です。','である。').replace('とおきます。','とおく。').replace('代入します。','代入する。').replace('戻します。','戻す。').replace('とおけます。','とおける。').replace('を得ます。','を得る。').replace('となります。','となる。').replace('消えます。','消える。').replace('まとめられます。','まとめられる。') for s in route['steps']]
-    if kind=='difference-normalization':
-        steps.insert(3,'階差を足し合わせるには、'+M(r'H(n)')+' を '+M('n')+' の多項式とおき、'+M('rH(n+1)-H(n)')+' が階差の多項式部分と一致するように係数を決める。')
-    return steps
+    return route['steps']
 
 
 def shift_expr(e):
