@@ -15,32 +15,39 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   await page.goto(baseURL+'?problem='+first.id);
   await page.locator('#bank-status').filter({hasText:'Lean検証済み'}).waitFor();
   await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
-  // Inline formulas must use display-size fractions and operator limits while
-  // retaining inline placement in prose (also used by fixed and batch problems).
+  // Compare single math atoms: MathJax 4 may split a compound inline
+  // expression into multiple SVGs to allow line breaking within prose.
   const sizing = await page.evaluate(async () => {
-    const tex = String.raw`\frac{1}{2}+\sum_{k=1}^{n}k+\int_0^1 x\,dx`;
-    const inline = await MathJax.tex2svgPromise(tex, {display:false});
-    const display = await MathJax.tex2svgPromise(tex, {display:true});
-    const probe = document.createElement('p');
-    probe.textContent = '前 \\(' + tex + '\\) 後';
-    document.body.append(probe);
-    await MathJax.typesetPromise([probe]);
-    const actual = probe.querySelector('mjx-container');
-    const result = {
-      inlineBox:inline.querySelector('svg').getAttribute('viewBox'),
-      displayBox:display.querySelector('svg').getAttribute('viewBox'),
-      actualBox:actual.querySelector('svg').getAttribute('viewBox'),
-      inlinePlacement:actual.getAttribute('display'),
-      prose:probe.firstChild.textContent + probe.lastChild.textContent,
-    };
-    MathJax.typesetClear([probe]);
-    probe.remove();
+    const result = [];
+    for (const tex of [String.raw`\frac{1}{2}`, String.raw`\sum_{k=1}^{n}`, String.raw`\int_0^1`]) {
+      const inline = await MathJax.tex2svgPromise(tex, {display:false});
+      const display = await MathJax.tex2svgPromise(tex, {display:true});
+      const probe = document.createElement('p');
+      probe.textContent = '前 \\(' + tex + '\\) 後';
+      document.body.append(probe);
+      await MathJax.typesetPromise([probe]);
+      const actual = probe.querySelector('mjx-container');
+      result.push({
+        tex,
+        inlineBox:inline.querySelector('svg').getAttribute('viewBox'),
+        displayBox:display.querySelector('svg').getAttribute('viewBox'),
+        actualBox:actual.querySelector('svg').getAttribute('viewBox'),
+        inlinePlacement:actual.getAttribute('display'),
+        prose:probe.firstChild.textContent + probe.lastChild.textContent,
+        errors:probe.querySelectorAll('[data-mml-node="merror"],[data-mjx-error]').length,
+      });
+      MathJax.typesetClear([probe]);
+      probe.remove();
+    }
     return result;
   });
-  assert.equal(sizing.inlineBox,sizing.displayBox,'Inline fractions and limits use display style.');
-  assert.equal(sizing.actualBox,sizing.displayBox,'Typeset prose uses the same display-sized math.');
-  assert.equal(sizing.inlinePlacement,null,'Display style preserves placement within prose.');
-  assert.equal(sizing.prose,'前  後');
+  for (const sample of sizing) {
+    assert.equal(sample.errors,0,sample.tex);
+    assert.equal(sample.inlineBox,sample.displayBox,'Display style: '+sample.tex);
+    assert.equal(sample.actualBox,sample.displayBox,'Typeset prose: '+sample.tex);
+    assert.equal(sample.inlinePlacement,null,'Inline placement: '+sample.tex);
+    assert.equal(sample.prose,'前  後');
+  }
   assert.equal(await page.locator('#answer').isVisible(),false);
   assert.equal(await page.locator('#problem-content').textContent().then(t=>t.includes('階比型')),false);
   assert.equal(await page.locator('#single-actions button').count(),4);
