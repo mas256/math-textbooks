@@ -1,5 +1,5 @@
 name: Verify recurrence bank
-description: Generate exact recipes, check Lean certificates, and test the exercise interface.
+description: Import the pinned browser engine, verify the textbook bank, and test both interfaces.
 runs:
   using: composite
   steps:
@@ -8,6 +8,27 @@ runs:
         python-version: '3.12'
         cache: pip
         cache-dependency-path: recurrence/requirements-dev.txt
+    - name: Read the browser engine lock
+      id: engine
+      shell: bash
+      run: |
+        python3 - <<'PY' >> "$GITHUB_OUTPUT"
+        import json
+        from pathlib import Path
+        config = json.loads(Path('recurrence/engine-lock.json').read_text())
+        print('repository=' + config['repository'])
+        print('revision=' + config['revision'])
+        PY
+    - name: Checkout the pinned browser engine
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ steps.engine.outputs.repository }}
+        ref: ${{ steps.engine.outputs.revision }}
+        path: .recurrence-engine
+        persist-credentials: false
+    - name: Prepare and verify browser engine assets
+      shell: bash
+      run: python3 recurrence/scripts/prepare-lab.py --engine-root .recurrence-engine
     - name: Generate recipes and proof obligations
       shell: bash
       run: |
@@ -49,3 +70,4 @@ runs:
         /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
         python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/recurrence-http.log 2>&1 &
         NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/browser.cjs
+        NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/lab-browser.cjs

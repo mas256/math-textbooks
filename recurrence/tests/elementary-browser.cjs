@@ -1,4 +1,4 @@
-// Offline UI integration checks. Certification metadata and MathJax are
+// Offline textbook UI integration checks. Certification metadata and MathJax are
 // in-memory test doubles: this does not certify candidates or test typesetting.
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
@@ -34,13 +34,13 @@ const { chromium } = require('playwright');
         return route.fulfill({contentType:'application/json',body:bytes});
       if (url.pathname.endsWith('/data/manifest.json'))
         return route.fulfill({contentType:'application/json',body:JSON.stringify(manifest)});
-      const name = url.pathname.split('/').pop() || 'index.html';
-      if (!['index.html','app.js','model.mjs','styles.css','mathjax-config.js'].includes(name))
+      const name = url.pathname.split('/').pop() || 'textbook.html';
+      if (!['textbook.html','app.js','model.mjs','styles.css','mathjax-config.js'].includes(name))
         return route.fulfill({status:404,body:''});
       const contentType = name.endsWith('.html') ? 'text/html' : name.endsWith('.css') ? 'text/css' : 'text/javascript';
       return route.fulfill({contentType,body:fs.readFileSync(path.join(root,name))});
     });
-    await page.goto('http://localhost/recurrence/');
+    await page.goto('http://localhost/recurrence/textbook.html');
     await page.waitForFunction(() => !document.querySelector('#family').disabled);
     await page.evaluate(() => {
       document.querySelector('#bank-status').textContent = 'UIテスト用データ（Lean未実行・数式描画は代替）';
