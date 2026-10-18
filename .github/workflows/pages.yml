@@ -83,3 +83,15 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           reporting_interval: 1000
+
+      - name: Verify the published recurrence site
+        env:
+          PAGES_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          for attempt in 1 2 3; do
+            if RECURRENCE_LAB_BASE_URL="${PAGES_URL%/}/recurrence/" RECURRENCE_EXPECT_SITE_REVISION="$GITHUB_SHA" NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/lab-browser.cjs; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then sleep 10; fi
+          done
+          exit 1

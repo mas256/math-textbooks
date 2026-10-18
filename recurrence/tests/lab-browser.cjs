@@ -38,9 +38,16 @@ async function verifyAssets() {
       if (url.pathname.startsWith('/api/')) apiRequests.push(url.href);
       if (/^https?:$/.test(url.protocol) && url.origin !== new URL(base).origin) externalRequests.push(url.href);
     });
-    await page.goto(base);
+    const entryURL = new URL(base);
+    if (process.env.RECURRENCE_EXPECT_SITE_REVISION) {
+      entryURL.searchParams.set('deployment', process.env.RECURRENCE_EXPECT_SITE_REVISION);
+    }
+    await page.goto(entryURL.href);
     await page.waitForFunction(() => !document.getElementById('generate').disabled);
     assert.equal(await page.locator('meta[name="recurrence-engine-revision"]').getAttribute('content'), lock.revision);
+    if (process.env.RECURRENCE_EXPECT_SITE_REVISION) {
+      assert.equal(await page.locator('meta[name="recurrence-site-revision"]').getAttribute('content'), process.env.RECURRENCE_EXPECT_SITE_REVISION);
+    }
     const catalog = await page.evaluate(() => window.RecurrenceBrowser.request('/api/status'));
     assert.equal(catalog.application_version, lock.version);
     assert.equal(catalog.families.length, 42);
@@ -105,7 +112,11 @@ async function verifyAssets() {
     assert.deepEqual(apiRequests, [], 'The generator must not send API requests to Pages');
     assert.deepEqual(externalRequests, [], 'All dynamic practice assets are served locally');
     // Preserve the exact public URL supplied by the user, including its problem ID.
-    await page.goto(new URL('?problem=L6-N03', base).href);
+    const sharedURL = new URL('?problem=L6-N03', base);
+    if (process.env.RECURRENCE_EXPECT_SITE_REVISION) {
+      sharedURL.searchParams.set('deployment', process.env.RECURRENCE_EXPECT_SITE_REVISION);
+    }
+    await page.goto(sharedURL.href);
     await page.waitForURL(/\/recurrence\/textbook\.html\?problem=L6-N03/);
     await page.waitForFunction(() => document.getElementById('problem-id').textContent === 'L6-N03');
     assert.match(await page.locator('#problem-level').textContent(), /6/);
