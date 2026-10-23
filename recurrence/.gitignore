@@ -2,5 +2,3 @@ build/
 data/
 scripts/__pycache__/
 tests/__pycache__/
-lean/.lake/
-engine/

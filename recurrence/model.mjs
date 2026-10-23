@@ -23,7 +23,7 @@ export function chooseProblem(pool, seen, random = Math.random, familyWeights = 
 }
 
 export const BATCH_COUNTS = Object.freeze({1:2, 2:2, 3:3, 4:3, 5:2, 6:2});
-export const problemLevel = p => p.scores?.level ?? p.level;
+export const problemLevel = p => p.level;
 
 export function validateAuthoredBank(bank) {
   if (bank.schema_version !== 1 || bank.level !== 6 || bank.authorship !== 'hand_authored'
@@ -99,24 +99,24 @@ export function mathTextParts(text) {
   return parts;
 }
 
+// Lv1-5 come from a bank built ahead of time by the Rust engine. Each problem
+// passed finite exact checks and a Lean proof of the original recurrence.
 export function validateBank(bank, manifest) {
-  if (bank.schema_version !== '0.2' || !Array.isArray(bank.problems)
-    || bank.verification?.status !== 'lean-verified'
-    || manifest.status !== 'lean-verified'
-    || bank.verification.commit !== manifest.commit
-    || bank.proof_source_sha256 !== manifest.proof_source_sha256
-    || bank.problems.length !== manifest.count) {
+  if (bank.schema_version !== 'bank-1' || manifest.schema_version !== 'bank-1'
+    || manifest.status !== 'lean-verified' || !Array.isArray(bank.problems)
+    || bank.problems.length !== manifest.count || bank.seed !== manifest.seed) {
     throw new Error('検証済み問題の形式が一致しません。');
   }
   const ids = new Set();
   for (const p of bank.problems) {
-    if (ids.has(p.id) || !/^p\d{3,}$/.test(p.id)
-      || p.verification?.status !== 'lean-verified'
-      || !p.lean_theorems?.includes(p.id + '_unique')
-      || !p.routes?.length || p.routes[0].parts.U !== 0
-      || p.quality?.accepted !== true || p.quality?.version !== bank.score_version
-      || !p.routes.every(r => r.complete && r.certificate)
-      || !Number.isInteger(p.scores.level) || p.scores.level < 1 || p.scores.level > 5) {
+    if (ids.has(p.id) || !/^[0-9a-f]{12}$/.test(p.id) || !p.problem_hash?.startsWith(p.id)
+      || !Number.isInteger(p.level) || p.level < 1 || p.level > 5
+      || p.lean?.status !== 'lean-verified' || typeof p.lean.source !== 'string'
+      || p.finite_check?.recipe_replayed !== true || p.finite_check.formal_verification !== false
+      || !Array.isArray(p.statement?.recurrences_tex) || !p.statement.recurrences_tex.length
+      || !Array.isArray(p.statement.initials_tex) || typeof p.answer_tex !== 'string'
+      || !Array.isArray(p.routes) || !p.routes.length
+      || !p.routes.every(r => typeof r.title === 'string' && typeof r.hint === 'string' && Array.isArray(r.steps))) {
       throw new Error('問題の検証情報を確認できません。');
     }
     ids.add(p.id);
@@ -126,11 +126,7 @@ export function validateBank(bank, manifest) {
 
 const scoreLabels = {B:'操作', R:'発見', A:'計算', T:'条件の確認', P:'式の複雑さ', U:'未評価部分'};
 
-export function problemInstruction(p) {
-  return p.ir?.shape === 'system' ? '次の条件で定められる2つの数列について、一般項をそれぞれ求めよ。'
-    : p.ir?.shape === 'power_second' || p.family === 'multiplicative_second' ? '次の条件を満たす正の数列について、一般項を求めよ。'
-    : '次の条件で定められる数列について、一般項を求めよ。';
-}
+export const problemInstruction = p => p.statement.instruction;
 
 // Equashare renders one formula per line, without a document preamble or math delimiters.
 export function equashareSource(p) {
@@ -151,29 +147,29 @@ export function equashareSource(p) {
     return lines.join('\n') + '\n';
   }
   return [
-    '\\text{問題 ' + p.id.toUpperCase() + (p.scores ? '（Lv' + p.scores.level + '）' : '') + '}',
+    '\\text{問題 ' + p.id.toUpperCase() + '（Lv' + p.level + '）}',
     '\\text{' + problemInstruction(p) + '}',
-    p.statement.definitions_tex,
     p.statement.initials_tex.join(',\\quad '),
-    p.statement.recurrence_tex,
-    'n\\in\\mathbb{Z},\\quad n\\ge1',
-  ].filter(Boolean).join('\n') + '\n';
+    ...p.statement.recurrences_tex,
+    'n\\in\\mathbb{Z},\\quad ' + p.statement.range_tex,
+  ].join('\n') + '\n';
 }
 
 export function routeComparison(routes) {
   const main = routes[0];
   const others = routes.slice(1);
-  const difficulty = r => r.difficulty_cost ?? r.cost;
-  if (main.difficulty_cost !== undefined && others.some(r => difficulty(r) > difficulty(main))) {
+  const difficulty = r => r.score;
+  const cost = r => r.total_score;
+  if (others.some(r => difficulty(r) > difficulty(main))) {
     return {reason:`登録済みの候補で教育上の難易度スコアが最小（${difficulty(main)}）なので、主解法にしています。`,
-      alternatives:others.map(r => `主解法との比較：難易度は${difficulty(r)}（主解法は${difficulty(main)}）、操作などの合計は${r.cost}（主解法は${main.cost}）。`)};
+      alternatives:others.map(r => `主解法との比較：難易度は${difficulty(r)}（主解法は${difficulty(main)}）、操作などの合計は${cost(r)}（主解法は${cost(main)}）。`)};
   }
   let reason = '登録済みの候補では、この解法だけを検出しました。';
   if (others.length) {
-    const tied = others.filter(r => r.cost === main.cost);
-    if (!tied.length) reason = `登録済みの候補で合計スコアが最小（${main.cost}）なので、主解法にしています。`;
+    const tied = others.filter(r => cost(r) === cost(main));
+    if (!tied.length) reason = `登録済みの候補で合計スコアが最小（${cost(main)}）なので、主解法にしています。`;
     else if (tied.every(r => r.numeric_cost > main.numeric_cost)) {
-      reason = `合計スコアは同点（${main.cost}）ですが、途中で扱う数値のコストが小さいため、主解法にしています。`;
+      reason = `合計スコアは同点（${cost(main)}）ですが、途中で扱う数値のコストが小さいため、主解法にしています。`;
     } else {
       reason = `合計スコアと数値のコストが同点の解法があります。解法名の順で表示しており、優劣を表す順序ではありません。`;
     }
@@ -186,14 +182,14 @@ export function routeComparison(routes) {
       if (difference > 0) higher.push(`${label}が${difference}点高い`);
     }
     const differences = [...lower, ...higher];
-    return `主解法との比較：${differences.length ? differences.join('、') : '各項目のスコアも同じ'}。合計は${route.cost}（主解法は${main.cost}）。`;
+    return `主解法との比較：${differences.length ? differences.join('、') : '各項目のスコアも同じ'}。合計は${cost(route)}（主解法は${cost(main)}）。`;
   });
   return {reason, alternatives};
 }
 
 // Keep mathematical expressions intact while using the textbook's prose style.
 export function textbookText(text) {
-  return text.split(/(\\\([\s\S]*?\\\))/g).map((part, i) => i % 2 ? part : part
+  return text.split(/(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/g).map((part, i) => i % 2 ? part : part
     .replaceAll('とおけます。', 'とおける。').replaceAll('を得ます。', 'を得る。')
     .replaceAll('となります。', 'となる。').replaceAll('消えます。', '消える。')
     .replaceAll('まとめられます。', 'まとめられる。').replaceAll('定義できます。', '定義できる。')
@@ -205,11 +201,10 @@ const escapeTex = text => text.replace(/[\\%&#_${}~^]/g, char => ({
 }[char] || '\\' + char));
 const displayMath = tex => '\\[\\fitmath{' + tex + '}\\]\n';
 function textbookProse(text) {
-  return textbookText(text).split(/(\\\([\s\S]*?\\\))/g).map((part, i) => {
-    if (!(i % 2)) return escapeTex(part);
-    const tex = part.slice(2, -2);
-    return tex.length > 65 || tex.includes('\\begin{aligned}') ? displayMath(tex) : part;
-  }).join('') + '\\par\n';
+  return mathTextParts(textbookText(text)).map(part => part.type === 'display' ? displayMath(part.text)
+    : part.type === 'inline' ? (part.text.length > 65 || part.text.includes('\\begin{aligned}')
+      ? displayMath(part.text) : '\\(' + part.text + '\\)')
+    : escapeTex(part.text)).join('') + '\\par\n';
 }
 
 const texPreamble = String.raw`% UTF-8 / pLaTeX + dvipdfmx
@@ -235,16 +230,13 @@ const texPreamble = String.raw`% UTF-8 / pLaTeX + dvipdfmx
 \begin{document}
 `;
 
+const statementEnding = {system:'を満たす数列 $a_n$, $b_n$ の一般項をそれぞれ求めよ。\\par\n',
+  positive:'を満たす正の数列の一般項を求めよ。\\par\n', single:'を満たす数列の一般項を求めよ。\\par\n'};
+
 function generatedStatementTex(p) {
-  let text = '';
-  if (p.statement.definitions_tex) text += textbookProse('\\(' + p.statement.definitions_tex + '\\) とおく。');
-  text += textbookProse('\\(' + p.statement.initials_tex.join(',\\quad ') + '\\) とし、');
-  text += displayMath(p.statement.recurrence_tex);
-  const system = p.statement.initials_tex.some(tex => /b_/.test(tex));
-  text += system ? 'を満たす数列 $a_n$, $b_n$ の一般項をそれぞれ求めよ。\\par\n'
-    : (p.ir?.shape === 'power_second' || p.family === 'multiplicative_second') ? 'を満たす正の数列の一般項を求めよ。\\par\n'
-    : 'を満たす数列の一般項を求めよ。\\par\n';
-  return text;
+  let text = textbookProse('\\(' + p.statement.initials_tex.join(',\\quad ') + '\\) とし、');
+  for (const tex of p.statement.recurrences_tex) text += displayMath(tex);
+  return text + (statementEnding[p.statement.shape] ?? statementEnding.single);
 }
 
 function generatedSolutionTex(p, standalone = false) {
@@ -273,7 +265,7 @@ export function texDocument(p, includeAnswer = false) {
     return text + '\\end{document}\n';
   }
   let text = texPreamble + '\\chapter{問題演習}\n\\begin{multicols*}{2}\n以下、\\,$n$は正の整数とする。\\par\n';
-  text += '\\section*{問題 ' + escapeTex(p.id) + (p.scores ? '（Lv' + p.scores.level + '）' : '') + '}\n';
+  text += '\\section*{問題 ' + escapeTex(p.id.toUpperCase()) + '（Lv' + p.level + '）}\n';
   text += generatedStatementTex(p) + '\\end{multicols*}\n';
   if (includeAnswer) {
     text += '\\chapter{方針・解答・解法}\n\\begin{multicols*}{2}\n'

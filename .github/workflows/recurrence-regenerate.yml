@@ -1,0 +1,63 @@
+# 「更新の依頼」：Actions → Regenerate recurrence problems → Run workflow。
+# 新しい乱数の種でLv1〜5の問題を作り直し、全問をLeanで検証してmainへコミットし、
+# そのコミットをPagesへ公開する。Lv6の固定問題は変わらない。
+name: Regenerate recurrence problems
+
+on:
+  workflow_dispatch:
+    inputs:
+      per_level:
+        description: 各難易度（Lv1〜5）の問題数
+        type: number
+        default: 30
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: write
+    concurrency:
+      group: recurrence-regenerate
+      cancel-in-progress: false
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate, prove and check the new bank
+        uses: ./.github/actions/verify-recurrence
+        with:
+          regenerate: 'true'
+          per-level: ${{ inputs.per_level }}
+      - name: Commit the new bank to main
+        id: commit
+        run: |
+          seed="$(jq -r .seed recurrence/bank/manifest.json)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add recurrence/bank
+          git commit -m "漸化式の問題（Lv1〜5）を再生成する" -m "seed ${seed} / run ${GITHUB_RUN_ID}"
+          # Fails if main moved during generation; run the workflow again in that case.
+          git push origin HEAD:main
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recurrence-regenerated
+          path: |
+            recurrence/bank/
+            recurrence/build/
+
+  deploy:
+    needs: generate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
+    with:
+      ref: ${{ needs.generate.outputs.commit }}

@@ -5,8 +5,9 @@ import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, tex
 const $ = id => document.getElementById(id);
 const state = { bank: null, manifest: null, authored: null, level: 2, family: 'all', current: null,
   batch: null, seen: new Set(), batchSeen: new Map(), hints: 0 };
-const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '等差・等比数列と、基本的な階差の和を確認します。',
-  2: '総和の基本形、単項式の階比、指数で割ると等差になる型を扱います。', 3: '連立、一般の階比、基本的な3項間、対数型、指数の付加項を扱います。', 4: '一次分数、定数項付き3項間、平行移動して対数をとる型、難しい階比を扱います。', 5: '正規化・総和・階差・対数など、複数の変形を組み合わせる発展問題です。',
+const levelText = {0: '基本から発展まで、すべての問題を含みます。', 1: '等差・等比数列、定数の数列、一次式の階差を扱います。',
+  2: '不動点、階比と階乗、二次式の階差、定数の二階差を扱います。', 3: '基本的な3項間と重根、指数係数の階比、特解、連立の分離、総和の消去、逆数型を扱います。',
+  4: '一次分数、倍率による正規化、定数項を含む3項間、正規化する連立を扱います。', 5: '逆数と変数係数、階差と総和、部分和の正規化、対数と二重の階差など、変形を組み合わせる発展問題です。',
   6: 'ガウス型・隣接4項間・非隣接型・ニュートン法など、事前作成した難問を扱います。'};
 let mathQueue = Promise.resolve();
 
@@ -62,7 +63,7 @@ function problemStatement(p) {
   if (p.level === 6) return mathProse(p.statement);
   const box = el('div');
   box.append(el('p', problemInstruction(p)), mathBlock(p.statement.initials_tex.join(',\\quad ')),
-    mathBlock((p.statement.definitions_tex ? p.statement.definitions_tex + '\\qquad ' : '') + p.statement.recurrence_tex),
+    ...p.statement.recurrences_tex.map(tex => mathBlock(tex)),
     el('p', 'n は 1 以上の整数とする。', 'question-line'));
   return box;
 }
@@ -104,12 +105,9 @@ function updatePool() {
 }
 
 function renderRecipe(p) {
-  const names = {power_first_encode:'累乗の更新へ',exponential_force:'指数の付加項',mobius_encode:'一次分数へ',factorial_product:'階比の総積',second_difference:'等差と階差の組合せ',constant:'定数数列', geometric:'等比数列', affine_fixed_point:'特性方程式型（2項間）',
-    index_scale:'n に応じた倍率', add_constant:'定数の移動', constant_scale:'定数倍', index_add:'n の一次式を付加', reciprocal:'逆数', linear_combination:'等比数列の組合せ',
-    repeated_factor:'一次式を掛けて重解へ', difference_lift:'階差を元の数列へ', sum_encode:'総和を含む式へ', cumulative_sum:'差を足して一段戻す', power_sequence:'指数の数列を元の数列へ',pair_mix:'独立した数列を連立へ',partial_sum_encode:'部分和の数列として与える',sum_relation_encode:'総和と一般項の関係へ',difference_polynomial:'多項式を階差にする'};
   const list = $('block-list');
-  list.replaceChildren(el('span', names[p.recipe.core.kind], 'block'));
-  for (const b of p.recipe.blocks) list.append(el('span', '→', 'block-arrow'), el('span', names[b.kind] || b.kind, 'block'));
+  list.replaceChildren(el('span', p.recipe.core.kind, 'block'));
+  for (const b of p.recipe.blocks) list.append(el('span', '→', 'block-arrow'), el('span', b.kind, 'block'));
   const table = el('table', undefined, 'score-table');
   const head = el('tr');
   for (const title of ['解法', '操作 B', '発見 R', '計算 A', '条件 T', '式 P', '未評価 U', '合計']) head.append(el('th', title));
@@ -117,78 +115,46 @@ function renderRecipe(p) {
   const tbody = el('tbody');
   for (const r of p.routes) {
     const row = el('tr');
-    for (const value of [r.title, ...['B','R','A','T','P','U'].map(k => r.parts[k]), r.cost]) row.append(el('td', String(value)));
+    for (const value of [r.title, ...['B','R','A','T','P','U'].map(k => r.parts[k]), r.total_score]) row.append(el('td', String(value)));
     tbody.append(row);
   }
   table.append(tbody);
   const wrapper = el('div', undefined, 'math-block'); wrapper.append(table);
-  $('score-info').replaceChildren(wrapper, el('p', `教育上の難易度：${p.scores.difficulty} → Lv.${p.scores.level}。数値の扱いやすさ：${p.scores.cleanliness}（低いほど簡単）。分類の目安：${p.routes[0].difficulty_rule}。`, 'details-note'));
+  const c = p.classification;
+  $('score-info').replaceChildren(wrapper, el('p', `教育上の難易度スコア：${c.score} → Lv.${p.level}。数値の扱いやすさ：${c.numeric_cost}（低いほど簡単）。分類の目安：${c.reason}。出題の細分類：${p.variant.label}。`, 'details-note'));
   const comparison = routeComparison(p.routes);
   $('score-info').append(el('p', comparison.reason + ' スコアは暫定値です。', 'details-note'),
     ...comparison.alternatives.map(note => el('p', note, 'details-note')));
-  const metrics = p.quality.metrics;
-  $('score-info').append(el('p', `完成式の評価：多項式係数の最高次数 ${metrics.coefficient_degree}、指数の次数 ${metrics.exponent_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。登録済みの解法を係数から検出し、採用条件を確認しています。`, 'details-note'));
+  const metrics = c.metrics;
+  $('score-info').append(el('p', `完成式の評価：多項式係数の最高次数 ${metrics.coefficient_degree}、指数の次数 ${metrics.exponent_degree}、式の要素数 ${metrics.nodes}、分数の深さ ${metrics.fraction_depth}。`, 'details-note'));
   const proof = $('proof-info');
-  proof.replaceChildren(document.createTextNode('検証：Lean 4.19.0 / mathlib v4.19.0　'));
-  if (/^\d+$/.test(String(state.manifest.run_id))) {
-    const link = el('a', '検証実行の記録 ↗');
-    link.href = `https://github.com/mas256/math-textbooks/actions/runs/${state.manifest.run_id}`;
-    link.target = '_blank'; link.rel = 'noopener noreferrer'; proof.append(link);
-  }
+  proof.replaceChildren(document.createTextNode(`検証：Lean ${p.lean.lean_version} / mathlib v4.19.0（公理：${p.lean.axioms.join('、') || 'なし'}）、n=${p.finite_check.first_index ?? 1}〜${p.finite_check.checked_terms} の厳密計算　`));
+  const run = runLink();
+  if (run) proof.append(run);
+}
+
+function runLink() {
+  if (!/^\d+$/.test(String(state.manifest.run_id))) return null;
+  const link = el('a', '生成・検証の実行記録 ↗');
+  link.href = `https://github.com/mas256/math-textbooks/actions/runs/${state.manifest.run_id}`;
+  link.target = '_blank'; link.rel = 'noopener noreferrer';
+  return link;
 }
 
 function renderGenerationSummary() {
-  const {comparison, generation_config: config, function_catalog: catalog} = state.bank;
+  const {manifest, bank} = state;
+  const counts = Object.entries(manifest.counts).map(([level, count]) => `Lv.${level}：${count}問`).join('、');
+  const generated = manifest.generated_at ? new Date(manifest.generated_at).toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'}) + '（日本時間）' : '記録なし';
+  const families = new Set(bank.problems.map(p => p.family)).size;
+  const variants = new Set(bank.problems.map(p => p.variant.id)).size;
   const summary = $('generation-summary');
-  summary.replaceChildren(el('p', `旧版の ${comparison.before.count} 問を同じ基準で再評価し、${comparison.baseline_rejected_count} 問を採用条件から除外しました。調整版は ${comparison.after.count} 問です。`),
-    el('p', `多項式係数の最高次数：${comparison.before.max_coefficient_degree} → ${comparison.after.max_coefficient_degree}。式の要素数の最大値：${comparison.before.max_nodes} → ${comparison.after.max_nodes}。平均値：${comparison.before.mean_nodes} → ${comparison.after.mean_nodes}。`),
-    el('p', `同じ種類の変形は通常 ${config.max_transforms.index_scale} 回、差を足して戻す操作は ${config.max_transforms.cumulative_sum} 回、全体で ${config.max_blocks} ブロックまで。連続する定数の付加・定数倍は統合し、逆数が連続する候補は除外します。`),
-    el('p', 'この比較は式の構造を測った結果です。学習者の正答率や、良問としての評価は今後確認します。'));
-  const diversity = comparison.diversity;
-  const diversitySummary = $('diversity-summary');
-  diversitySummary.replaceChildren();
-  if (diversity) {
-    diversitySummary.append(el('p', `前版の ${diversity.before.count} 問と今回の ${diversity.after.count} 問では、係数パターンは ${diversity.before.coefficient_patterns} → ${diversity.after.coefficient_patterns} 種類です。初期値だけが違う問題は同じパターンとして数えます。数値の扱いやすさを優先し、同程度の候補から公比・指数の底の偏りを減らして選びます。`));
-    const table = el('table', undefined, 'score-table');
-    table.append(el('caption', '公比・指数の底の分布'));
-    const head = el('tr');
-    for (const label of ['型','前版','今回']) head.append(el('th',label));
-    const thead=el('thead'); thead.append(head); table.append(thead);
-    const tbody=el('tbody');
-    const distribution = data => Object.entries(data?.parameters || {}).map(([key,count]) => key.replace('ratio:', '公比 ').replace('base:', '底 ') + `：${count}問`).join('、') || '出題なし';
-    for (const family of ['scaled_affine','reciprocal_scaled','ratio_power']) {
-      const row=el('tr');
-      for (const text of [state.bank.families[family] || family,distribution(diversity.before.families[family]),distribution(diversity.after.families[family])]) row.append(el('td',text));
-      tbody.append(row);
-    }
-    table.append(tbody); diversitySummary.append(table);
-  }
-  const levelMix=$('level-diversity');
-  levelMix.replaceChildren();
-  if (comparison.level_diversity) {
-    levelMix.append(el('p', '発展問題には、正規化した3項間、階差から階比へ進む型、総和を消去する型、対数と二重の階差を使う型を加えました。Lv3〜5では、逆数を使わない系統を各3種類以上、逆数型の割合を各40%以下にする条件も検査します。'));
-    const table=el('table',undefined,'score-table');
-    table.append(el('caption','難易度別の構成（逆数型は一次分数型などの系統）'));
-    const head=el('tr');
-    for (const label of ['難易度','前版：逆数型 / 全問','今回：逆数型 / 全問','今回：逆数以外の系統数']) head.append(el('th',label));
-    const thead=el('thead'); thead.append(head); table.append(thead);
-    const tbody=el('tbody');
-    for (const lv of ['3','4','5']) {
-      const before=comparison.level_diversity.before[lv],after=comparison.level_diversity.after[lv];
-      const count=data=>`${data.fraction_count} / ${data.count}問（${data.count?Math.round(100*data.fraction_count/data.count):0}%）`;
-      const row=el('tr');
-      for (const text of [`Lv.${lv}`,count(before),count(after),`${after.nonfraction_families.length} 系統`]) row.append(el('td',text));
-      tbody.append(row);
-    }
-    table.append(tbody);
-    const wrapper=el('div',undefined,'math-block'); wrapper.append(table); levelMix.append(wrapper);
-    levelMix.append(el('p','難易度の配点は暫定です。系統数と割合の改善は、学習者にとっての良問性や難しさの一致を保証するものではありません。','details-note'));
-  }
-  const functions = $('function-catalog');
-  const normalizers = catalog.scales.filter(p => !p.id.startsWith('inverse:')).map(p => '\\(' + p.normalizer_tex + '\\)').join('、');
-  const increments = catalog.exponents.map(p => '\\(' + p.increment_tex + '\\)').join('、');
-  functions.replaceChildren(el('p', '正規化の候補：' + normalizers + ' と、それぞれの逆数。階比にはこれらの隣接比を使います。'),
-    el('p', '指数係数の指数：' + increments + '。和が閉じた式になる候補を使います。'));
+  summary.replaceChildren(
+    el('p', `生成日時：${generated}。漸化式エンジン v${manifest.engine_version}（コミット ${String(manifest.engine_revision).slice(0, 12)}）、乱数の種 ${manifest.seed}。`),
+    el('p', `${counts}。${families}系統・${variants}細分類から、出題の偏りを抑えて選んでいます。`),
+    el('p', `全問で、Recipeの再生成、一般項と初期条件・漸化式・定義域条件の n=1〜${manifest.finite_checked_terms} の厳密計算、Lean ${manifest.lean_version} による初期値・全ての添字での漸化式・一意性・定義域条件の証明を通過しています。Lean検証に失敗して除外した候補：${manifest.lean_rejected.length}件。`),
+    el('p', '問題は更新を依頼したときにまとめて作り直します。更新すると、以前の問題へのリンクは使えなくなります。難易度6の固定問題は更新しても変わりません。', 'details-note'));
+  const run = runLink();
+  if (run) summary.append(run);
 }
 
 function resetExercise() {
@@ -215,7 +181,7 @@ function updateBankStatus() {
   } else if (state.current?.level === 6) {
     $('bank-status').textContent = `固定${state.authored.problems.length}問・${state.authored.categories.length}分野 / 解説付き`;
   } else {
-    $('bank-status').textContent = `${state.manifest.count} 問・${Object.keys(state.bank.families).length}系統 / Lean検証済み`;
+    $('bank-status').textContent = `${state.manifest.count} 問 / Lean検証済み`;
   }
 }
 
@@ -335,13 +301,18 @@ function solutionCard(p) {
   return card;
 }
 
+function stepItem(step) {
+  const item = el('li'); item.append(mathProse(textbookText(step)));
+  return item;
+}
+
 function showHint() {
   if (!state.current) return;
   if (state.hints) return;
   const hints = [state.current].map(p => {
     const hint = el('div', undefined, 'hint');
     hint.append(el('strong', '方針'),
-      p.level === 6 ? mathProse(p.hint) : el('span', textbookText(p.routes[0].hint)));
+      mathProse(p.level === 6 ? p.hint : textbookText(p.routes[0].hint)));
     return hint;
   });
   $('hints').append(...hints);
@@ -369,7 +340,7 @@ function toggleAnswer() {
   $('method-title').textContent = p.routes[0].title;
   $('method-observation').textContent = '方針：' + textbookText(p.routes[0].hint);
   $('method-choice').hidden = true;
-  $('solution-steps').replaceChildren(...p.routes[0].steps.map(step => el('li', textbookText(step))));
+  $('solution-steps').replaceChildren(...p.routes[0].steps.map(stepItem));
   $('answer-formula').replaceChildren(mathBlock(p.answer_tex));
   $('revealed-family').textContent = p.family_label;
   const alternates = $('alternate-container'); alternates.replaceChildren();
@@ -378,7 +349,7 @@ function toggleAnswer() {
     box.append(el('summary', '別解：' + route.title));
     box.append(el('p', '方針：' + textbookText(route.hint), 'method-observation'));
     const steps = el('ol', undefined, 'solution-steps');
-    steps.append(...route.steps.map(step => el('li', textbookText(step)))); box.append(steps);
+    steps.append(...route.steps.map(stepItem)); box.append(steps);
     box.addEventListener('toggle', () => { if (box.open) typeset([box]); });
     alternates.append(box);
   }
@@ -437,11 +408,16 @@ async function load() {
     if (hash !== manifest.bank_sha256) throw new Error('検証情報と問題データが一致しません。再読み込みしてください。');
     state.manifest = manifest;
     state.bank = validateBank(JSON.parse(new TextDecoder().decode(bytes)), manifest);
+    const present = new Set(state.bank.problems.map(p => p.family));
+    const group = el('optgroup'); group.label = '難易度1〜5（生成問題）';
     for (const [key, label] of Object.entries(state.bank.families)) {
-      const option = el('option', label); option.value = key; $('family').append(option);
+      if (!present.has(key)) continue;
+      const option = el('option', label); option.value = key; group.append(option);
     }
+    $('family').prepend(group);
+    $('family').prepend($('family').querySelector('option[value="all"]'));
     $('family').disabled = false;
-    $('bank-status').textContent = `${manifest.count} 問・${Object.keys(state.bank.families).length}系統 / Lean検証済み`;
+    $('bank-status').textContent = `${manifest.count} 問 / Lean検証済み`;
     renderGenerationSummary();
     const params = new URL(location.href).searchParams;
     const requested = params.get('problem');
@@ -507,9 +483,8 @@ $('download-tex').addEventListener('click', () => {
 });
 $('open-equashare').addEventListener('click', () => openEquashare(state.current));
 $('download-recipe').addEventListener('click', () => download(JSON.stringify(state.current.recipe,null,2), 'json', 'application/json'));
-$('download-lean').addEventListener('click', () => download(state.current.lean_source, 'lean'));
+$('download-lean').addEventListener('click', () => download(state.current.lean.source, 'lean'));
 $('print-problem').addEventListener('click', () => window.print());
-$('generation-details').addEventListener('toggle', () => { if ($('generation-details').open) typeset([$('function-catalog')]); });
 $('retry-math').addEventListener('click', () => {
   if (window.MathJax?.typesetPromise) { typeset([$('problem-content'),$('answer'),$('hints')]); return; }
   $('mathjax-script')?.remove();

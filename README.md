@@ -6,7 +6,7 @@
 - 教科書一覧データ: [`books.json`](books.json)
 - 漸化式の問題生成: https://mas256.github.io/math-textbooks/recurrence/
 
-漸化式生成ページの仕様・検証範囲・開発手順は [`recurrence/README.md`](recurrence/README.md) にあります。通常の演習では、版を固定したRust/WebAssemblyエンジンがブラウザー内で問題を動的に生成し、有限項の計算を検査します。教材問題・Lv6・14問セットは別画面で継続し、旧来の問題リンクも復元できます。教材の生成問題は公開前にLeanで検証し、動的生成と教材の両画面をブラウザーで検査します。検証に失敗したビルドは公開しません。
+漸化式生成ページの仕様・検証範囲・開発手順は [`recurrence/README.md`](recurrence/README.md) にあります。1つの画面で難易度1〜6を出題します。Lv1〜5は、版を固定したRust製の漸化式エンジンで、更新を依頼したときにまとめて生成した問題です。全問を有限項の厳密計算とLeanで検証してから公開します。Lv6は事前作成の固定問題です。問題の更新は Actions → **Regenerate recurrence problems** から依頼します。検証に失敗したビルドは公開しません。
 
 トップページの案内欄にEquashare v5.0.2のWindows版ダウンロードとWeb版へのリンクを掲載しています。Equashareは教科書一覧には含めていません。Web版のビルドは [`equashare/`](equashare/) にあります。
 

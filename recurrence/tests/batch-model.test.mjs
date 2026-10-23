@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import {BATCH_COUNTS, chooseBatch, batchFromIds, problemLevel, validateAuthoredBank,
   validateBank, mathTextParts, batchTexDocument, poolFor, texDocument, equashareSource} from '../model.mjs';
 
-// Candidates exercise selection/export only; this does not certify them.
-const bank = JSON.parse(fs.readFileSync(new URL('../build/candidates.json', import.meta.url), 'utf8'));
+// The committed Lean-verified bank exercises selection and export.
+const bank = JSON.parse(fs.readFileSync(new URL('../bank/problems.json', import.meta.url), 'utf8'));
 const authored = JSON.parse(fs.readFileSync(new URL('../authored/level6.json', import.meta.url), 'utf8'));
 const counts = problems => Object.fromEntries(Object.keys(BATCH_COUNTS)
   .map(level => [level, problems.filter(p => problemLevel(p) === Number(level)).length]));
