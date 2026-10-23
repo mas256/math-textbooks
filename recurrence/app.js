@@ -464,12 +464,21 @@ document.querySelectorAll('button[data-level]').forEach(button => button.addEven
 }));
 $('all-levels').addEventListener('click', () => { state.level = 0; updatePool(); });
 $('family').addEventListener('change', () => { state.family = $('family').value; updatePool(); });
+// In the one-column layout the problem appears below the settings; bring it
+// into view and move focus to it so the result of the button is visible.
+function revealExercise() {
+  if (!window.matchMedia('(max-width: 700px)').matches) return;
+  const heading = $('problem-title');
+  heading.tabIndex = -1;
+  heading.closest('.exercise').scrollIntoView({behavior: 'smooth', block: 'start'});
+  heading.focus({preventScroll: true});
+}
 $('generate').addEventListener('click', () => {
   const p = chooseProblem(poolFor(state.bank, state.level, state.family, state.authored), state.seen, Math.random, state.bank.selection_weights);
-  if (p) renderProblem(p);
+  if (p) { renderProblem(p); revealExercise(); }
 });
 $('generate-batch').addEventListener('click', () => {
-  try { renderBatch(chooseBatch(state.bank, state.authored, state.batchSeen)); }
+  try { renderBatch(chooseBatch(state.bank, state.authored, state.batchSeen)); revealExercise(); }
   catch (error) { $('batch-status').textContent = error.message; }
 });
 $('hint-button').addEventListener('click', showHint);

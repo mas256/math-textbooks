@@ -187,13 +187,64 @@ export function routeComparison(routes) {
   return {reason, alternatives};
 }
 
+// The engine writes formulas inside its prose as plain text, e.g. a_n=S_n−S_(n−1)
+// or x_1^(2^(n−1)). Typeset those runs; leave anything that cannot be parsed.
+const FORMULA_RUN = /[A-Za-z0-9λΣ_^(){}+\-−=\/·<>≥≧≤≦≠…⋯]+/g;
+const SYMBOLS = {'−':'-', '·':'\\cdot ', '≥':'\\ge ', '≧':'\\ge ', '≤':'\\le ', '≦':'\\le ',
+  '≠':'\\ne ', '…':'\\ldots ', '⋯':'\\cdots ', 'Σ':'\\sum ', 'λ':'\\lambda '};
+
+function scriptGroup(text, start) {
+  if (text[start] === '(' || text[start] === '{') {
+    const close = text[start] === '(' ? ')' : '}';
+    let depth = 0;
+    for (let i = start; i < text.length; i++) {
+      if (text[i] === text[start]) depth++;
+      else if (text[i] === close && --depth === 0) return [text.slice(start + 1, i), i + 1];
+    }
+    return null;
+  }
+  return /[A-Za-z0-9]/.test(text[start] ?? '') ? [text[start], start + 1] : null;
+}
+
+function formulaTex(run) {
+  let tex = '';
+  for (let i = 0; i < run.length;) {
+    const c = run[i];
+    if (c === '_' || c === '^') {
+      const group = scriptGroup(run, i + 1);
+      if (!group) return null;
+      const inner = formulaTex(group[0]);
+      if (inner === null) return null;
+      tex += c + '{' + inner + '}';
+      i = group[1];
+    } else {
+      tex += SYMBOLS[c] ?? c;
+      i++;
+    }
+  }
+  let depth = 0;
+  for (const c of tex.replace(/\\[a-z]+ ?/g, '')) {
+    if (c === '(' || c === '{') depth++;
+    if ((c === ')' || c === '}') && --depth < 0) return null;
+  }
+  return depth === 0 ? tex : null;
+}
+
+export function inlineFormulas(text) {
+  return text.replace(FORMULA_RUN, run => {
+    if (!/[_^]/.test(run)) return run;
+    const tex = formulaTex(run);
+    return tex === null ? run : '\\(' + tex + '\\)';
+  });
+}
+
 // Keep mathematical expressions intact while using the textbook's prose style.
 export function textbookText(text) {
-  return text.split(/(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/g).map((part, i) => i % 2 ? part : part
+  return text.split(/(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/g).map((part, i) => i % 2 ? part : inlineFormulas(part
     .replaceAll('とおけます。', 'とおける。').replaceAll('を得ます。', 'を得る。')
     .replaceAll('となります。', 'となる。').replaceAll('消えます。', '消える。')
     .replaceAll('まとめられます。', 'まとめられる。').replaceAll('定義できます。', '定義できる。')
-    .replaceAll('です。', 'である。')).join('');
+    .replaceAll('です。', 'である。'))).join('');
 }
 
 const escapeTex = text => text.replace(/[\\%&#_${}~^]/g, char => ({

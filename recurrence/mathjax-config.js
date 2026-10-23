@@ -10,5 +10,8 @@ window.MathJax = {
     }],
   },
   svg: { fontCache: 'local' },
+  // Break long display equations at operators to fit narrow screens; equations
+  // without a break point still scroll horizontally.
+  output: { displayOverflow: 'linebreak', linebreaks: { width: '100%' } },
   startup: { typeset: false },
 };
