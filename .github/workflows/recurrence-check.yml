@@ -4,9 +4,9 @@ on:
   workflow_call:
   push:
     branches: ['codex/recurrence-*']
-    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
+    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml', '.github/workflows/recurrence-regenerate.yml', '.github/workflows/pages.yml']
   pull_request:
-    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml']
+    paths: ['recurrence/**', '.github/actions/verify-recurrence/**', '.github/workflows/recurrence-check.yml', '.github/workflows/recurrence-regenerate.yml', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:

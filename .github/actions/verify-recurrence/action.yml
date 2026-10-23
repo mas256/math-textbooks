@@ -1,5 +1,12 @@
 name: Verify recurrence bank
-description: Import the pinned browser engine, verify the textbook bank, and test both interfaces.
+description: Build the locked Rust engine, optionally regenerate the Lv1-5 bank with Lean, and check the page.
+inputs:
+  regenerate:
+    description: Generate a new Lv1-5 bank with a fresh seed and prove every problem in Lean
+    default: 'false'
+  per-level:
+    description: Number of problems per level when regenerating
+    default: '30'
 runs:
   using: composite
   steps:
@@ -8,7 +15,7 @@ runs:
         python-version: '3.12'
         cache: pip
         cache-dependency-path: recurrence/requirements-dev.txt
-    - name: Read the browser engine lock
+    - name: Read the engine lock
       id: engine
       shell: bash
       run: |
@@ -19,55 +26,61 @@ runs:
         print('repository=' + config['repository'])
         print('revision=' + config['revision'])
         PY
-    - name: Checkout the pinned browser engine
+    - name: Checkout the locked engine
       uses: actions/checkout@v4
       with:
         repository: ${{ steps.engine.outputs.repository }}
         ref: ${{ steps.engine.outputs.revision }}
         path: .recurrence-engine
         persist-credentials: false
-    - name: Prepare and verify browser engine assets
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: .recurrence-engine
+    - name: Build the bank generator
       shell: bash
-      run: python3 recurrence/scripts/prepare-lab.py --engine-root .recurrence-engine
-    - name: Generate recipes and proof obligations
+      run: cargo build --release --locked --bin recurrence-bank --manifest-path .recurrence-engine/Cargo.toml
+    - name: Install Lean 4.19.0 and mathlib
+      if: inputs.regenerate == 'true'
+      shell: bash
+      run: bash .recurrence-engine/scripts/setup-lean.sh
+    - name: Generate the bank and prove each problem in Lean
+      if: inputs.regenerate == 'true'
       shell: bash
       run: |
-        python3 recurrence/scripts/generate.py
-        python3 recurrence/tests/math_check.py
-        python3 recurrence/tests/exposition_check.py
-        python3 recurrence/tests/elementary_check.py
-        node --test recurrence/tests/model.test.mjs recurrence/tests/elementary-model.test.mjs recurrence/tests/batch-model.test.mjs
-    - name: Check all hand-authored problems and documents
+        export PATH="$HOME/.elan/bin:$PATH"
+        python3 recurrence/scripts/regenerate-bank.py \
+          --engine-root .recurrence-engine \
+          --bank-binary .recurrence-engine/target/release/recurrence-bank \
+          --per-level '${{ inputs.per-level }}'
+    - name: Check the bank against the locked engine
+      shell: bash
+      run: |
+        .recurrence-engine/target/release/recurrence-bank check --bank recurrence/bank
+        python3 - <<'PY'
+        import json
+        from pathlib import Path
+        lock = json.loads(Path('recurrence/engine-lock.json').read_text())
+        manifest = json.loads(Path('recurrence/bank/manifest.json').read_text())
+        assert manifest['engine_revision'] == lock['revision'], 'Regenerate the bank after changing the engine lock'
+        assert manifest['engine_version'] == lock['version'], 'Regenerate the bank after changing the engine lock'
+        print(f"Bank seed {manifest['seed']}: {manifest['counts']}")
+        PY
+    - name: Check the fixed Lv6 problems and documents
       shell: bash
       run: |
         python3 -m pip install -r recurrence/requirements-dev.txt
         python3 recurrence/scripts/authored_workbook.py --check
         python3 recurrence/tests/level6_check.py
-    - name: Install Lean and check all generated theorems
-      uses: leanprover/lean-action@v1
-      with:
-        lake-package-directory: recurrence/lean
-        use-mathlib-cache: true
-        build: false
-        test: false
-        lint: false
-    - name: Compile and audit each theorem
-      working-directory: recurrence/lean
+    - name: Check the page model
       shell: bash
-      run: |
-        set -o pipefail
-        lake build 2>&1 | tee ../build/lean.log
-    - name: Certify the bank
-      shell: bash
-      run: python3 recurrence/scripts/certify.py
+      run: node --test recurrence/tests/model.test.mjs recurrence/tests/batch-model.test.mjs
     - name: Check browser rendering and interactions
       shell: bash
       run: |
         mkdir -p recurrence/data
-        cp recurrence/build/problems.json recurrence/build/manifest.json recurrence/build/quality-report.json recurrence/data/
-        cp recurrence/authored/level6.json recurrence/data/
+        cp recurrence/bank/problems.json recurrence/bank/manifest.json recurrence/authored/level6.json recurrence/data/
         npm install --prefix /tmp/recurrence-browser --no-save --ignore-scripts playwright@1.55.1
         /tmp/recurrence-browser/node_modules/.bin/playwright install --with-deps chromium
         python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/recurrence-http.log 2>&1 &
         NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/browser.cjs
-        NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/lab-browser.cjs

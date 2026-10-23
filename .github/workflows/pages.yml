@@ -15,19 +15,27 @@ on:
       - ".github/actions/verify-recurrence/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
+  # Called by recurrence-regenerate.yml to publish the bank commit it created.
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to deploy
+        type: string
+        required: true
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency:
-  group: github-pages
-  cancel-in-progress: false
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Job-level so that the called workflow shares the queue with push deploys.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -35,9 +43,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
 
-      - name: Generate and verify the recurrence bank
+      - name: Record the deployed revision
+        run: echo "SITE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Verify the recurrence bank
         uses: ./.github/actions/verify-recurrence
 
       - name: Check catalog reading links
@@ -71,7 +83,7 @@ jobs:
       - name: Check the assembled recurrence site
         run: |
           python3 -m http.server 8788 --directory site --bind 127.0.0.1 > /tmp/recurrence-site-http.log 2>&1 &
-          RECURRENCE_LAB_BASE_URL=http://127.0.0.1:8788/recurrence/ NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/lab-browser.cjs
+          RECURRENCE_BASE_URL=http://127.0.0.1:8788/recurrence/ NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/site-browser.cjs
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
@@ -89,7 +101,7 @@ jobs:
           PAGES_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for attempt in 1 2 3; do
-            if RECURRENCE_LAB_BASE_URL="${PAGES_URL%/}/recurrence/" RECURRENCE_EXPECT_SITE_REVISION="$GITHUB_SHA" NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/lab-browser.cjs; then
+            if RECURRENCE_BASE_URL="${PAGES_URL%/}/recurrence/" RECURRENCE_EXPECT_SITE_REVISION="$SITE_REVISION" NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/site-browser.cjs; then
               exit 0
             fi
             if [ "$attempt" -lt 3 ]; then sleep 10; fi

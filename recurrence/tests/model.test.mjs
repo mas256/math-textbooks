@@ -2,8 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, equashareSource } from '../model.mjs';
 
-const p = (id, family, level) => ({id,family,scores:{level}});
+const p = (id, family, level) => ({id,family,level});
 const bank = {problems:[p('p001','a',1),p('p002','a',1),p('p003','b',2)]};
+
+// A bank record as written by the Rust engine's recurrence-bank command.
+function generated(overrides = {}) {
+  return {id:'0123456789ab', problem_hash:'0123456789ab'.padEnd(64,'0'), level:2, family:'geometric',
+    family_label:'等比数列', variant:{id:'geometric/base',label:'等比数列',pattern:'constant_coefficient_first'},
+    statement:{shape:'single', instruction:'次の条件で定められる数列について、一般項を求めよ。',
+      recurrences_tex:['a_{n+1}=2\\,a_{n}+1'], initials_tex:['a_{1}=1'], range_tex:'n\\ge1'},
+    answer_tex:'a_{n}=2^{n}-1',
+    routes:[{title:'不動点を引く',hint:'係数が一定です。',steps:['不動点を引く。\n\\[b_{n}=a_{n}+1\\]','公比は2です。'],
+      score:5,total_score:5,numeric_cost:2,parts:{B:2,R:1,A:2,T:0,P:0,U:0}}],
+    classification:{score:5,numeric_cost:2,reason:'理由',metrics:{nodes:5,fraction_depth:0,coefficient_degree:0,exponent_degree:0}},
+    recipe:{core:{kind:'geometric'},blocks:[],seed:'1'},
+    finite_check:{recipe_replayed:true,formal_verification:false,checked_terms:20},
+    lean:{status:'lean-verified',source:'theorem ...',lean_version:'4.19.0',axioms:['propext']},
+    ...overrides};
+}
 
 test('difficulty and family filters intersect, including empty combinations', () => {
   assert.deepEqual(poolFor(bank,1,'a').map(p=>p.id),['p001','p002']);
@@ -19,64 +35,62 @@ test('all matching instances appear once before recycling', () => {
   assert.equal(chooseProblem([],seen),null);
 });
 
-test('unverified banks and mismatched manifests are rejected', () => {
-  assert.throws(()=>validateBank({schema_version:'0.2',problems:[],verification:{status:'pending'}},{status:'lean-verified'}));
-});
-
-test('structurally rejected or incomplete problems cannot be served', () => {
-  const problem={id:'p001',verification:{status:'lean-verified'},lean_theorems:['p001_unique'],
-    scores:{level:2},quality:{accepted:true,version:'0.3.0'},
-    routes:[{parts:{U:0},complete:true,certificate:{kind:'polynomial-normalization'}}]};
-  const verified={schema_version:'0.2',score_version:'0.3.0',problems:[problem],
-    proof_source_sha256:'proof',verification:{status:'lean-verified',commit:'commit'}};
-  const manifest={status:'lean-verified',commit:'commit',proof_source_sha256:'proof',count:1};
+test('only Lean-verified banks matching their manifest can be served', () => {
+  const problem = generated();
+  const verified = {schema_version:'bank-1', seed:'7', problems:[problem]};
+  const manifest = {schema_version:'bank-1', status:'lean-verified', seed:'7', count:1};
   assert.equal(validateBank(verified,manifest),verified);
-  problem.quality.accepted=false;
-  assert.throws(()=>validateBank(verified,manifest));
-  problem.quality.accepted=true;
-  problem.routes[0].complete=false;
-  assert.throws(()=>validateBank(verified,manifest));
-  problem.routes[0].complete=true;
-  problem.id='p1000'; problem.lean_theorems=['p1000_unique'];
-  assert.equal(validateBank(verified,manifest),verified);
+  assert.throws(()=>validateBank(verified,{...manifest,status:'pending'}));
+  assert.throws(()=>validateBank(verified,{...manifest,count:2}));
+  assert.throws(()=>validateBank(verified,{...manifest,seed:'8'}));
+  for (const broken of [{lean:{status:'pending',source:''}}, {finite_check:{recipe_replayed:false}},
+    {level:6}, {id:'P001'}, {problem_hash:'ffff'}, {routes:[]}, {statement:{...problem.statement,recurrences_tex:[]}}]) {
+    assert.throws(()=>validateBank({...verified,problems:[generated(broken)]},manifest), JSON.stringify(broken));
+  }
+  assert.throws(()=>validateBank({...verified,problems:[problem,problem]},{...manifest,count:2}));
 });
 
 test('TeX defaults to problem only and adds solutions on request', () => {
-  const q={id:'p001',statement:{initials_tex:['a_1=1'],recurrence_tex:'a_{n+1}=2a_n'},
-    answer_tex:'a_n=2^{n-1}',routes:[{title:'等比',hint:'係数が一定です。',steps:['公比は2です。']}]};
+  const q=generated();
   assert.ok(!texDocument(q).includes('\\section*{解答}'));
+  assert.ok(texDocument(q).includes('問題 0123456789AB（Lv2）'));
   assert.ok(texDocument(q,true).includes(q.answer_tex));
   assert.ok(texDocument(q,true).includes('\\documentclass[dvipdfmx,a4paper,11pt,fleqn,openany]{jsbook}'));
   assert.ok(texDocument(q,true).includes('\\begin{multicols*}{2}'));
   assert.ok(!texDocument(q,true).includes('スコア'));
-  assert.ok(texDocument({...q, family:'multiplicative_second'}).includes('正の数列'));
-  assert.ok(texDocument({...q,statement:{...q.statement,initials_tex:['a_1=1','b_1=2']}}).includes('それぞれ求めよ')); 
+  // Display equations in explanations stay mathematics, not escaped prose.
+  assert.ok(texDocument(q,true).includes('\\[\\fitmath{b_{n}=a_{n}+1}\\]'));
+  assert.ok(!texDocument(q,true).includes('\\textbackslash{}['));
+  assert.ok(texDocument({...q,statement:{...q.statement,shape:'positive'}}).includes('正の数列'));
+  assert.ok(texDocument({...q,statement:{...q.statement,shape:'system'}}).includes('それぞれ求めよ'));
   assert.equal(textbookText('\\(a_n=2^{n-1}\\) です。'), '\\(a_n=2^{n-1}\\) である。');
+  assert.equal(textbookText('\\[x です。\\] です。'), '\\[x です。\\] である。');
   assert.ok(texDocument(q,true).includes('係数が一定である。'));
 });
 
 test('route explanations distinguish strict wins, numerical tie breaks and display ties', () => {
-  const main={cost:5,numeric_cost:2,parts:{B:2,R:1,A:2,T:0,P:0,U:0}};
-  const other={cost:6,numeric_cost:2,parts:{B:1,R:3,A:2,T:0,P:0,U:0}};
+  const main={score:5,total_score:5,numeric_cost:2,parts:{B:2,R:1,A:2,T:0,P:0,U:0}};
+  const other={score:5,total_score:6,numeric_cost:2,parts:{B:1,R:3,A:2,T:0,P:0,U:0}};
   assert.ok(routeComparison([main]).reason.includes('だけを検出'));
   const strict=routeComparison([main,other]);
   assert.ok(strict.reason.includes('最小'));
   assert.ok(strict.alternatives[0].includes('操作が1点低い、発見が2点高い'));
-  other.cost=5; other.numeric_cost=3;
+  other.total_score=5; other.numeric_cost=3;
   assert.ok(routeComparison([main,other]).reason.includes('数値のコストが小さい'));
   other.numeric_cost=2;
   assert.ok(routeComparison([main,other]).reason.includes('優劣を表す順序ではありません'));
   other.parts={...main.parts};
   assert.ok(routeComparison([main,other]).alternatives[0].includes('各項目のスコアも同じ'));
+  const harder={...other,score:9};
+  assert.ok(routeComparison([main,harder]).reason.includes('教育上の難易度スコアが最小（5）'));
 });
 
 test('Equashare gets problem-only formulas one per line, without document TeX or math delimiters', () => {
-  const q={id:'p001',scores:{level:2},statement:{initials_tex:['a_1=1'],recurrence_tex:'a_{n+1}=2a_n+1'},
-    answer_tex:'a_n=2^n-1',routes:[{hint:'解答のヒント'}]};
-  assert.equal(equashareSource(q), String.raw`\text{問題 P001（Lv2）}
+  const q=generated();
+  assert.equal(equashareSource(q), String.raw`\text{問題 0123456789AB（Lv2）}
 \text{次の条件で定められる数列について、一般項を求めよ。}
-a_1=1
-a_{n+1}=2a_n+1
+a_{1}=1
+a_{n+1}=2\,a_{n}+1
 n\in\mathbb{Z},\quad n\ge1
 `);
   const source=equashareSource(q);
@@ -84,18 +98,13 @@ n\in\mathbb{Z},\quad n\ge1
   assert.ok(!source.includes(q.routes[0].hint));
   assert.doesNotMatch(source, /\\(?:documentclass|usepackage|fitmath|chapter|section)|\\[()[\]]|\$/);
   assert.equal(new URLSearchParams({prefill:source}).get('prefill'),source);
-  const system={...q,ir:{shape:'system'},statement:{initials_tex:['a_1=1','b_1=2'],
-    recurrence_tex:String.raw`\begin{cases}a_{n+1}=a_n+b_n\\b_{n+1}=a_n-b_n\end{cases}`}};
+  const system=generated({statement:{shape:'system',instruction:'次の条件で定められる2つの数列について、一般項をそれぞれ求めよ。',
+    initials_tex:['a_{1}=1','b_{1}=2'], recurrences_tex:['a_{n+1}=a_{n}+b_{n}','b_{n+1}=a_{n}-b_{n}'], range_tex:'n\\ge1'}});
   assert.ok(equashareSource(system).includes('一般項をそれぞれ求めよ。'));
-  assert.ok(equashareSource(system).includes('a_1=1,\\quad b_1=2\n'+system.statement.recurrence_tex+'\n'));
-  const sum={...q,statement:{...q.statement,definitions_tex:String.raw`S_n=\sum_{k=1}^{n}a_k`}};
-  assert.ok(equashareSource(sum).includes(sum.statement.definitions_tex+'\n'+q.statement.initials_tex[0]));
-  for (const positive of [{...q,ir:{shape:'power_second'}},{...q,family:'multiplicative_second'}]) {
-    assert.ok(equashareSource(positive).includes('正の数列'));
-  }
+  assert.ok(equashareSource(system).includes('a_{1}=1,\\quad b_{1}=2\na_{n+1}=a_{n}+b_{n}\nb_{n+1}=a_{n}-b_{n}\n'));
 });
 
-test('fractional family receives the configured weight and exhausted families disappear', () => {
+test('family weights still bias the choice and exhausted families disappear', () => {
   const pool=[p('p001','a',4),p('p002','mobius',4)];
   const seen=new Set();
   assert.equal(chooseProblem(pool,seen,()=>0.4,{mobius:2}).family,'mobius');

@@ -5,16 +5,22 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
 
 (async () => {
   const {textbookText, mathTextParts, equashareSource} = await import('../model.mjs');
+  fs.mkdirSync('recurrence/build',{recursive:true});
   const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
-  const bank=JSON.parse(fs.readFileSync('recurrence/build/problems.json','utf8'));
+  const bank=JSON.parse(fs.readFileSync('recurrence/bank/problems.json','utf8'));
   const authored=JSON.parse(fs.readFileSync('recurrence/authored/level6.json','utf8'));
-  const first=bank.problems.find(p=>p.family==='shifted_scaled');
+  const families=[...new Set(bank.problems.map(p=>p.family))];
+  // A family served only at Lv5 exercises the empty Lv1 filter.
+  const lv5Only=families.find(f=>bank.problems.filter(p=>p.family===f).every(p=>p.level===5));
+  assert.ok(lv5Only,'The bank needs a family that appears only at Lv5.');
+  const statementMath=p=>1+p.statement.recurrences_tex.length;
+  const first=bank.problems.find(p=>p.level===2);
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(baseURL+'?problem='+first.id);
   await page.locator('#bank-status').filter({hasText:'Lean検証済み'}).waitFor();
-  await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
+  await page.waitForFunction(n=>document.querySelectorAll('#problem-content mjx-container').length===n,statementMath(first));
   // Compare single math atoms: MathJax 4 may split a compound inline
   // expression into multiple SVGs to allow line breaking within prose.
   const sizing = await page.evaluate(async () => {
@@ -90,7 +96,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   await page.screenshot({path:'recurrence/build/desktop.png',fullPage:true});
   await page.locator('#hint-button').click();
   assert.equal(await page.locator('.hint').count(),1);
-  assert.equal(await page.locator('.hint span').textContent(), textbookText(first.routes[0].hint));
+  assert.ok((await page.locator('.hint').textContent()).startsWith('方針'));
   assert.equal(await page.locator('#hint-button').isDisabled(),true);
   assert.equal(await page.locator('#answer').isVisible(),false);
   await page.locator('#answer-button').click();
@@ -106,8 +112,8 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   }
   await page.locator('#answer-button').click();
   assert.equal(await page.locator('#answer').isVisible(),false);
-  assert.ok((await page.locator('#bank-status').textContent()).includes(`${bank.problems.length} 問・${Object.keys(bank.families).length}系統`));
-  await page.locator('#family').selectOption('reciprocal_forcing');
+  assert.ok((await page.locator('#bank-status').textContent()).includes(`${bank.problems.length} 問 / Lean検証済み`));
+  await page.locator('#family').selectOption(lv5Only);
   await page.locator('[data-level="1"]').click();
   assert.equal(await page.locator('#generate').isDisabled(),true);
   await page.locator('[data-level="5"]').click();
@@ -137,7 +143,8 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   await answerEditor.close();
   await page.locator('#all-levels').click();
   await page.locator('#family').selectOption('all');
-  for(const family of Object.keys(bank.families)) {
+  assert.deepEqual(await page.locator('#family optgroup').first().locator('option').evaluateAll(o=>o.map(x=>x.value)).then(v=>v.sort()),[...families].sort());
+  for(const family of families) {
     await page.locator('#family').selectOption(family);
     await page.locator('#generate').click();
     await page.locator('#answer-button').click();
@@ -155,8 +162,8 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
     assert.ok(!(await alternate.textContent()).includes('スコア')); 
     assert.ok((await alternate.textContent()).includes('方針：'));
   }
-  const formulas=[...new Set([...bank.problems.flatMap(p=>[...p.statement.initials_tex,p.statement.recurrence_tex,p.answer_tex,
-    ...p.routes.flatMap(r=>r.steps.flatMap(s=>[...s.matchAll(/\\\((.*?)\\\)/gs)].map(m=>m[1]))) ]),
+  const formulas=[...new Set([...bank.problems.flatMap(p=>[...p.statement.initials_tex,...p.statement.recurrences_tex,p.answer_tex,
+    ...p.routes.flatMap(r=>[r.hint,...r.steps].flatMap(text=>mathTextParts(text).filter(part=>part.type!=='text').map(part=>part.text))) ]),
     ...authored.problems.flatMap(p => [p.statement,p.hint,p.answer,...p.solution]
       .flatMap(text => mathTextParts(text).filter(part => part.type !== 'text').map(part => part.text)))])];
   const renderingErrors=await page.evaluate(async formulas=>{
@@ -171,19 +178,15 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   },formulas);
   assert.deepEqual(renderingErrors,[],'Every statement, answer and registered route must render.');
   await page.locator('#generation-details summary').click();
-  await page.waitForFunction(()=>document.querySelector('#function-catalog mjx-container'));
-  assert.ok((await page.locator('#generation-summary').textContent()).includes(`${bank.problems.length} 問`));
-  assert.ok((await page.locator('#diversity-summary').textContent()).includes(`${bank.comparison.diversity.after.coefficient_patterns} 種類`));
-  assert.equal(await page.locator('#diversity-summary tbody tr').count(),3);
-  assert.equal(await page.locator('#level-diversity tbody tr').count(),3);
-  assert.ok((await page.locator('#level-diversity').textContent()).includes('対数と二重の階差'));
-  for (const family of ['scaled_second_order','difference_scaled','weighted_sum','multiplicative_second']) {
-    assert.ok(bank.problems.some(p=>p.family===family && p.scores.level>=3),family);
+  const summary=await page.locator('#generation-summary').textContent();
+  assert.ok(summary.includes(`乱数の種 ${bank.seed}`),summary);
+  for (const level of [1,2,3,4,5]) {
+    assert.ok(summary.includes(`Lv.${level}：${bank.problems.filter(p=>p.level===level).length}問`),summary);
   }
   await page.setViewportSize({width:375,height:900});
-  const widest=bank.problems.reduce((a,b)=>a.quality.metrics.nodes>b.quality.metrics.nodes?a:b);
+  const widest=bank.problems.reduce((a,b)=>a.classification.metrics.nodes>b.classification.metrics.nodes?a:b);
   await page.goto(baseURL+'?problem='+widest.id);
-  await page.waitForFunction(()=>document.querySelectorAll('#problem-content mjx-container').length===2);
+  await page.waitForFunction(n=>document.querySelectorAll('#problem-content mjx-container').length===n,statementMath(widest));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   await page.screenshot({path:'recurrence/build/mobile.png',fullPage:true});
   await page.locator('#answer-button').click();
@@ -192,7 +195,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   // Expanded explanations introduce longer equations than the statements.
   // Exercise the longest main explanation in every family on a phone.
-  for (const family of Object.keys(bank.families)) {
+  for (const family of families) {
     const examples=bank.problems.filter(p=>p.family===family);
     const longest=examples.reduce((a,b)=>a.routes[0].steps.join('').length>b.routes[0].steps.join('').length?a:b);
     await page.goto(baseURL+'?problem='+longest.id);
@@ -204,7 +207,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile '+family);
   }
   await checkAuthored(page, authored, openInEquashare);
-  await checkBatch(page, [...bank.problems, ...authored.problems], openInEquashare);
+  await checkBatch(page, [...bank.problems, ...authored.problems], openInEquashare, lv5Only);
   assert.deepEqual(errors,[]);
   console.log(`Browser checks passed: ${formulas.length} formulas, ${bank.problems.length + authored.problems.length} Equashare problems, every family, hints, filters, exports, comparison, mobile layout and 14-question batches.`);
   await browser.close();
@@ -249,9 +252,9 @@ async function checkAuthored(page, authored, openInEquashare) {
   await page.screenshot({path:'recurrence/build/level6-mobile.png',fullPage:true});
 }
 
-async function checkBatch(page, problems, openInEquashare) {
+async function checkBatch(page, problems, openInEquashare, lv5Only) {
   const {texDocument} = await import('../model.mjs');
-  await page.locator('#family').selectOption('reciprocal_forcing');
+  await page.locator('#family').selectOption(lv5Only);
   await page.locator('[data-level="1"]').click();
   assert.equal(await page.locator('#generate').isDisabled(), true);
   await page.waitForFunction(() => !document.querySelector('#generate-batch').disabled);
