@@ -163,7 +163,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
     assert.ok((await alternate.textContent()).includes('方針：'));
   }
   const formulas=[...new Set([...bank.problems.flatMap(p=>[...p.statement.initials_tex,...p.statement.recurrences_tex,p.answer_tex,
-    ...p.routes.flatMap(r=>[r.hint,...r.steps].flatMap(text=>mathTextParts(text).filter(part=>part.type!=='text').map(part=>part.text))) ]),
+    ...p.routes.flatMap(r=>[r.hint,...r.steps].flatMap(text=>mathTextParts(textbookText(text)).filter(part=>part.type!=='text').map(part=>part.text))) ]),
     ...authored.problems.flatMap(p => [p.statement,p.hint,p.answer,...p.solution]
       .flatMap(text => mathTextParts(text).filter(part => part.type !== 'text').map(part => part.text)))])];
   const renderingErrors=await page.evaluate(async formulas=>{
@@ -189,6 +189,15 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   await page.waitForFunction(n=>document.querySelectorAll('#problem-content mjx-container').length===n,statementMath(widest));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   await page.screenshot({path:'recurrence/build/mobile.png',fullPage:true});
+  // On a phone the problem sits below the settings; generating must reveal it.
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.locator('#generate').click();
+  // The page end can stop the scroll a little short of the top.
+  await page.waitForFunction(()=>{const top=document.querySelector('.exercise').getBoundingClientRect().top; return top>-2 && top<innerHeight/4;});
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'problem-title');
+  // Long display equations break at operators instead of overflowing.
+  const overflowing=await page.evaluate(()=>[...document.querySelectorAll('#problem-content .math-block')].filter(b=>b.scrollWidth>b.clientWidth+2).length);
+  assert.equal(overflowing,0,'Problem equations fit the phone width');
   await page.locator('#answer-button').click();
   await page.waitForFunction(()=>document.querySelector('#answer-formula mjx-container'));
   await page.screenshot({path:'recurrence/build/mobile-answer.png',fullPage:true});
