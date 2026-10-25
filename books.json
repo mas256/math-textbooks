@@ -24,5 +24,18 @@
       "微分積分",
       "積分"
     ]
+  },
+  {
+    "title": "微積分の体系的解説",
+    "category": "微分・積分",
+    "description": "運動と図形から微分・積分を導き、計算の考え方、別解、応用まで体系的に解説します。",
+    "site": "https://mas256.github.io/Integral/",
+    "repository": "https://github.com/mas256/Integral",
+    "releases": "https://github.com/mas256/Integral/releases",
+    "tags": [
+      "高校数学",
+      "微分積分",
+      "積分"
+    ]
   }
 ]
