@@ -1,5 +1,5 @@
 {
-  "bank_sha256": "4990aa681efafe6290f9557f925366919353a485f5219e1a35da8a42d7bf1da9",
+  "bank_sha256": "9cb1204857f1ec9a008c3eee430a55c2dc792cc2d8ebef56c8e8a841e67a840c",
   "count": 150,
   "counts": {
     "1": 30,
@@ -8,7 +8,7 @@
     "4": 30,
     "5": 30
   },
-  "elapsed_seconds": 108,
+  "elapsed_seconds": 239,
   "engine_version": "0.4.0",
   "finite_checked_terms": 20,
   "lean_rejected": [],
@@ -17,7 +17,7 @@
   "seed": "16719389825307286709",
   "status": "lean-verified",
   "engine_repository": "mas256/recurrence-equation-generator",
-  "engine_revision": "3a6b7ee7468020b16e4f0d9d5d876ea7a9466546",
-  "generated_at": "2026-10-23T15:35:37+00:00",
+  "engine_revision": "0de3d43f30ba3531875a8dbebcd01ca84d68400c",
+  "generated_at": "2026-10-24T03:40:15+00:00",
   "run_id": null
 }

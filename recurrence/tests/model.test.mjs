@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, equashareSource } from '../model.mjs';
+import { poolFor, chooseProblem, validateBank, texDocument, routeComparison, textbookText, equashareSource, inlineFormulas } from '../model.mjs';
 
 const p = (id, family, level) => ({id,family,level});
 const bank = {problems:[p('p001','a',1),p('p002','a',1),p('p003','b',2)]};
@@ -109,4 +109,19 @@ test('family weights still bias the choice and exhausted families disappear', ()
   const seen=new Set();
   assert.equal(chooseProblem(pool,seen,()=>0.4,{mobius:2}).family,'mobius');
   assert.equal(chooseProblem(pool,seen,()=>0.9,{mobius:2}).family,'a');
+});
+
+test('plain-text formulas in engine prose are typeset, and unparsable text is left alone', () => {
+  assert.equal(inlineFormulas('a_n=S_n−S_(n−1)で求める。'), '\\(a_{n}=S_{n}-S_{n-1}\\)で求める。');
+  assert.equal(inlineFormulas('x_n=x_1^(2^(n−1))'), '\\(x_{n}=x_{1}^{2^{n-1}}\\)');
+  assert.equal(inlineFormulas('倍率g_nとg_{n+1}'), '倍率\\(g_{n}\\)と\\(g_{n+1}\\)');
+  assert.equal(inlineFormulas('v_1…v_{n−1}'), '\\(v_{1}\\ldots v_{n-1}\\)');
+  assert.equal(inlineFormulas('n≥1で正'), 'n≥1で正');
+  assert.equal(inlineFormulas('f_(n'), 'f_(n');
+  assert.equal(inlineFormulas('H(k)r^(k−1)'), '\\(H(k)r^{k-1}\\)');
+  // Formulas already delimited by the engine are not touched again.
+  assert.equal(textbookText('\\(a_n\\) です。'), '\\(a_n\\) である。');
+  const tex = texDocument(generated({routes:[{...generated().routes[0], steps:['a_n=S_n−S_(n−1)を使う。']}]}), true);
+  assert.ok(tex.includes('\\(a_{n}=S_{n}-S_{n-1}\\)を使う。'));
+  assert.ok(!tex.includes('\\_'));
 });

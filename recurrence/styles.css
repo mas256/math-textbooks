@@ -133,3 +133,4 @@ mjx-container[display=true] { margin:14px 0 !important; max-width:100%; }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; scroll-behavior:auto !important; } }
 @media print { .header,.intro,.controls,.about,.footer,.problem-actions,.export-bar,.recipe-details,.math-warning,.hints { display:none !important; } main { width:100%; } .workspace { display:block; } .exercise { border:0; padding:0; } .problem-content { min-height:0; } .answer { break-before:page; } body { background:white; } .alternate { break-inside:avoid; } .problem-id { color:black; } }
 @media print { .question-actions,.question-hint { display:none !important; } .batch-question-heading { break-after:avoid; } .batch-question,.batch-solution { padding:16px 0; } }
+#problem-title:focus { outline:none; }
