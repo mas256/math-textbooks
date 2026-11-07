@@ -4,10 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f4ee">
-  <meta name="description" content="公開中の数学教科書やその他の著作物を探せる本棚です。">
+  <meta name="description" content="無料で読める数学の教科書と、演習用のツールを並べた本棚です。">
   <title>数学書の本棚 — 数学教科書カタログ</title>
-  <link rel="stylesheet" href="styles.css?v=publications">
-  <script src="app.js?v=publications" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap">
+  <link rel="stylesheet" href="styles.css?v=bookshelf">
+  <script src="app.js?v=bookshelf" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -15,52 +18,63 @@
       <span class="brand-mark" aria-hidden="true">∫</span>
       <span>数学書の本棚</span>
     </a>
-
+    <nav class="site-nav" aria-label="サイト内">
+      <a href="#books">教科書</a>
+      <a href="#tools">学習ツール</a>
+      <a href="https://github.com/mas256/math-textbooks" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
   </header>
 
   <main>
-    <section class="product-banner" aria-labelledby="equashare-title">
-      <div class="product-copy">
-        <p class="eyebrow">EQUATION SHARING APP</p>
-        <h1 id="equashare-title">Equashare <span>v5.0.2</span></h1>
-        <p>LaTeXの数式を手軽に画像へ変換して共有できます。</p>
-      </div>
-      <div class="product-actions">
-        <a class="product-download" href="https://github.com/mas256/Equashare/releases/download/v5.0.2/Equashare_5.0.2_x64-setup.exe" download="Equashare_5.0.2_x64-setup.exe">Windows版をダウンロード <span aria-hidden="true">↓</span></a>
-        <a class="product-web" href="./equashare/" target="_blank" rel="noopener noreferrer">Web版を開く <span aria-hidden="true">↗</span></a>
-        <a class="product-web" href="https://github.com/mas256/Equashare" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
-      </div>
-    </section>
-
-    <section class="product-banner recurrence-banner" aria-labelledby="recurrence-title">
-      <div class="product-copy">
-        <p class="eyebrow">RECURRENCE LAB</p>
-        <h2 id="recurrence-title">漸化式の問題生成</h2>
-        <p>難易度を選んで演習。ヒント・解答・別解で、式のつながりを学べます。</p>
-      </div>
-      <div class="product-actions">
-        <a class="product-download" href="./recurrence/">問題をつくる <span aria-hidden="true">↗</span></a>
-      </div>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">数学を、自分のペースで。</h1>
+      <p>無料で読める数学の教科書と、演習用のツールを並べた本棚です。</p>
     </section>
 
     <section class="catalog" id="books" aria-labelledby="catalog-title">
       <div class="section-heading">
-        <div>
-          <p class="eyebrow section-eyebrow">THE COLLECTION</p>
-          <h2 id="catalog-title">公開中の教科書</h2>
-        </div>
+        <h2 id="catalog-title">教科書</h2>
         <p class="catalog-count" id="catalog-count" aria-live="polite">読み込み中…</p>
       </div>
 
       <div class="book-grid" id="book-grid" aria-live="polite" aria-busy="true"></div>
       <p class="load-error" id="load-error" hidden>一覧を読み込めませんでした。時間をおいて再読み込みしてください。</p>
     </section>
+
+    <section class="tools" id="tools" aria-labelledby="tools-title">
+      <div class="tools-inner">
+        <h2 id="tools-title">学習ツール</h2>
+        <div class="tool-grid">
+          <div class="tool-card">
+            <div class="tool-copy">
+              <h3>漸化式の問題生成</h3>
+              <p>難易度を選んで演習。ヒント・解答・別解で、式のつながりを学べます。</p>
+            </div>
+            <div class="tool-actions">
+              <a class="button button-primary" href="./recurrence/">問題をつくる</a>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-copy">
+              <h3>Equashare <span class="tool-version">v5.0.2</span></h3>
+              <p>LaTeXの数式を手軽に画像へ変換して共有できます。</p>
+            </div>
+            <div class="tool-actions">
+              <a class="button button-secondary" href="./equashare/" target="_blank" rel="noopener noreferrer">Web版</a>
+              <a class="button button-secondary" href="https://github.com/mas256/Equashare/releases/download/v5.0.2/Equashare_5.0.2_x64-setup.exe" download="Equashare_5.0.2_x64-setup.exe">Windows版</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
     <a class="brand footer-brand" href="./"><span class="brand-mark" aria-hidden="true">∫</span><span>数学書の本棚</span></a>
-    <span>数学を、自分のペースで。</span>
-    <a href="https://github.com/mas256/math-textbooks">サイトのRepository</a>
+    <span class="footer-links">
+      <a href="https://github.com/mas256/Equashare" target="_blank" rel="noopener noreferrer">EquashareのGitHub</a>
+      <a href="https://github.com/mas256/math-textbooks" target="_blank" rel="noopener noreferrer">サイトのリポジトリ</a>
+    </span>
   </footer>
 </body>
 </html>
