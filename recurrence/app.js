@@ -422,6 +422,12 @@ async function load() {
     const params = new URL(location.href).searchParams;
     const requested = params.get('problem');
     const requestedBatch = params.get('batch');
+    // The bookshelf home links here with ?level=N to start at that difficulty.
+    const requestedLevel = Number(params.get('level'));
+    if (!requested && !requestedBatch && Number.isInteger(requestedLevel) && requestedLevel >= 1 && requestedLevel <= 6) {
+      if (requestedLevel === 6) await authoredLoaded;
+      if (requestedLevel < 6 || state.authored) state.level = requestedLevel;
+    }
     // Single-question practice remains available while the fixed bank loads.
     if (requestedBatch || requested?.startsWith('L6-')) await authoredLoaded;
     const shared = [...state.bank.problems, ...(state.authored?.problems ?? [])].find(p => p.id === requested);
