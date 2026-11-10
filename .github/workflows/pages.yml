@@ -7,6 +7,11 @@ on:
       - "index.html"
       - "styles.css"
       - "app.js"
+      - "book.html"
+      - "book.js"
+      - "lib.js"
+      - "shell.css"
+      - "shell.js"
       - "books.json"
       - "tests/**"
       - "equashare/**"
@@ -65,7 +70,7 @@ jobs:
           books = json.loads(Path("books.json").read_text(encoding="utf-8"))
           assert isinstance(books, list) and books, "books.json must be a non-empty array"
           ids = set()
-          required = ("title", "category", "description", "site", "repository", "releases")
+          required = ("id", "title", "category", "description", "site", "repository", "releases")
           for book in books:
               for key in required:
                   assert isinstance(book.get(key), str) and book[key].strip(), f"missing {key}: {book}"
@@ -84,6 +89,7 @@ jobs:
         run: |
           python3 -m http.server 8788 --directory site --bind 127.0.0.1 > /tmp/recurrence-site-http.log 2>&1 &
           RECURRENCE_BASE_URL=http://127.0.0.1:8788/recurrence/ NODE_PATH=/tmp/recurrence-browser/node_modules node recurrence/tests/site-browser.cjs
+          CATALOG_TEST_URL=http://127.0.0.1:8788/ NODE_PATH=/tmp/recurrence-browser/node_modules node tests/catalog-browser.cjs
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3

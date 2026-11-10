@@ -47,6 +47,9 @@ function url(path) {
       assert.equal(await page.locator('#problem-level').textContent(), `Lv.${level}`);
       await page.waitForFunction(() => document.querySelector('#problem-content mjx-container'));
     }
+    // The bookshelf home opens the generator at a chosen difficulty.
+    await page.goto(url('./?level=4'));
+    await page.locator('#problem-level').filter({hasText: 'Lv.4'}).waitFor();
     const generated = bank.problems[0];
     await page.goto(url('./?problem=' + generated.id));
     await page.waitForFunction(id => document.getElementById('problem-id').textContent === id, generated.id.toUpperCase());

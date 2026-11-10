@@ -2,7 +2,7 @@ name: Check catalog reading links
 
 on:
   pull_request:
-    paths: ['app.js', 'styles.css', 'books.json', 'tests/**', '.github/workflows/catalog-check.yml']
+    paths: ['index.html', 'app.js', 'styles.css', 'book.html', 'book.js', 'lib.js', 'shell.css', 'shell.js', 'books.json', 'tests/**', 'recurrence/scripts/assemble-site.py', '.github/workflows/catalog-check.yml']
 
 permissions:
   contents: read
@@ -20,3 +20,9 @@ jobs:
         run: |
           python3 -m http.server 8787 --bind 127.0.0.1 > /tmp/catalog-http.log 2>&1 &
           NODE_PATH=/tmp/recurrence-browser/node_modules node tests/catalog-browser.cjs
+      - name: Check the assembled site
+        run: |
+          python3 recurrence/scripts/assemble-site.py
+          python3 -m http.server 8788 --directory site --bind 127.0.0.1 > /tmp/site-http.log 2>&1 &
+          sleep 1
+          CATALOG_TEST_URL=http://127.0.0.1:8788/ NODE_PATH=/tmp/recurrence-browser/node_modules node tests/catalog-browser.cjs

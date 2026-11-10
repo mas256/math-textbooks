@@ -1,189 +1,161 @@
-const grid = document.querySelector("#book-grid");
-const count = document.querySelector("#catalog-count");
-const loadError = document.querySelector("#load-error");
-// Cover colors, assigned in books.json order. Each passes 4.5:1 against the cover text color.
-const COVER_COLORS = ["#245c54", "#2f3f6b", "#7a3f2a", "#4b3a63", "#4f5a2c", "#5b3a4a"];
-let books = [];
+// ホーム:前回開いた本、教科書の一覧、演習の入口、最近の更新。
+import {
+  bookColor, bookUrl, chapterCount, el, loadBooks, loadCatalog,
+  pdfUrl, readLastOpened, readingLink, disabledLink, siteUrl, timeElement,
+} from "./lib.js";
 
-function createTextElement(tagName, className, text) {
-  const element = document.createElement(tagName);
-  if (className) element.className = className;
-  element.textContent = text;
-  return element;
+const grid = document.getElementById("book-grid");
+const count = document.getElementById("catalog-count");
+const loadError = document.getElementById("load-error");
+
+const KIND_LABEL = {
+  release: "PDF(A4版)で開いていました",
+  mobile: "スマホ版で開いていました",
+  latest: "作成中の版を開いていました",
+  "latest-mobile": "作成中の版(スマホ版)を開いていました",
+};
+
+function bookCard(book) {
+  const i = book.index;
+  const titleLink = el("a", { href: bookUrl(book), id: "book-link-" + i }, book.title);
+  const title = el("h3", { id: "book-title-" + i }, titleLink);
+  const pdf = disabledLink("PDF", { class: "button button-solid", id: "release-pdf-" + i, "aria-label": book.title + "をPDFで読む" });
+  const second = el("a", { class: "button", href: bookUrl(book), id: "book-detail-" + i, "aria-label": book.title + "の詳細" }, "詳細");
+  const meta = el("p", { class: "book-meta" },
+    el("span", { id: "book-chapters-" + i }),
+    el("span", { id: "release-version-" + i }, "確認中…"),
+    el("span", { id: "book-formats-" + i }));
+  return el("article", { class: "book-card", id: "book-card-" + i, "aria-labelledby": "book-title-" + i },
+    el("p", { class: "eyebrow book-category" },
+      el("span", { class: "shell-dot", style: `--dot: ${bookColor(i)}`, "aria-hidden": "true" }), book.category || ""),
+    title,
+    el("p", { class: "description" }, book.description || ""),
+    meta,
+    el("div", { class: "card-actions", id: "book-actions-" + i }, pdf, second));
 }
 
-function externalLink(href, label, className, ariaLabel) {
-  const link = document.createElement("a");
-  if (href) link.href = href;
-  else link.setAttribute("aria-disabled", "true");
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.textContent = label;
-  if (className) link.className = className;
-  if (ariaLabel) link.setAttribute("aria-label", ariaLabel);
-  return link;
+function fillCard(book, catalog) {
+  const i = book.index;
+  document.getElementById("book-link-" + i).textContent = catalog.title;
+  document.getElementById("release-version-" + i).textContent = catalog.release.version;
+  const chapters = chapterCount(catalog);
+  document.getElementById("book-chapters-" + i).textContent = chapters ? chapters + "章 · " : "";
+  document.getElementById("book-formats-" + i).textContent = catalog.release.mobile ? " · A4 / スマホ" : " · A4";
+  const pdf = readingLink(book, pdfUrl(book, catalog.release), "PDF", "release", {
+    class: "button button-solid", id: "release-pdf-" + i, "aria-label": catalog.title + "をPDFで読む",
+  });
+  const actions = document.getElementById("book-actions-" + i);
+  if (catalog.release.mobile) {
+    const mobile = readingLink(book, pdfUrl(book, catalog.release.mobile), "スマホ版", "mobile", {
+      class: "button", id: "release-mobile-pdf-" + i, "aria-label": catalog.title + "をスマホ版で読む",
+    });
+    actions.replaceChildren(pdf, mobile);
+  } else {
+    actions.replaceChildren(pdf, document.getElementById("book-detail-" + i));
+  }
 }
 
-function bookCard(book, index) {
-  const name = book.title || "書籍";
-  const article = document.createElement("article");
-  article.className = "book-card";
-  article.setAttribute("aria-labelledby", "book-title-" + index);
-
-  const cover = createTextElement("div", "book-cover", "");
-  cover.style.setProperty("--cover", COVER_COLORS[index % COVER_COLORS.length]);
-  const title = createTextElement("h3", "", book.title || "書名未登録");
-  title.id = "book-title-" + index;
-  cover.append(createTextElement("p", "book-category", book.category || ""), title);
-
-  const body = createTextElement("div", "book-body", "");
-  const description = createTextElement("p", "description", book.description || "");
-
-  const meta = createTextElement("p", "book-meta", "正式版 ");
-  const version = createTextElement("span", "", "確認中…");
-  version.id = "release-version-" + index;
-  const dateWrap = createTextElement("span", "", " · ");
-  dateWrap.id = "release-date-" + index;
-  dateWrap.hidden = true;
-  const releaseTime = createTextElement("time", "", "");
-  releaseTime.id = "release-updated-" + index;
-  dateWrap.append(releaseTime, document.createTextNode(" 更新"));
-  meta.append(version, dateWrap);
-
-  const actions = createTextElement("div", "book-actions", "");
-  const primaryLink = externalLink(null, "PDFで読む", "button button-primary", name + "をPDFで読む");
-  primaryLink.id = "release-pdf-" + index;
-  const mobileLink = externalLink(null, "スマホ版で読む", "button button-secondary", name + "をスマホ版で読む");
-  mobileLink.id = "release-mobile-pdf-" + index;
-  mobileLink.hidden = true;
-  actions.append(primaryLink, mobileLink);
-
-  const links = createTextElement("div", "book-links", "");
-  const dev = createTextElement("span", "dev-links", "");
-  dev.id = "latest-links-" + index;
-  dev.hidden = true;
-  const latestLink = externalLink(null, "開発中の版", "", name + "の開発中の版（PDF）");
-  latestLink.id = "latest-pdf-" + index;
-  const latestMobileLink = externalLink(null, "スマホ版", "", name + "の開発中の版（スマホ版）");
-  latestMobileLink.id = "latest-mobile-pdf-" + index;
-  latestMobileLink.hidden = true;
-  const latestTime = createTextElement("time", "", "");
-  latestTime.id = "latest-updated-" + index;
-  const latestDate = createTextElement("span", "", "");
-  latestDate.append("· ", latestTime, " 更新");
-  dev.append(latestLink, latestMobileLink, latestDate);
-  links.append(dev,
-    externalLink(book.releases, "過去の版", "", name + "の過去の版"),
-    externalLink(book.repository, "GitHub", "", name + "のRepository"));
-
-  body.append(description, meta, actions, links);
-  article.append(cover, body);
-  return article;
+function failCard(book, error) {
+  document.getElementById("release-version-" + book.index).textContent = "取得できません";
+  console.warn("公開PDF情報を取得できませんでした:", book.site, error);
 }
 
-function render() {
-  grid.replaceChildren(...books.map((book, index) => bookCard(book, index)));
+function resumeLink(book, catalog, kind) {
+  if (kind === "mobile" && catalog.release.mobile) return pdfUrl(book, catalog.release.mobile);
+  if (kind === "latest" && catalog.latest) return pdfUrl(book, catalog.latest, true);
+  if (kind === "latest-mobile" && catalog.latest?.mobile) return pdfUrl(book, catalog.latest.mobile, true);
+  return pdfUrl(book, catalog.release);
+}
+
+async function showResume(books) {
+  const last = readLastOpened();
+  const book = last && books.find((candidate) => candidate.id === last.id);
+  if (!book) return;
+  const section = document.getElementById("resume");
+  section.style.setProperty("--dot", bookColor(book.index));
+  document.getElementById("resume-title").textContent = book.title;
+  document.getElementById("resume-kind").textContent = KIND_LABEL[last.kind] || KIND_LABEL.release;
+  document.getElementById("resume-meta").replaceChildren("この端末で前回開いた本 · ", timeElement(last.at));
+  const detail = el("a", { class: "button", href: bookUrl(book) }, "本の詳細");
+  const actions = document.getElementById("resume-actions");
+  actions.replaceChildren(detail);
+  section.hidden = false;
+  try {
+    const catalog = await loadCatalog(book);
+    document.getElementById("resume-title").textContent = catalog.title;
+    actions.replaceChildren(
+      readingLink(book, resumeLink(book, catalog, last.kind), "続きを読む", last.kind, { class: "button button-accent", id: "resume-open" }),
+      detail);
+  } catch {
+    // The detail link stays available when the catalog cannot be read.
+  }
+}
+
+function renderUpdates(books, results) {
+  const list = document.getElementById("update-list");
+  const events = [];
+  books.forEach((book, i) => {
+    if (results[i].status !== "fulfilled") return;
+    const catalog = results[i].value;
+    const releases = catalog.history.length
+      ? catalog.history
+      : [{ version: catalog.release.version, published_at: catalog.release.updated_at }];
+    for (const release of releases) {
+      events.push({ book, at: release.published_at, text: `${catalog.title} ${release.version} を公開` });
+    }
+    if (catalog.latest) {
+      events.push({ book, at: catalog.latest.updated_at, text: `${catalog.title} 作成中の版を更新` });
+    }
+  });
+  events.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  list.replaceChildren(...events.slice(0, 6).map((event) => el("li", {},
+    timeElement(event.at),
+    el("span", {},
+      el("span", { class: "shell-dot", style: `--dot: ${bookColor(event.book.index)}`, "aria-hidden": "true" }),
+      el("a", { href: bookUrl(event.book) }, event.text)))));
+  if (!events.length) list.replaceChildren(el("li", { class: "muted" }, "更新情報を取得できませんでした。"));
+  list.setAttribute("aria-busy", "false");
+}
+
+function setupDrill() {
+  const start = document.getElementById("drill-start");
+  const buttons = [...document.querySelectorAll(".level-grid button[data-level]")];
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      for (const other of buttons) other.setAttribute("aria-pressed", String(other === button));
+      start.href = siteUrl("recurrence/?level=" + button.dataset.level);
+    });
+  }
+}
+
+async function main() {
+  setupDrill();
+  let books;
+  try {
+    books = await loadBooks();
+  } catch (error) {
+    loadError.hidden = false;
+    count.textContent = "";
+    grid.setAttribute("aria-busy", "false");
+    console.error(error);
+    renderUpdates([], []);
+    return;
+  }
+  grid.replaceChildren(...books.map(bookCard));
   count.textContent = books.length + "冊 · すべて無料";
-  grid.hidden = books.length === 0;
-}
-function pdfUrl(site, info, development = false) {
-  // Encode the title as a filename, including characters such as # and %.
-  const url = new URL(encodeURIComponent(info.pdf), site);
-  if (development) url.searchParams.set("sha", info.sha256);
-  return url.href;
-}
-
-function validateCatalog(catalog) {
-  if (catalog.schema_version !== 1 || typeof catalog.title !== "string" || !catalog.title) {
-    throw new Error("公開PDF情報の形式が正しくありません");
-  }
-  if (!catalog.release) throw new Error("正式Release情報がありません");
-  for (const [kind, info] of [["release", catalog.release], ["latest", catalog.latest]]) {
-    if (!info) continue;
-    if (!/^v\d+\.\d+\.\d+$/.test(info.version)
-      || !/^[a-f0-9]{64}$/.test(info.sha256)
-      || !Number.isFinite(Date.parse(info.updated_at))) {
-      throw new Error("公開PDFのバージョン・日時・SHA-256が正しくありません");
-    }
-    const expected = (kind === "latest" ? "latest-" : "") + catalog.title + "-" + info.version + ".pdf";
-    if (info.pdf !== expected || /[\\/]/.test(info.pdf)) {
-      throw new Error("公開PDFのファイル名が正しくありません");
-    }
-    if (info.mobile) {
-      const mobileExpected = (kind === "latest" ? "latest-" : "")
-        + catalog.title + "-スマホ版-" + info.version + ".pdf";
-      if (info.mobile.pdf !== mobileExpected || !/^[a-f0-9]{64}$/.test(info.mobile.sha256)) {
-        throw new Error("スマホ版PDFのファイル名・SHA-256が正しくありません");
-      }
-    }
-  }
-  return catalog;
-}
-
-function showUpdatedDate(element, value) {
-  const date = new Date(value);
-  element.dateTime = value;
-  element.textContent = new Intl.DateTimeFormat("ja-JP", {
-    timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(date);
-  element.title = new Intl.DateTimeFormat("ja-JP", {
-    timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-  }).format(date) + " JST";
-}
-
-async function updatePublications() {
-  await Promise.all(books.map(async (book, index) => {
-    const version = document.getElementById("release-version-" + index);
+  showResume(books);
+  const results = await Promise.allSettled(books.map(async (book) => {
     try {
-      const site = new URL(book.site);
-      if (site.protocol !== "https:") throw new Error("Pages URLはHTTPSで指定してください");
-      const response = await fetch(new URL("catalog.json", site), { cache: "no-store" });
-      if (!response.ok) throw new Error("公開PDF情報: " + response.status);
-      const catalog = validateCatalog(await response.json());
-      document.getElementById("book-title-" + index).textContent = catalog.title;
-      version.textContent = catalog.release.version;
-      version.title = "Pagesで配信中の正式Release";
-      for (const kind of ["release", "latest"]) {
-        const info = catalog[kind];
-        if (!info) continue;
-        showUpdatedDate(document.getElementById(kind + "-updated-" + index), info.updated_at);
-        const link = document.getElementById(kind + "-pdf-" + index);
-        link.href = pdfUrl(site, info, kind === "latest");
-        link.removeAttribute("aria-disabled");
-        if (info.mobile) {
-          const mobileLink = document.getElementById(kind + "-mobile-pdf-" + index);
-          mobileLink.href = pdfUrl(site, info.mobile, kind === "latest");
-          mobileLink.removeAttribute("aria-disabled");
-          mobileLink.hidden = false;
-        }
-      }
-      document.getElementById("release-date-" + index).hidden = false;
-      document.getElementById("latest-links-" + index).hidden = !catalog.latest;
+      const catalog = await loadCatalog(book);
+      fillCard(book, catalog);
+      return catalog;
     } catch (error) {
-      version.textContent = "取得できません";
-      console.warn("公開PDF情報を取得できませんでした:", book.site, error);
+      failCard(book, error);
+      throw error;
     }
   }));
+  grid.setAttribute("aria-busy", "false");
+  renderUpdates(books, results);
 }
 
-async function loadBooks() {
-  try {
-    const response = await fetch("books.json", { cache: "no-cache" });
-    if (!response.ok) throw new Error("books.json: " + response.status);
-    const data = await response.json();
-    if (!Array.isArray(data)) throw new Error("books.json must contain an array");
-    books = data;
-    grid.setAttribute("aria-busy", "false");
-    render();
-    void updatePublications();
-  } catch (error) {
-    console.error(error);
-    grid.hidden = true;
-    count.textContent = "";
-    loadError.hidden = false;
-    grid.setAttribute("aria-busy", "false");
-  }
-}
-
-loadBooks();
+main();
