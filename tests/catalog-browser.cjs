@@ -38,11 +38,15 @@ const noOverflow = async (page, label) => assert.ok(
 
 (async () => {
   const browser = await chromium.launch({executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
-  const context = await browser.newContext();
-  await context.route('**/catalog.json', route => {
+  // Service workers are checked separately below, so mocked responses are never served from their cache here.
+  const context = await browser.newContext({serviceWorkers: 'block'});
+  let catalogRequests = 0;
+  const mockCatalog = route => {
+    catalogRequests++;
     const book = books.find(candidate => new URL('catalog.json', candidate.site).href === route.request().url());
     return route.fulfill({json: catalogFor(book)});
-  });
+  };
+  await context.route('**/catalog.json', mockCatalog);
   await context.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.fulfill({body: ''}));
   await context.route(/\.pdf(\?|#|$)/, route => route.fulfill({contentType: 'application/pdf', body: '%PDF-test'}));
   const page = await context.newPage();
@@ -85,6 +89,12 @@ const noOverflow = async (page, label) => assert.ok(
       assert.equal(await sidebarLink.isVisible(), true);
     }
   }
+
+  // A reload within the freshness window reuses the saved data without asking the network.
+  const requestsBefore = catalogRequests;
+  await page.reload();
+  await page.locator('#release-version-0').filter({hasText: 'v2.0.1'}).waitFor();
+  assert.equal(catalogRequests, requestsBefore, 'Catalogs are read from the device cache on reload');
 
   // Drill entry keeps the chosen level.
   await page.setViewportSize({width: 1280, height: 900});
@@ -152,7 +162,8 @@ const noOverflow = async (page, label) => assert.ok(
   await page.click('#tab-history');
   assert.equal(await page.locator('#history-list > li').count(), 1);
 
-  // Broken metadata disables only that book.
+  // Broken metadata disables only that book (on a device without saved data).
+  await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('bookshelf:cache:')).forEach(key => localStorage.removeItem(key)));
   corrupt = true;
   await page.goto(base);
   await page.locator('#release-version-0').filter({hasText: '取得できません'}).waitFor();
@@ -170,6 +181,28 @@ const noOverflow = async (page, label) => assert.ok(
   }
 
   assert.deepEqual(errors, []);
+
+  // The assembled site installs a service worker; afterwards pages open without the network.
+  if (process.env.CATALOG_TEST_URL) {
+    const swContext = await browser.newContext();
+    await swContext.route('**/catalog.json', mockCatalog);
+    await swContext.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.fulfill({body: ''}));
+    const swPage = await swContext.newPage();
+    await swPage.goto(base);
+    await swPage.locator('#release-version-0').filter({hasText: 'v2.0.1'}).waitFor();
+    await swPage.evaluate(() => navigator.serviceWorker.ready);
+    await swPage.reload();
+    assert.ok(await swPage.evaluate(() => Boolean(navigator.serviceWorker.controller)), 'The service worker controls the page');
+    await swPage.click('#book-link-1');
+    await swPage.locator('#release-version').filter({hasText: 'v2.0.1'}).waitFor();
+    await swContext.setOffline(true);
+    await swPage.goto(base);
+    await swPage.locator('#release-version-0').filter({hasText: 'v2.0.1'}).waitFor();
+    await swPage.click('#book-link-1');
+    await swPage.locator('#release-version').filter({hasText: 'v2.0.1'}).waitFor();
+    await swContext.close();
+  }
+
   await browser.close();
-  console.log('Bookshelf checked: home at 1440/390/320px, book pages, search, theme, last opened, drawer, broken catalog');
+  console.log('Bookshelf checked: home at 1440/390/320px, book pages, search, theme, last opened, drawer, broken catalog, device cache' + (process.env.CATALOG_TEST_URL ? ', service worker offline' : ''));
 })().catch(error => { console.error(error); process.exit(1); });

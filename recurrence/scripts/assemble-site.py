@@ -31,7 +31,8 @@ for name in ("index.html", "books.json") + SHARED:
 for name in ("shell.js", "app.js", "book.js"):
     path = site / name
     path.write_text(path.read_text().replace('from "./lib.js"', f'from "./lib.js?v={revision}"'))
-BOOK_PATH = '<meta name="bookshelf-book-path" content="books/{id}/">'
+BOOK_PATH = '<meta name="bookshelf-book-path" content="books/{id}/">' + f'<meta name="bookshelf-revision" content="{revision}">'
+(site / "sw.js").write_text((ROOT / "sw.js").read_text().replace("__REVISION__", revision))
 
 
 def versioned(text, prefix=""):

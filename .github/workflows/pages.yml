@@ -12,6 +12,7 @@ on:
       - "lib.js"
       - "shell.css"
       - "shell.js"
+      - "sw.js"
       - "books.json"
       - "tests/**"
       - "equashare/**"

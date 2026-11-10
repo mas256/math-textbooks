@@ -378,9 +378,15 @@ function updateBatchAvailability() {
   $('batch-status').textContent = `難易度6は固定問題${state.authored.problems.length}問から選びます。`;
 }
 
+// The deployed bank is tied to the site revision, so the browser may keep it until the next deploy.
+function dataVersion() {
+  const revision = document.querySelector('meta[name="recurrence-site-revision"]')?.content;
+  return revision ? '?v=' + encodeURIComponent(revision) : '';
+}
+
 async function loadAuthored() {
   try {
-    const response = await fetch('./data/level6.json', {cache:'no-store'});
+    const response = await fetch('./data/level6.json' + dataVersion());
     if (!response.ok) throw new Error('難易度6の固定問題を取得できませんでした。');
     state.authored = validateAuthoredBank(await response.json());
     $('level-six').disabled = false;
@@ -399,7 +405,7 @@ async function loadAuthored() {
 async function load() {
   const authoredLoaded = loadAuthored();
   try {
-    const responses = await Promise.all(['manifest.json', 'problems.json'].map(path => fetch('./data/' + path, {cache:'no-store'})));
+    const responses = await Promise.all(['manifest.json', 'problems.json'].map(path => fetch('./data/' + path + dataVersion())));
     for (const r of responses) if (!r.ok) throw new Error('問題データを取得できませんでした。');
     const manifest = await responses[0].json();
     const bytes = await responses[1].arrayBuffer();
