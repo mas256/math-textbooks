@@ -2,7 +2,7 @@ name: Check catalog reading links
 
 on:
   pull_request:
-    paths: ['index.html', 'app.js', 'styles.css', 'book.html', 'book.js', 'lib.js', 'shell.css', 'shell.js', 'books.json', 'tests/**', 'recurrence/scripts/assemble-site.py', '.github/workflows/catalog-check.yml']
+    paths: ['index.html', 'app.js', 'styles.css', 'book.html', 'book.js', 'lib.js', 'shell.css', 'shell.js', 'sw.js', 'books.json', 'tests/**', 'recurrence/scripts/assemble-site.py', '.github/workflows/catalog-check.yml']
 
 permissions:
   contents: read

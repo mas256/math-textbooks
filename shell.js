@@ -1,5 +1,5 @@
 // 共通の外枠:サイドバー、メニュー(狭い画面)、明暗の切り替え、章・節の検索。
-import { bookColor, bookUrl, el, loadBooks, loadCatalog, siteUrl } from "./lib.js";
+import { REVISION, bookColor, bookUrl, el, loadBooks, loadCatalog, siteUrl } from "./lib.js";
 
 const THEME_KEY = "bookshelf:theme";
 const page = document.body.dataset.page || "";
@@ -207,3 +207,10 @@ document.addEventListener("keydown", (event) => {
   event.preventDefault();
   openSearch();
 });
+
+// 公開サイトでは、サイトの部品と取得したデータを端末にキャッシュする(sw.js)。
+if (REVISION !== "dev" && "serviceWorker" in navigator) {
+  addEventListener("load", () => {
+    navigator.serviceWorker.register(siteUrl("sw.js"), { scope: siteUrl("./") }).catch(() => {});
+  });
+}

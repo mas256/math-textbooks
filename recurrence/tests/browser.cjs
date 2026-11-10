@@ -7,7 +7,7 @@ const baseURL = process.env.RECURRENCE_BASE_URL || (process.env.RECURRENCE_TEST_
   const {textbookText, mathTextParts, equashareSource} = await import('../model.mjs');
   fs.mkdirSync('recurrence/build',{recursive:true});
   const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
-  const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
+  const page = await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1,serviceWorkers:'block'});
   const bank=JSON.parse(fs.readFileSync('recurrence/bank/problems.json','utf8'));
   const authored=JSON.parse(fs.readFileSync('recurrence/authored/level6.json','utf8'));
   const families=[...new Set(bank.problems.map(p=>p.family))];
@@ -360,7 +360,7 @@ async function checkBatch(page, problems, openInEquashare, lv5Only) {
   assert.equal(await page.locator('#single-answer').isVisible(), true);
   assert.equal(await page.locator('#batch-answers').isVisible(), false);
   // An unavailable fixed bank must not yield a partial batch or break single practice.
-  await page.route('**/data/level6.json', route => route.fulfill({status:503,body:''}));
+  await page.route(/\/data\/level6\.json(\?|$)/, route => route.fulfill({status:503,body:''}));
   await page.goto(baseURL+'?batch=missing');
   await page.waitForFunction(() => document.querySelector('#batch-status').textContent.includes('取得できません'));
   await page.waitForFunction(() => !document.querySelector('#generate').disabled);

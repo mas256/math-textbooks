@@ -19,27 +19,80 @@ export function bookColor(index) {
   return `var(--book-${index % 6})`;
 }
 
+// 取得したデータはこの端末に保存し、次回からは保存分をすぐ使う(古ければ裏で取り直す)。
+const CACHE_PREFIX = "bookshelf:cache:";
+const FRESH_MS = 10 * 60 * 1000;
+const KEEP_MS = 30 * 24 * 60 * 60 * 1000;
+export const REVISION = document.querySelector('meta[name="bookshelf-revision"]')?.content || "dev";
+
+function readCache(key) {
+  try {
+    const entry = JSON.parse(localStorage.getItem(CACHE_PREFIX + key) || "null");
+    if (entry && Date.now() - entry.at < KEEP_MS) return entry;
+  } catch {
+    // Unreadable storage behaves like an empty cache.
+  }
+  return null;
+}
+
+function writeCache(key, data) {
+  try {
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ at: Date.now(), data }));
+  } catch {
+    // Storage may be full or disabled; the data was still used for this page.
+  }
+}
+
+// Stale-while-revalidate: a valid saved copy is returned at once; when it is older
+// than FRESH_MS it is refreshed in the background for the next page.
+function cachedJson(key, url, validate) {
+  const refresh = async () => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(new URL(url).pathname + ": " + response.status);
+    const data = await response.json();
+    const value = validate(data);
+    writeCache(key, data);
+    return value;
+  };
+  const hit = readCache(key);
+  if (hit) {
+    try {
+      const value = validate(hit.data);
+      if (Date.now() - hit.at > FRESH_MS) refresh().catch(() => {});
+      return Promise.resolve(value);
+    } catch {
+      // A saved copy that no longer validates is ignored.
+    }
+  }
+  return refresh();
+}
+
+function validateBooks(books) {
+  if (!Array.isArray(books)) throw new Error("books.json must be an array");
+  return books.map((book, index) => ({ ...book, index }));
+}
+
 let booksPromise;
 export function loadBooks() {
-  booksPromise ??= fetch(siteUrl("books.json"), { cache: "no-cache" }).then(async (response) => {
-    if (!response.ok) throw new Error("books.json: " + response.status);
-    const books = await response.json();
-    if (!Array.isArray(books)) throw new Error("books.json must be an array");
-    return books.map((book, index) => ({ ...book, index }));
-  });
+  // The key includes the deployed revision so a new deploy reads the new list at once.
+  booksPromise ??= cachedJson("books:" + REVISION, siteUrl("books.json"), validateBooks);
+  try {
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith(CACHE_PREFIX + "books:") && key !== CACHE_PREFIX + "books:" + REVISION) localStorage.removeItem(key);
+    }
+  } catch {
+    // Nothing to clean up without storage.
+  }
   return booksPromise;
 }
 
 const catalogPromises = new Map();
 export function loadCatalog(book) {
   if (!catalogPromises.has(book.site)) {
-    catalogPromises.set(book.site, (async () => {
-      const site = new URL(book.site);
-      if (site.protocol !== "https:") throw new Error("Pages URLはHTTPSで指定してください");
-      const response = await fetch(new URL("catalog.json", site), { cache: "no-store" });
-      if (!response.ok) throw new Error("公開PDF情報: " + response.status);
-      return validateCatalog(await response.json());
-    })());
+    const site = new URL(book.site);
+    catalogPromises.set(book.site, site.protocol !== "https:"
+      ? Promise.reject(new Error("Pages URLはHTTPSで指定してください"))
+      : cachedJson("catalog:" + book.site, new URL("catalog.json", site).href, validateCatalog));
   }
   return catalogPromises.get(book.site);
 }
